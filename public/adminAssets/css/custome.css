@@ -1,0 +1,92 @@
+.main-logo{
+    height: 100px !important;
+}
+.header-layout4 .header-top {
+    padding: 0px 0 0 !important;
+}
+
+.search-filters{
+  margin-top: 200px !important;
+
+}
+.search-filters .service-form-wrap{
+    background-color: #0068A5 !important;
+    
+}
+
+.search-btn{
+    background-color: black !important;
+}
+.footer-layout4 {
+    padding-top: 0px !important;
+}
+.serarch-filter .col-lg-2 {
+    width: 21%;
+}
+.serarch-filter{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.serarch-filter{
+    margin-bottom: 30px;
+}
+.service-form-wrap h3{
+    color: white !important;
+}
+
+
+
+/* loginpage css  */
+.password-input .form-control {
+    border-top-right-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+}
+
+.password-input .eye-btn {
+    border-top-left-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+    height: 48px;
+    border: 1px solid #0068A5;
+  
+   
+
+}
+
+.login-form .form-control {
+    height: 48px;
+    background: #fff;
+    color: #000;
+    font-size: 16px;
+    border-radius: 5px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border: 1px solid #0068A5;
+    
+}
+.login-form .form-control::placeholder{
+    color: rgb(184, 185, 185);
+}
+
+.login-screen .container{
+    width: 1020px !important;
+}
+
+.login-screen .btn {
+    padding: 17px 30px 15px;
+    overflow: hidden;
+}
+.login-screen .password-input .eye-btn {
+    background-color: rgba(241, 239, 240, 0.3) !important;
+    color: rgb(15, 15, 15) !important;
+}
+.login-screen .password-input .eye-btn:hover {
+   
+    color: rgb(243, 240, 240) !important;
+}
+
+@media screen and (max-width: 768px) {
+    .login-screen .container {
+        width: 100% !important;
+    }
+}
