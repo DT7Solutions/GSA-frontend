@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from "react";
 import HeaderFive from "../components/HeaderFive";
-// import HeroSix from "../components/HeroSix";
+import HeroSix from "../components/HeroSix";
 import HeroFive from "../components/HeroFive";
 // import CarBrands from "../components/CarBrands";
-// import FeatureArea from "../components/FeatureArea"
+import FeatureArea from "../components/FeatureArea"
 import CategoryAreaOne from "../components/CategoryAreaOne";
-// import ProductAreaOne from "../components/ProductAreaOne";
-// import CTAAreaTwo from "../components/CTAAreaTwo";
+import ProductAreaOne from "../components/ProductAreaOne";
+import CTAAreaTwo from "../components/CTAAreaTwo";
 import ProductAreaTwo from "../components/ProductAreaTwo";
 import FaqAreaThree from "../components/FaqAreaThree";
 import ClientAreaFour from "../components/ClientAreaFour";
 import BlogAreaTwo from "../components/BlogAreaTwo";
-// import SubscribeTwo from "../components/SubscribeTwo";
+import SubscribeTwo from "../components/SubscribeTwo";
 import FooterAreaFour from "../components/FooterAreaFour";
 import Preloader from "../helper/Preloader";
 // import ServiceAreaThree from "../components/ServiceAreaThree";
 import TestimonialOne from "../components/TestimonialOne";
 
-// import CategoriesSection from "../components/CategoriesSection";
+import CategoriesSection from "../components/CategoriesSection";
 import CurrentOffers from "../components/CurrentOffersSection";
 
 import SearchVehicleArea from "../components/SearchVehicleArea"

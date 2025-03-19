@@ -3,6 +3,7 @@ import HeaderFive from "../components/HeaderFive";
 
 import FooterAreaFour from "../components/FooterAreaFour";
 import Breadcrumb from "../components/Breadcrumb";
+import SubscribeOne from "../components/SubscribeOne";
 import Cart from "../components/Cart";
 import Preloader from "../helper/Preloader";
 
