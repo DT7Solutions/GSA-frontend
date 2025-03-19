@@ -1,0 +1,68 @@
+.app {
+    display: flex;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background: #343a40;
+    color: white;
+    height: 100vh;
+    transition: 0.3s;
+  }
+  
+  .sidebar.collapsed {
+    width: 80px;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar li {
+    padding: 15px;
+    cursor: pointer;
+  }
+  
+  .toggle-btn {
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .main-layout {
+    flex-grow: 1;
+  }
+  
+  .content {
+    padding: 20px;
+  }
+  
+
+  .t-btn{
+    color: red;
+  }
+
+  #dropdown-basic{
+    background-color: none !important;
+  }
+
+  .dashboard-navbar{
+    background-color: white !important;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+    padding: 0px 30px;
+    background: rgb(255, 255, 255);
+  }
+  
+  .user-profile-icon{
+    color: black !important;
+  }
+ .dashboard-navbar .btn{
+
+    -webkit-transition: none !important;
+    transition: none !important;
+ }
+
+ 

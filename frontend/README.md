@@ -1,3 +1,24 @@
+<<<<<<< HEAD
+# -gowrishankar-frontend
+
+
+# github page for front end 
+
+npm install gh-pages --save-dev
+git init 
+git add .
+git status
+
+******************************************
+
+package.json changes:
+
+"homepage": "https://(github username).github.io/(repo name)"
+"predeploy": "npm run build"
+"deploy": "gh-pages -d build"
+
+npm run deploy
+=======
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -68,3 +89,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+>>>>>>> 482c72d (Initial deploy)
