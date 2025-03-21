@@ -13,6 +13,7 @@ git status
 package.json changes:
 
 "homepage": "https://(github username).github.io/(repo name)"
+https://DT7Solutions.github.io/GSA-frontend
 "predeploy": "npm run build"
 "deploy": "gh-pages -d build"
 
