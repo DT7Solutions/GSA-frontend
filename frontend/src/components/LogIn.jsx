@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate  } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import PhoneInput from "react-phone-input-2";
+// import PhoneInput from "react-phone-input-2";
+import axios from "axios";
+import API_BASE_URL from "../config";
 
 const Login = () => {
   const [isOtpLogin, setIsOtpLogin] = useState(false);
@@ -10,16 +12,50 @@ const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      navigate("/Dashboard2"); // Redirect if already logged in
+    }
+  }, [navigate]);
+
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
+    debugger;
     if (isOtpLogin) {
       console.log("Phone Number:", phoneNumber);
-      alert(phoneNumber)
     } else {
       console.log("Username:", username, "Password:", password, "Remember Me:", rememberMe);
-      alert(username)
     }
+
+   try {
+      const endpoint = isOtpLogin ? "api/auth/login/" : "api/auth/login/";
+      const payload = isOtpLogin
+        ? { phone_number: phoneNumber }
+        : { username, password};
+
+      const response = await axios.post(`${API_BASE_URL}${endpoint}`, payload,{
+        withCredentials: true,
+    }
+  );
+
+      console.log("Response:", response.data);
+      alert("Login Successful!");
+
+      if (response.data.token) {
+        // localStorage.setItem("authToken", response.data.token);
+        localStorage.setItem("accessToken", response.data.access);
+        localStorage.setItem("refreshToken", response.data.refresh);
+        navigate("/Dashboard2");
+      }
+    } catch (error) {
+      console.error("Login Failed:", error.response ? error.response.data : error.message);
+      alert("Login Failed! Please check your credentials.");
+    }
+
   };
   return (
     <div className="login-screen" style={{height:"100vh"}}>
