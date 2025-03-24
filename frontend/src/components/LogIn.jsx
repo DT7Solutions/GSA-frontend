@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link,useNavigate  } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {jwtDecode} from "jwt-decode";
 // import PhoneInput from "react-phone-input-2";
+import Swal from "sweetalert2";
 import axios from "axios";
 import API_BASE_URL from "../config";
 
@@ -43,17 +45,26 @@ const Login = () => {
   );
 
       console.log("Response:", response.data);
-      alert("Login Successful!");
+      
+  
+ debugger;
+      if (response.data.access) {
+        const decoded = jwtDecode(response.data.access);
+        console.log("Decoded Token:", decoded);
 
-      if (response.data.token) {
-        // localStorage.setItem("authToken", response.data.token);
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
         navigate("/Dashboard2");
       }
     } catch (error) {
       console.error("Login Failed:", error.response ? error.response.data : error.message);
-      alert("Login Failed! Please check your credentials.");
+      Swal.fire({
+        title: "Login Failed",
+        text: "Login Failed! Please check your credentials.",
+        icon: "error",
+        confirmButtonText: "Retry",
+    });
+     
     }
 
   };

@@ -1,25 +1,57 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate  } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Swal from "sweetalert2";
+import axios from "axios";
+import API_BASE_URL from "../config";
 
-const Register = () => {
-    const [isOtpLogin, setIsOtpLogin] = useState(false);
+const Register =  () => {
     const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [rememberMe, setRememberMe] = useState(false);
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isOtpLogin) {
-            console.log("Phone Number:", phoneNumber);
-            alert(phoneNumber)
-        } else {
-            console.log("Username:", username, "Password:", password, "Remember Me:", rememberMe);
-            alert(username)
-        }
-    };
+      // Check if passwords match
+      if (password !== confirmPassword) {
+        Swal.fire({
+            title: "Error",
+            text: "Passwords do not match!",
+            icon: "error",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+
+    try {
+        debugger;
+        const response = await axios.post(`${API_BASE_URL}api/auth/register/`, {
+            username,
+            email,
+            phone_number: phoneNumber,
+            password,
+            role_id: 2
+        });
+
+        console.log("Registration Successful:", response.data);
+        navigate("/Dashboard2"); // Redirect to login page after success
+      
+
+    } catch (error) {
+        console.error("Registration Failed:", error.response ? error.response.data : error.message);
+        
+        Swal.fire({
+            title: "Registration Failed",
+            text: error.response?.data?.message || "Something went wrong. Please try again.",
+            icon: "error",
+            confirmButtonText: "Retry",
+        });
+    }
+};
     return (
         <div className="mt-3 space-extra-bottom login-screen ">
             <div className="container">
@@ -52,8 +84,8 @@ const Register = () => {
                                         type="email"
                                         className="form-control"
                                         placeholder="please enter your email"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
                                         required
                                     />
                                 </div>
@@ -63,8 +95,8 @@ const Register = () => {
                                         type="number"
                                         className="form-control"
                                         placeholder="please enter your phone number"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value)}
                                         required
                                     />
                                 </div>
@@ -95,8 +127,8 @@ const Register = () => {
                                             type={showPassword ? "text" : "password"}
                                             className="form-control"
                                             placeholder="please enter confirm password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
                                             required
                                         />
                                         <button

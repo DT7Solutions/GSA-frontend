@@ -18,3 +18,11 @@ https://DT7Solutions.github.io/GSA-frontend
 "deploy": "gh-pages -d build"
 
 npm run deploy
+
+<!-- alert  -->
+Swal.fire({
+        title: "Login Success",
+        text: "Login Successful!",
+        icon: "success, error, warning, info",
+        confirmButtonText: "OK",
+    });
