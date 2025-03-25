@@ -142,3 +142,15 @@
     background-color: white;
     border-radius: 4px;
 }
+
+.header-grid-details .dropdown-menu.to-top {
+    top: calc(100% - 2px) !important;
+}
+
+
+.view-profile-sec {
+    height: auto !important;
+}
+.view-profile .card{
+    margin: 120px 0px !important;
+}

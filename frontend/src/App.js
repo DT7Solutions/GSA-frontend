@@ -1,6 +1,6 @@
 // import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
-
+import PrivateRoute from "./components/PrivateRoute"; 
 import RouteScrollToTop from "./helper/RouteScrollToTop";
 import ScrollToTop from "react-scroll-to-top";
 import AboutPage from "./pages/AboutPage";
@@ -17,6 +17,7 @@ import ContactPage from "./pages/ContactPage";
 import HomePageSix from "./pages/HomePageSix";
 import LoginPage  from "./pages/LoginPage";
 import RegisterPage  from "./pages/RegisterPage";
+import ViewProfilePage from "./pages/ViewProfilePage"
 // import DashboardPage from "./pages/dashboard-pages/MainPage" 
 
 
@@ -50,9 +51,20 @@ function App() {
         <Route exact path="/Register" element={<RegisterPage />} />
 
         <Route exact path="/Dashboard" element={<DashboardPage />} />
-        <Route exact path="/Dashboard2" element={<AdminPage />} />
-        <Route exact path="/Tables" element={<TableDataPage />} />      
-        <Route exact path="/Form" element={<FormValidationPage />} />
+         {/* Private Route for Dashboard2 */}
+        <Route element={<PrivateRoute />}>
+          <Route exact path="/Dashboard2" element={<AdminPage />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route exact path="/Tables" element={<TableDataPage />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route exact path="/Form" element={<FormValidationPage />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route exact path="/view-profile" element={<ViewProfilePage />} />
+        </Route>
+        
 
 
       </Routes>
