@@ -181,3 +181,11 @@
 .testimonialOne.arrow .testimonialOne-button-prev {
     display: none !important;
 }
+
+.changepassword-logo{
+    display: flex;
+    justify-content: center !important;
+}
+.changepassword-logo img{
+    height: 200px !important;
+}

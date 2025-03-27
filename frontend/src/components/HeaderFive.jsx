@@ -174,9 +174,9 @@ const HeaderFive = () => {
                                     <li>
                                       <Link
                                         className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                                        to="/email"
+                                        to="/change-password"
                                       >
-                                        <Icon icon="tabler:message-check" className="icon text-xl" /> Inbox
+                                        <Icon icon="tabler:lock" className="icon text-xl" /> Change Password
                                       </Link>
                                     </li>
                                     <li>

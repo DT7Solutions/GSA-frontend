@@ -18,6 +18,8 @@ import HomePageSix from "./pages/HomePageSix";
 import LoginPage  from "./pages/LoginPage";
 import RegisterPage  from "./pages/RegisterPage";
 import ViewProfilePage from "./pages/ViewProfilePage"
+
+import ChnagePassword from "./components/ChnagePassword";
 // import DashboardPage from "./pages/dashboard-pages/MainPage" 
 
 
@@ -25,6 +27,7 @@ import DashboardPage  from "./pages/dashboard-pages/MainPage";
 import AdminPage from "./pages/dashboard-pages/AdminPage"
 import TableDataPage from "./pages/dashboard-pages/DataTablePage"
 import FormValidationPage from "./pages/dashboard-pages/FormValidationPage"
+
 
 function App() {
   return (
@@ -63,6 +66,9 @@ function App() {
         </Route>
         <Route element={<PrivateRoute />}>
           <Route exact path="/view-profile" element={<ViewProfilePage />} />
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route exact path="/change-password" element={<ChnagePassword />} />
         </Route>
         
 
