@@ -9,21 +9,14 @@ const TestimonialOne = () => {
     >
       <div className="container">
         <div className="row">
-          {/* <div className="col-lg-6">
-            <div className="testimonial-thumb1">
-              <img src={`${process.env.PUBLIC_URL}/assets/img/testimonial/testimonial-1-1.png`} alt="Fixturbo" />
-            </div>
-          </div> */}
           <div className="col-lg-12">
             <div className="space1">
               <div className="title-area">
-                {/* <span className="sub-title">Clients  Feedback</span> */}
-
-                <h2 className="sec-title text-dark text-center mt-5 gsa-title">
+                <h2 className="sec-title  text-center mt-5 gsa-title" style={{color:"white"}}>
                 Clients  Says
                 </h2>
               </div>
-              <div className="row global-carousel testi-slider-1 mb-5">
+              <div className="row global-carousel testmonial-slider">
                 <Swiper
                   loop={true}
                   navigation={{
@@ -183,6 +176,7 @@ const TestimonialOne = () => {
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>

@@ -154,3 +154,30 @@
 .view-profile .card{
     margin: 120px 0px !important;
 }
+
+.testmonial-slider{
+    margin-top: 50px;
+    margin-bottom: 100px !important;
+}
+
+.contact-grid-details h6 {
+    font-size: 16px !important;
+    color: #ffffffb3 !important;
+}
+.footer-widget .widget_title {
+    position: relative;
+    font-size: 25.5px !important;
+    font-weight: 900 !important;
+    font-family: var(--title-font);
+    line-height: 1em;
+    margin: -0.12em 0 25px 0;
+}
+.widget-area {
+    padding: 60px 0 30px !important;
+}
+
+
+.testimonialOne.arrow .testimonialOne-button-next, 
+.testimonialOne.arrow .testimonialOne-button-prev {
+    display: none !important;
+}

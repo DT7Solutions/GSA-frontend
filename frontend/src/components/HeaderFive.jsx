@@ -4,6 +4,11 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 const HeaderFive = () => {
   const [active, setActive] = useState(false);
   const [scroll, setScroll] = useState(false);
+  
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
     var offCanvasNav = document.getElementById("offcanvas-navigation");
@@ -49,13 +54,19 @@ const HeaderFive = () => {
     setActive(!active);
   };
 
-  const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     // Check if the user is logged in
     const token = localStorage.getItem("accessToken");
-    setIsLoggedIn(!!token); // Convert token to boolean
+    // setIsLoggedIn(!!token); // Convert token to boolean
+    if (token) {
+      debugger;
+      setIsLoggedIn(true);
+      setUserName(localStorage.getItem("username") || "Guest");
+      setUserRole(localStorage.getItem("role") || "User");
+    } else {
+      setIsLoggedIn(false);
+    }
   }, []);
 
   const handleLogout = () => {
@@ -142,10 +153,10 @@ const HeaderFive = () => {
                                   <div className="py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
                                     <div>
                                       <h6 className="text-lg text-primary-light fw-semibold mb-2">
-                                        dt7solutions
+                                        {userName}
                                       </h6>
                                       <span className="text-secondary-light fw-medium text-sm">
-                                        Admin
+                                      {userRole}
                                       </span>
                                     </div>
                                   </div>

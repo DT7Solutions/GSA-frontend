@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link,useNavigate  } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 // import PhoneInput from "react-phone-input-2";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -9,7 +9,7 @@ import API_BASE_URL from "../config";
 
 const Login = () => {
   const [isOtpLogin, setIsOtpLogin] = useState(false);
-  const [username, setUsername] = useState("");
+  const [email, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -19,41 +19,69 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
-      navigate("/Dashboard2"); // Redirect if already logged in
+      navigate("/Dashboard2");
     }
+
+
   }, [navigate]);
 
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     debugger;
     if (isOtpLogin) {
       console.log("Phone Number:", phoneNumber);
     } else {
-      console.log("Username:", username, "Password:", password, "Remember Me:", rememberMe);
+      console.log("email:", email, "Password:", password, "Remember Me:", rememberMe);
     }
 
-   try {
+    try {
       const endpoint = isOtpLogin ? "api/auth/login/" : "api/auth/login/";
       const payload = isOtpLogin
         ? { phone_number: phoneNumber }
-        : { username, password};
+        : { email, password };
 
-      const response = await axios.post(`${API_BASE_URL}${endpoint}`, payload,{
+      const response = await axios.post(`${API_BASE_URL}${endpoint}`, payload, {
         withCredentials: true,
-    }
-  );
+      }
+      );
 
-      console.log("Response:", response.data);
-      
-  
- debugger;
+
+
       if (response.data.access) {
-        const decoded = jwtDecode(response.data.access);
-        console.log("Decoded Token:", decoded);
-
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
+        debugger;
+        //  const token = localStorage.getItem("authToken");
+        if (response.data.access) {
+          debugger;
+          const decoded = jwtDecode(response.data.access);
+          let userId = decoded.user_id
+          axios
+            .get(`${API_BASE_URL}api/auth/get_user_data/${userId}/`, {
+              headers: {
+                Authorization: `Bearer ${response.data.access}`,
+              },
+            })
+            .then((response) => {
+              let username = response.data.username;
+              let roll_no = response.data.roll;
+              let roll = "";
+
+              if (roll_no == 1) {
+                roll = "Admin";
+              } else if (roll_no == 2) {
+                roll = "Dealer";
+              } else {
+                roll = "Customer";
+              }
+
+              // Store in Local Storage
+              localStorage.setItem("username", username);
+              localStorage.setItem("role", roll);
+            })
+            .catch((error) => console.error("Error fetching user data:", error));
+        }
         navigate("/Dashboard2");
       }
     } catch (error) {
@@ -63,18 +91,20 @@ const Login = () => {
         text: "Login Failed! Please check your credentials.",
         icon: "error",
         confirmButtonText: "Retry",
-    });
-     
+      });
+
     }
 
   };
+
+
   return (
-    <div className="login-screen" style={{height:"100vh"}}>
+    <div className="login-screen" style={{ height: "100vh" }}>
       <div className="container">
         <div className="row justify-content-center align-items-center py-4  shadow d-flex">
           {/* Left Column - Image */}
           <div className="col-md-5">
-            <img src={`${process.env.PUBLIC_URL}/assets/img/update-img/hero6-1.png`} alt="Login" className="img-fluid"/>
+            <img src={`${process.env.PUBLIC_URL}/assets/img/update-img/hero6-1.png`} alt="Login" className="img-fluid" />
           </div>
 
           {/* Right Column - Login Form */}
@@ -85,28 +115,28 @@ const Login = () => {
                 {/* Toggle between Username/Password and OTP login */}
                 {isOtpLogin ? (
                   <div className="mb-3">
-                  <label className="form-label">Phone Number</label>
-                  <div className="input-group">
-                    <span className="input-group-text">+91</span>
-                    <input
-                      type="tel"
-                      className="form-control"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="Enter phone number"
-                      required
-                    />
+                    <label className="form-label">Phone Number</label>
+                    <div className="input-group">
+                      <span className="input-group-text">+91</span>
+                      <input
+                        type="tel"
+                        className="form-control"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Enter phone number"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
                 ) : (
                   <>
                     <div className="mb-3">
-                      <label className="form-label">Username</label>
+                      <label className="form-label">Email</label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="please enter your username"
-                        value={username}
+                        placeholder="please enter your email"
+                        value={email}
                         onChange={(e) => setUsername(e.target.value)}
                         required
                       />

@@ -7,23 +7,6 @@ const ClientAreaFour = () => {
     <div className="client-area-3">
       <div className="container">
         <div className="row gx-80">
-          {/* <div className="col-lg-5"> 
-            <div className="client3-wrap">
-              <div className="title-area mb-0">
-                <span className="sub-title">Logo Brands &amp; Clients</span>
-                <h2 className="sec-title">
-                Brands we Trust
-                </h2>
-                <p className="sec-text">
-                  A car repair is a service provided to fix any issues or
-                  damages with a your vehicle. It involves diagnosing the
-                  problem, repairing or replacing the necessary parts, and
-                  ensuring that the car
-                </p>
-              </div>
-            </div>
-          </div> */}
-
           <div className="col-lg-12">
             <div className="client-slider3">
               <div className="title-area">
