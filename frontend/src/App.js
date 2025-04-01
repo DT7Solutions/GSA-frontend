@@ -20,6 +20,7 @@ import RegisterPage  from "./pages/RegisterPage";
 import ViewProfilePage from "./pages/ViewProfilePage"
 
 import ChnagePassword from "./components/ChnagePassword";
+import ForgotPassword from "./components/ForgotPassword";
 // import DashboardPage from "./pages/dashboard-pages/MainPage" 
 
 
@@ -52,23 +53,18 @@ function App() {
         <Route exact path="/contact" element={<ContactPage />} />
         <Route exact path="/Login" element={<LoginPage />} />
         <Route exact path="/Register" element={<RegisterPage />} />
-
+        <Route exact path="/forgot-password" element={<ForgotPassword />} />
         <Route exact path="/Dashboard" element={<DashboardPage />} />
          {/* Private Route for Dashboard2 */}
+    
+      
         <Route element={<PrivateRoute />}>
           <Route exact path="/Dashboard2" element={<AdminPage />} />
-        </Route>
-        <Route element={<PrivateRoute />}>
           <Route exact path="/Tables" element={<TableDataPage />} />
-        </Route>
-        <Route element={<PrivateRoute />}>
-          <Route exact path="/Form" element={<FormValidationPage />} />
-        </Route>
-        <Route element={<PrivateRoute />}>
+          <Route exact path="/Form" element={<FormValidationPage />} /> 
           <Route exact path="/view-profile" element={<ViewProfilePage />} />
-        </Route>
-        <Route element={<PrivateRoute />}>
           <Route exact path="/change-password" element={<ChnagePassword />} />
+          
         </Route>
         
 

@@ -65,7 +65,7 @@ const Register =  () => {
                     <div className="col-md-5">
                         <div className="">
                             <h2 className="text-center mb-4 my-5">Sign Up</h2>
-                            <form onSubmit={handleSubmit} className="login-form">
+                            <form onSubmit={handleSubmit} className="input-style">
 
                                 <div className="mb-3">
                                     <label className="form-label">Username</label>

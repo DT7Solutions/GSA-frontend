@@ -111,7 +111,7 @@ const Login = () => {
           <div className="col-md-5">
             <div className="">
               <h2 className="text-center mb-4 my-5">Sign In</h2>
-              <form onSubmit={handleSubmit} className="login-form">
+              <form onSubmit={handleSubmit} className="input-style">
                 {/* Toggle between Username/Password and OTP login */}
                 {isOtpLogin ? (
                   <div className="mb-3">

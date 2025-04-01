@@ -57,7 +57,7 @@
 
 }
 
-.login-form .form-control {
+.input-style .form-control {
     height: 48px;
     background:transparent;
     color: #000;
@@ -68,7 +68,7 @@
     border: 1px solid #0068A5;
     
 }
-.login-form .form-control::placeholder{
+.input-style .form-control::placeholder{
     color: rgb(184, 185, 185);
 }
 
