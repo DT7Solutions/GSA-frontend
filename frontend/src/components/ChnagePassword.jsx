@@ -21,7 +21,7 @@ const ForgotPassword = () => {
         debugger;
         try {
             await axios.post(
-                `${API_BASE_URL}api/auth/send-otp/${userId}/`, 
+                `${API_BASE_URL}api/auth/user/send-otp/${userId}/`, 
                 {},
                 {
                     headers: {
@@ -62,7 +62,7 @@ const ForgotPassword = () => {
             const decoded = jwtDecode(token);
             let userId = decoded.user_id
             const response = await axios.post(
-                `${API_BASE_URL}api/auth/verify_otp_change_password/`, 
+                `${API_BASE_URL}api/auth/user/verify_otp_change_password/`, 
                 { user_id: userId, otp, password },  
                 {
                     headers: {

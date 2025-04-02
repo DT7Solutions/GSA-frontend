@@ -7,8 +7,8 @@ const CategoryAreaOne = () => {
     // pt-95
     <div className="category-area-1 pb-100">
       <div className="container">
-        <h4 className="text-center fw-extrabold mb-20">Search By Categories</h4>
-        <div className="row gx-0 global-carousel category-slider3">
+        <h4 className="text-center fw-extrabold mb-20">Search By Brand</h4>
+        {/* <div className="row gx-0 global-carousel category-slider3">
           <Swiper
             navigation={{
               nextEl: ".team-slider2-next",
@@ -265,6 +265,126 @@ const CategoryAreaOne = () => {
               </div>
             </SwiperSlide>
           </Swiper>
+        </div> */}
+        <div className="row mt-5">
+
+          <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center">HYUNDAI</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center">HYUNDAI</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center">HYUNDAI</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center">HYUNDAI</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center">HYUNDAI</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center">HYUNDAI</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center">HYUNDAI</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center">HYUNDAI</a>
+              </div>
+            </div>
+          </div>
+
+          
+
+          
+
         </div>
       </div>
     </div>

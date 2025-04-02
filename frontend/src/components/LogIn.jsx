@@ -58,7 +58,7 @@ const Login = () => {
           const decoded = jwtDecode(response.data.access);
           let userId = decoded.user_id
           axios
-            .get(`${API_BASE_URL}api/auth/get_user_data/${userId}/`, {
+            .get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
               headers: {
                 Authorization: `Bearer ${response.data.access}`,
               },
