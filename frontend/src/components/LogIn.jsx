@@ -36,7 +36,7 @@ const Login = () => {
     }
 
     try {
-      const endpoint = isOtpLogin ? "api/auth/login/" : "api/auth/login/";
+      const endpoint = isOtpLogin ? "api/auth/mobial_otp_request/" : "api/auth/login/";
       const payload = isOtpLogin
         ? { phone_number: phoneNumber }
         : { email, password };

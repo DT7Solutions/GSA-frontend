@@ -20,7 +20,7 @@ const UserProfile = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const accessToken = localStorage.getItem("accessToken");
+    // const accessToken = localStorage.getItem("accessToken");
 
     // Fetch user data
     useEffect(() => {
@@ -57,6 +57,13 @@ const UserProfile = () => {
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        const accessToken = localStorage.getItem("accessToken");
+
+        if (!accessToken) {
+            Swal.fire("Error", "No access token found!", "error");
+            return;
+        }
 
         const formData = new FormData();
         Object.keys(userData).forEach((key) => {
@@ -74,12 +81,13 @@ const UserProfile = () => {
             const response = await axios.put(`${API_BASE_URL}api/auth/user/profile/`, formData, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "multipart/form-data",
                 },
             });
         
             setUserData(response.data);
             Swal.fire({
-                title: "Login Success",
+                title: "Profile",
                 text: "Profile updated successfully!",
                 icon: "success",
                 confirmButtonText: "OK",
@@ -87,6 +95,8 @@ const UserProfile = () => {
 
         } catch (error) {
             console.error("Error updating profile:", error);
+        }finally {
+            setLoading(false);
         }
     };
 
@@ -103,12 +113,12 @@ const UserProfile = () => {
                                 <form className="row gy-3 needs-validation" onSubmit={handleSubmit} noValidate>
                                     <div className="col-md-6">
                                         <label className="form-label">First Name</label>
-                                        <input type="text" name="first_name" className="form-control" value={userData.first_name} onChange={handleChange} required />
+                                        <input type="text" name="first_name" className="form-control" value={userData.first_name} onChange={handleChange} />
                                     </div>
 
                                     <div className="col-md-6">
                                         <label className="form-label">Last Name</label>
-                                        <input type="text" name="last_name" className="form-control" value={userData.last_name} onChange={handleChange} required />
+                                        <input type="text" name="last_name" className="form-control" value={userData.last_name} onChange={handleChange}  />
                                     </div>
 
                                     <div className="col-md-6">
@@ -118,7 +128,7 @@ const UserProfile = () => {
 
                                     <div className="col-md-6">
                                         <label className="form-label">Email</label>
-                                        <input type="email" name="email" className="form-control" value={userData.email} onChange={handleChange} required />
+                                        <input type="email" name="email" className="form-control" value={userData.email} onChange={handleChange} disabled  required />
                                     </div>
 
                                     <div className="col-md-6">
@@ -133,12 +143,12 @@ const UserProfile = () => {
 
                                     <div className="col-md-6">
                                         <label className="form-label">Date of Birth</label>
-                                        <input type="date" name="date_of_birth" className="form-control" value={userData.date_of_birth} onChange={handleChange} required />
+                                        <input type="date" name="date_of_birth" className="form-control" value={userData.date_of_birth} onChange={handleChange}  />
                                     </div>
 
                                     <div className="col-md-6">
                                         <label className="form-label">Pincode</label>
-                                        <input type="number" name="pincode" className="form-control" value={userData.pincode} onChange={handleChange} required />
+                                        <input type="number" name="pincode" className="form-control" value={userData.pincode} onChange={handleChange}  />
                                     </div>
 
                                     <div className="col-md-12">
