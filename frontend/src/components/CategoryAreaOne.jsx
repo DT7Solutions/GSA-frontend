@@ -273,12 +273,12 @@ const CategoryAreaOne = () => {
               <a href="
               ">
                 <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/1.png`}
+                src={`${process.env.PUBLIC_URL}/assets/img/brands/22.png`}
                 alt="Fixturbo"
               />
               </a>
               <div className="text-center">
-                <a href="" className="text-center brand-name">Fiat</a>
+                <a href="" className="text-center brand-name">Hyundai</a>
               </div>
             </div>
           </div>
@@ -343,12 +343,12 @@ const CategoryAreaOne = () => {
               <a href="
               ">
                 <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/7.png`}
+                src={`${process.env.PUBLIC_URL}/assets/img/brands/23.png`}
                 alt="Fixturbo"
               />
               </a>
               <div className="text-center">
-                <a href="" className="text-center brand-name">leyaland</a>
+                <a href="" className="text-center brand-name">Honda</a>
               </div>
             </div>
           </div>
