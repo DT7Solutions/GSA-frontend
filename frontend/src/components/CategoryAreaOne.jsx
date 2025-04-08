@@ -270,15 +270,14 @@ const CategoryAreaOne = () => {
 
           <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
             <div className="category-card-item">
-              <a href="
-              ">
-                <img
+              <Link to="/bran-models"><img
                 src={`${process.env.PUBLIC_URL}/assets/img/brands/22.png`}
                 alt="Fixturbo"
-              />
-              </a>
+              /></Link>
               <div className="text-center">
-                <a href="" className="text-center brand-name">Hyundai</a>
+                <Link to="/bran-models" className="text-center brand-name">
+                Hyundai
+                </Link>
               </div>
             </div>
           </div>
@@ -287,12 +286,12 @@ const CategoryAreaOne = () => {
               <a href="
               ">
                 <img
-               src={`${process.env.PUBLIC_URL}/assets/img/brands/2.png`}
+               src={`${process.env.PUBLIC_URL}/assets/img/brands/17.png`}
                 alt="Fixturbo"
               />
               </a>
               <div className="text-center">
-                <a href="" className="text-center brand-name">volks wagen</a>
+                <a href="" className="text-center brand-name">Maruthi Suzuki</a>
               </div>
             </div>
           </div>
@@ -301,12 +300,26 @@ const CategoryAreaOne = () => {
               <a href="
               ">
                 <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/4.png`}
+                src={`${process.env.PUBLIC_URL}/assets/img/brands/25.png`}
                 alt="Fixturbo"
               />
               </a>
               <div className="text-center">
-                <a href="" className="text-center brand-name">Jeep</a>
+                <a href="" className="text-center brand-name">Kia</a>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
+            <div className="category-card-item">
+              <a href="
+              ">
+                <img
+                src={`${process.env.PUBLIC_URL}/assets/img/brands/23.png`}
+                alt="Fixturbo"
+              />
+              </a>
+              <div className="text-center">
+                <a href="" className="text-center brand-name">Honda</a>
               </div>
             </div>
           </div>
@@ -338,20 +351,7 @@ const CategoryAreaOne = () => {
               </div>
             </div>
           </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/23.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Honda</a>
-              </div>
-            </div>
-          </div>
+          
           <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
             <div className="category-card-item">
               <a href="

@@ -18,7 +18,7 @@ import HomePageSix from "./pages/HomePageSix";
 import LoginPage  from "./pages/LoginPage";
 import RegisterPage  from "./pages/RegisterPage";
 import ViewProfilePage from "./pages/ViewProfilePage"
-
+import BrandModelspage from "./pages/BrandModelsPage";
 import ChnagePassword from "./components/ChnagePassword";
 import ForgotPassword from "./components/ForgotPassword";
 // import DashboardPage from "./pages/dashboard-pages/MainPage" 
@@ -55,6 +55,10 @@ function App() {
         <Route exact path="/Register" element={<RegisterPage />} />
         <Route exact path="/forgot-password" element={<ForgotPassword />} />
         <Route exact path="/Dashboard" element={<DashboardPage />} />
+        <Route exact path="/bran-models" element={<BrandModelspage />} />
+
+
+
          {/* Private Route for Dashboard2 */}
     
       

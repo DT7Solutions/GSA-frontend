@@ -209,3 +209,9 @@
     align-items: center;
     justify-content: center;
 }
+
+
+.brand-models  img{
+    cursor: pointer !important;
+    border-radius: none !important;
+}
