@@ -33,7 +33,7 @@ const Register =  () => {
         const response = await axios.post(`${API_BASE_URL}api/auth/register/`, {
             username,
             email: email.toLowerCase(), 
-            phone_number: phoneNumber,
+            phone: phoneNumber,
             password,
             role_id: 2
         });
