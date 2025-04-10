@@ -47,20 +47,22 @@ const HeaderFive = () => {
       return () => (window.onscroll = null);
     };
 
+  }, []);
 
-
+  useEffect(() => {
+    alert("token found")
     const token = localStorage.getItem("accessToken");
+  
     if (token) {
-      debugger;
       setIsLoggedIn(true);
       setUserName(localStorage.getItem("username") || "Guest");
       setUserRole(localStorage.getItem("role") || "User");
     } else {
       setIsLoggedIn(false);
+      setUserName("Guest");
+      setUserRole("User");
     }
-
   }, []);
-
 
 
   const mobileMenu = () => {

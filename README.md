@@ -26,3 +26,8 @@ Swal.fire({
         icon: "success, error, warning, info",
         confirmButtonText: "OK",
     });
+
+
+ <!-- deployed     -->
+ 1. npm run build
+ >> cp -r build/* /var/www/html
