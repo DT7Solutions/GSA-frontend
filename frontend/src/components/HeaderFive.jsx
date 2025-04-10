@@ -50,14 +50,16 @@ const HeaderFive = () => {
   }, []);
 
   useEffect(() => {
-    alert("token found")
+ 
     const token = localStorage.getItem("accessToken");
-  
+    alert(token)
     if (token) {
+      alert("token found")
       setIsLoggedIn(true);
       setUserName(localStorage.getItem("username") || "Guest");
       setUserRole(localStorage.getItem("role") || "User");
     } else {
+      alert("token not found")
       setIsLoggedIn(false);
       setUserName("Guest");
       setUserRole("User");
