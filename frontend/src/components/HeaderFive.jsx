@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { jwtDecode } from "jwt-decode";
-
+import API_BASE_URL from "../config";
 
 const HeaderFive = () => {
   const [active, setActive] = useState(false);
@@ -58,13 +58,27 @@ const HeaderFive = () => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
+        const userId = decoded.user_id;
 
-        const username = decoded.username || "Guest";
-        const role = decoded.role || "User";
+        axios
+          .get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res) => {
+            const { username, role } = res.data;
+            setIsLoggedIn(true);
+            setUserName(username);
+            setUserRole(role);
+          })
+          .catch((err) => {
+            console.error("Error fetching user data:", err);
+            setIsLoggedIn(false);
+            setUserName("Guest");
+            setUserRole("User");
+          });
   
-        setIsLoggedIn(true);
-        setUserName(username);
-        setUserRole(role);
       } catch (error) {
         console.error("Invalid token:", error);
         setIsLoggedIn(false);
