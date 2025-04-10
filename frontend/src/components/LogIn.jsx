@@ -13,7 +13,7 @@ const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
@@ -81,14 +81,14 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${API_BASE_URL}api/auth/login/`, {
-        email,
+        email: email.toLowerCase(), 
         password,
       });
 
       if (response.data.access) {
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
-        navigate("/Dashboard2");
+        navigate("/");
       }
     } catch (error) {
       console.error("Login Failed:", error.response ? error.response.data : error.message);
@@ -101,10 +101,11 @@ const Login = () => {
     }
   };
 
+  
   return (
-    <div className="login-screen" style={{ height: "100vh" }}>
-      <div className="container">
-        <div className="row justify-content-center align-items-center py-4 shadow d-flex">
+    <div className="login-screen" style={{ height: "111vh" }}>
+      <div className="container ">
+        <div className="row d-flex justify-content-center align-items-center py-4 shadow">
           <div className="col-md-5">
             <img src={`${process.env.PUBLIC_URL}/assets/img/update-img/hero6-1.png`} alt="Login" className="img-fluid" />
           </div>
@@ -171,7 +172,7 @@ const Login = () => {
                         />
                         <button
                           type="button"
-                          className="btn eye-btn style2 btn-fw"
+                          className="btn eye-btn  btn-fw"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? <FaEyeSlash /> : <FaEye />}

@@ -94,7 +94,12 @@ const UserProfile = () => {
             });
 
         } catch (error) {
-            console.error("Error updating profile:", error);
+            Swal.fire({
+                title: "Profile",
+                text: "Error updating profile:", error,
+                icon: "error",
+                confirmButtonText: "Retry",
+            });
         }finally {
             setLoading(false);
         }
@@ -107,18 +112,18 @@ const UserProfile = () => {
                     <div className="col-lg-12 view-profile">
                         <div className="card">
                             <div className="card-header">
-                                <h5 className="card-title mb-0">User Profile</h5>
+                                <h3 className="card-title mb-0">User Profile</h3>
                             </div>
                             <div className="card-body">
-                                <form className="row gy-3 needs-validation" onSubmit={handleSubmit} noValidate>
+                                <form className="row gy-3 needs-validation input-style" onSubmit={handleSubmit} noValidate>
                                     <div className="col-md-6">
                                         <label className="form-label">First Name</label>
-                                        <input type="text" name="first_name" className="form-control" value={userData.first_name} onChange={handleChange} />
+                                        <input type="text" name="first_name" className="form-control" value={userData.first_name} onChange={handleChange}  placeholder="enter you first name "/>
                                     </div>
 
                                     <div className="col-md-6">
                                         <label className="form-label">Last Name</label>
-                                        <input type="text" name="last_name" className="form-control" value={userData.last_name} onChange={handleChange}  />
+                                        <input type="text" name="last_name" className="form-control" value={userData.last_name} onChange={handleChange} placeholder="enter you last name " />
                                     </div>
 
                                     <div className="col-md-6">
@@ -148,16 +153,16 @@ const UserProfile = () => {
 
                                     <div className="col-md-6">
                                         <label className="form-label">Pincode</label>
-                                        <input type="number" name="pincode" className="form-control" value={userData.pincode} onChange={handleChange}  />
+                                        <input type="number" name="pincode" className="form-control" value={userData.pincode} onChange={handleChange}placeholder="enter you zip/pin code" />
                                     </div>
 
                                     <div className="col-md-12">
                                         <label className="form-label">Address</label>
-                                        <textarea name="address" className="form-control" value={userData.address} onChange={handleChange} rows="3" required></textarea>
+                                        <textarea name="address" className="form-control" value={userData.address} onChange={handleChange} rows="3" required placeholder="enter yor adress... "></textarea>
                                     </div>
 
                                     <div className="col-12">
-                                        <button className="btn btn-primary-600" type="submit">Update Profile</button>
+                                        <button className="btn btn-primary-600 style2" type="submit">Update Profile</button>
                                     </div>
                                 </form>
                             </div>

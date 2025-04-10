@@ -46,6 +46,19 @@ const HeaderFive = () => {
       }
       return () => (window.onscroll = null);
     };
+
+
+
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      debugger;
+      setIsLoggedIn(true);
+      setUserName(localStorage.getItem("username") || "Guest");
+      setUserRole(localStorage.getItem("role") || "User");
+    } else {
+      setIsLoggedIn(false);
+    }
+
   }, []);
 
 
@@ -55,19 +68,18 @@ const HeaderFive = () => {
   };
 
 
-  useEffect(() => {
-    // Check if the user is logged in
-    const token = localStorage.getItem("accessToken");
-    // setIsLoggedIn(!!token); // Convert token to boolean
-    if (token) {
-      debugger;
-      setIsLoggedIn(true);
-      setUserName(localStorage.getItem("username") || "Guest");
-      setUserRole(localStorage.getItem("role") || "User");
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("accessToken");
+   
+  //   if (token) {
+  //     debugger;
+  //     setIsLoggedIn(true);
+  //     setUserName(localStorage.getItem("username") || "Guest");
+  //     setUserRole(localStorage.getItem("role") || "User");
+  //   } else {
+  //     setIsLoggedIn(false);
+  //   }
+  // }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");

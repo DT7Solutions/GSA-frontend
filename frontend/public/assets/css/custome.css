@@ -93,7 +93,6 @@
     color: rgb(15, 15, 15) !important;
 }
 .login-screen .password-input .eye-btn:hover {
-   
     color: rgb(243, 240, 240) !important;
 }
 
@@ -214,4 +213,8 @@
 .brand-models  img{
     cursor: pointer !important;
     border-radius: none !important;
+}
+
+.swal2-title{
+    font-size: 28px !important;
 }

@@ -53,7 +53,7 @@ const ForgotPassword = () => {
             if (password === confirmPassword) {
                 const response = await axios.post(
                     `${API_BASE_URL}api/auth/forgotpassword/forgot_change_password/`, 
-                    { email, password },  
+                    {  email: email.toLowerCase(), password },  
                 );
         
                 if (response.data.success) {
@@ -127,7 +127,7 @@ const ForgotPassword = () => {
                                         />
                                         <button
                                             type="button"
-                                            className="btn eye-btn style2 btn-fw"
+                                            className="btn eye-btn  btn-fw"
                                             onClick={() => setShowPassword(!showPassword)}
                                         >
                                             {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -148,7 +148,7 @@ const ForgotPassword = () => {
                                         />
                                         <button
                                             type="button"
-                                            className="btn eye-btn style2 btn-fw"
+                                            className="btn eye-btn  btn-fw"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                         >
                                             {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}

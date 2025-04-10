@@ -15,6 +15,7 @@ const ForgotPassword = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const token = localStorage.getItem("accessToken");
     const sendOTP = async (userId) => {
@@ -73,7 +74,7 @@ const ForgotPassword = () => {
     
             if (response.data.success) {
                 Swal.fire("Success", "OTP verified! Set a new password.", "success");
-                navigate("/");
+                handleLogout()
             } else {
                 Swal.fire("Error", response.data.message || "Invalid OTP", "error");
             }
@@ -81,7 +82,13 @@ const ForgotPassword = () => {
             Swal.fire("Error", error.response?.data?.message || "Invalid OTP", "error");
         }
     };
-
+    const handleLogout = () => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        setIsLoggedIn(false);
+        navigate("/login");
+      };
+    
 
     return (
         <div className="login-screen" style={{ height: "100vh" }}>
@@ -112,7 +119,7 @@ const ForgotPassword = () => {
                                         />
                                         <button
                                             type="button"
-                                            className="btn eye-btn style2 btn-fw"
+                                            className="btn eye-btn  btn-fw"
                                             onClick={() => setShowPassword(!showPassword)}
                                         >
                                             {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -134,7 +141,7 @@ const ForgotPassword = () => {
                                         />
                                         <button
                                             type="button"
-                                            className="btn eye-btn style2 btn-fw"
+                                            className="btn eye-btn  btn-fw"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                         >
                                             {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}

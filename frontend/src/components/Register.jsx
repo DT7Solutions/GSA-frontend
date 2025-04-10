@@ -12,6 +12,7 @@ const Register =  () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [showPassword2, setShowPassword2] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -31,7 +32,7 @@ const Register =  () => {
         debugger;
         const response = await axios.post(`${API_BASE_URL}api/auth/register/`, {
             username,
-            email,
+            email: email.toLowerCase(), 
             phone_number: phoneNumber,
             password,
             role_id: 2
@@ -53,15 +54,12 @@ const Register =  () => {
     }
 };
     return (
-        <div className="mt-3 space-extra-bottom login-screen ">
+        <div className="mt-3 space-extra-bottom login-screen" style={{ height: "125vh" }}>
             <div className="container">
-                <div className="row justify-content-center align-items-center py-4  shadow d-flex">
-                    {/* Left Column - Image */}
+                <div className="row d-flex justify-content-center align-items-center py-4 shadow ">
                     <div className="col-md-5">
                         <img src={`${process.env.PUBLIC_URL}/assets/img/update-img/hero6-1.png`} alt="Login" className="img-fluid" />
                     </div>
-
-                    {/* Right Column - Login Form */}
                     <div className="col-md-5">
                         <div className="">
                             <h2 className="text-center mb-4 my-5">Sign Up</h2>
@@ -96,7 +94,14 @@ const Register =  () => {
                                         className="form-control"
                                         placeholder="please enter your phone number"
                                         value={phoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, '');
+                                            if (value.length <= 10) {
+                                                setPhoneNumber(value);
+                                            }
+                                        }}
+                                        maxLength={10}
+                                        minLength={10}
                                         required
                                     />
                                 </div>
@@ -113,7 +118,7 @@ const Register =  () => {
                                         />
                                         <button
                                             type="button"
-                                            className="btn eye-btn style2 btn-fw"
+                                            className="btn eye-btn  btn-fw"
                                             onClick={() => setShowPassword(!showPassword)}
                                         >
                                             {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -124,7 +129,7 @@ const Register =  () => {
                                     <label className="form-label">Confirm Password</label>
                                     <div className="input-group password-input">
                                         <input
-                                            type={showPassword ? "text" : "password"}
+                                            type={showPassword2 ? "text" : "password"}
                                             className="form-control"
                                             placeholder="please enter confirm password"
                                             value={confirmPassword}
@@ -134,10 +139,10 @@ const Register =  () => {
                                         <button
                                             type="button"
                                           
-                                            className="btn eye-btn style2 btn-fw"
-                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="btn eye-btn  btn-fw"
+                                            onClick={() => setShowPassword2(!showPassword2)}
                                         >
-                                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                            {showPassword2 ? <FaEyeSlash /> : <FaEye />}
                                         </button>
                                     </div>
                                 </div>
