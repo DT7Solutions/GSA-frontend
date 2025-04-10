@@ -62,16 +62,29 @@ const HeaderFive = () => {
         const userId = decoded.user_id;
 
         axios
-          .get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}`, {
+          .get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           })
           .then((res) => {
-            const { username, role } = res.data;
+            debugger;
+            const { username, role_id } = res.data;
             setIsLoggedIn(true);
             setUserName(username);
-            setUserRole(role);
+            
+            let userRole = "";
+
+            if (role_id == 1) {
+              userRole = "Admin";
+            } else if (role_id == 2) {
+              userRole = "Dealer";
+            } else {
+              userRole = "Customer";
+            }
+          
+            setUserRole(userRole);
+
           })
           .catch((err) => {
             console.error("Error fetching user data:", err);

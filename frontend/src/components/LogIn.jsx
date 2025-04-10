@@ -88,6 +88,14 @@ const Login = () => {
       if (response.data.access) {
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
+
+        // if (role_id == 1) {
+        //   userRole = "Admin";
+        // } else if (role_id == 2) {
+        //   userRole = "Dealer";
+        // } else {
+        //   userRole = "Customer";
+        // }
         navigate("/");
       }
     } catch (error) {
