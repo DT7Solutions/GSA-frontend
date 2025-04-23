@@ -1,446 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode, Thumbs, EffectFade, Autoplay } from "swiper";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import API_BASE_URL from "../config";
+
 const CategoryAreaOne = () => {
+  const [carMakes, setCarMakes] = useState([]);
+
+  useEffect(() => {
+    const fetchCarMakes = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}api/home/car-makes/`);
+        setCarMakes(response.data);
+      } catch (error) {
+        console.error('Error fetching car makes:', error);
+      }
+    };
+   
+    fetchCarMakes();
+  }, []);
+
+
   return (
-    // pt-95
     <div className="category-area-1 pb-100 brand-logo-display">
       <div className="container-fluid">
-        <h4 className="text-center fw-extrabold mb-20">Search By Brand</h4>
-        {/* <div className="row gx-0 global-carousel category-slider3">
-          <Swiper
-            navigation={{
-              nextEl: ".team-slider2-next",
-              prevEl: ".team-slider2-prev",
-            }}
-            spaceBetween={20}
-            slidesPerGroup={1}
-            speed={1000}
-            pagination={{ clickable: true }}
-            loop
-            autoplay={{ delay: 3000, disableOnInteraction: false }}
-            className="mySwiper"
-            modules={[FreeMode, Navigation, Thumbs, EffectFade, Autoplay]}
-            breakpoints={{
-              0: {
-                slidesPerView: 2,
-              },
-              768: {
-                slidesPerView: 3,
-              },
-              992: {
-                slidesPerView: 4,
-              },
-              1200: {
-                slidesPerView: 5,
-              },
-              1400: {
-                slidesPerView: 5,
-              },
-            }}
-          >
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-1.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-2.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-3.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-4.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-5.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-6.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-7.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-8.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-1.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-2.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-3.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-4.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-5.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-6.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-7.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div>
-                <div className="category-card-item">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/assets/img/update-img/category/category1-8.png`}
-                    alt="Fixturbo"
-                  />
-                  <h6 className="category-card-title">
-                    <Link to="/shop-details">Engine pistons</Link>
-                  </h6>
-                  <p className="category-card-text">12 Products</p>
-                </div>
-              </div>
-            </SwiperSlide>
-          </Swiper>
-        </div> */}
+        <h4 className="text-center fw-extrabold mb-20  mt-5 pt-5">Search By Brand</h4>
+
         <div className="row mt-5 brands-sec">
 
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <Link to="/bran-models"><img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/22.png`}
-                alt="Fixturbo"
-              /></Link>
-              <div className="text-center">
-                <Link to="/bran-models" className="text-center brand-name">
-                Hyundai
-                </Link>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-               src={`${process.env.PUBLIC_URL}/assets/img/brands/17.png`}
-                alt="Fixturbo"
+        {carMakes.map((make) => (
+        <div key={make.id} className="col-sm-12 col-md-3 col-lg-2 mb-3">
+          <div className="category-card-item">
+            <Link to={`/brand-models/${make.id}`}>
+              <img
+               src={`${API_BASE_URL}${make.image}`}
+                alt={make.name}
+                onError={(e) => { e.target.src = `${process.env.PUBLIC_URL}/assets/img/brands/default.png`; }}
               />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Maruthi Suzuki</a>
-              </div>
+            </Link>
+            <div className="text-center">
+              <Link to={`/brand-models/${make.id}`} className="text-center brand-name">
+                {make.name}
+              </Link>
             </div>
           </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/25.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Kia</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/23.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Honda</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-               src={`${process.env.PUBLIC_URL}/assets/img/brands/5.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">TATA</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/6.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Toyota</a>
-              </div>
-            </div>
-          </div>
-          
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/8.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Audi</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/9.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">chevrolet</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/10.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">BMW</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/11.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Dastsun</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/12.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Ford</a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-12 col-md-3 col-lg-2 mb-3">
-            <div className="category-card-item">
-              <a href="
-              ">
-                <img
-                src={`${process.env.PUBLIC_URL}/assets/img/brands/13.png`}
-                alt="Fixturbo"
-              />
-              </a>
-              <div className="text-center">
-                <a href="" className="text-center brand-name">Skoda</a>
-              </div>
-            </div>
-          </div>
-
-          
-
-          
-
+        </div>
+      ))}
+  
         </div>
       </div>
     </div>

@@ -300,8 +300,7 @@ const HeaderFive = () => {
                           <span className="badge">3</span>
                         </Link>
                       </div>
-                      <div className="header-grid-details ">
-
+                      {/* <div className="header-grid-details ">
                         <button
                           type="button"
                           className="menu-toggle icon-btn"
@@ -309,7 +308,7 @@ const HeaderFive = () => {
                         >
                           <i className="fas fa-bars" />
                         </button>
-                      </div>
+                      </div> */}
                     </div>
                   </li>
 

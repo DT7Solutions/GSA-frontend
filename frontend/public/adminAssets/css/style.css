@@ -15724,3 +15724,7 @@ td.fc-header-center {
 }
 
 /* === footer css end === */
+
+.breadcumb-content h1{
+  font-size: 45px !important;
+}

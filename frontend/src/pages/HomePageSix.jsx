@@ -43,7 +43,7 @@ const HomePageSix = () => {
       {/* <FeatureArea /> */}
 
       {/* search filters  */}
-      <SearchVehicleArea />
+      {/* <SearchVehicleArea /> */}
 
       {/* Category Area One */}
       <CategoryAreaOne />

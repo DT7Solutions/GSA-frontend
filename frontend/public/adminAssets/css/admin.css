@@ -2,6 +2,7 @@
     display: flex;
   }
   
+
   .sidebar {
     width: 250px;
     background: #343a40;
@@ -20,7 +21,7 @@
   }
   
   .sidebar li {
-    padding: 15px;
+    padding: 0px !important;
     cursor: pointer;
   }
   
@@ -66,3 +67,6 @@
  }
 
  
+ .sidebar-menu-area{
+  background-color: red !important;
+ }

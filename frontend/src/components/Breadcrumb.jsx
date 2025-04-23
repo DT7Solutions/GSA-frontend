@@ -6,7 +6,7 @@ const Breadcrumb = ({ title }) => {
     <div className="breadcumb-wrapper">
       <div className="container">
         <div className="row">
-          <div className="col-lg-6">
+          <div className="col-lg-">
             <div className="breadcumb-content">
               <h1 className="breadcumb-title">{title}</h1>
               <ul className="breadcumb-menu">

@@ -86,17 +86,28 @@ const Login = () => {
       });
 
       if (response.data.access) {
+        debugger;
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
 
-        // if (role_id == 1) {
-        //   userRole = "Admin";
-        // } else if (role_id == 2) {
-        //   userRole = "Dealer";
-        // } else {
-        //   userRole = "Customer";
-        // }
-        navigate("/");
+        const decoded = jwtDecode(response.data.access);
+        const userId = decoded.user_id;
+        const userResponse = await axios.get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
+          headers: {
+            Authorization: `Bearer ${response.data.access}`,
+          },
+        });
+          const { username, role_id } = userResponse;
+            if (userResponse.data.role_id == 1) {
+              navigate("/Dashboard2");
+            } else if (userResponse.data.role_id == 2) {
+            
+              navigate("/Dashboard");
+            } else {
+              navigate("/");
+            }
+    
+        // navigate("/");
       }
     } catch (error) {
       console.error("Login Failed:", error.response ? error.response.data : error.message);

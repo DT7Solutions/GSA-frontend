@@ -90,3 +90,12 @@
         width: 100% !important;
     }
 }
+
+.sidebar li {
+    padding: 0px !important;
+    cursor: pointer;
+}
+
+.breadcumb-content h1{
+    font-size: 10px !important;
+}

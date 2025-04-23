@@ -1,0 +1,12 @@
+.sidebar-menu-area {
+    height: calc(100vh);
+    padding: 0.75rem 1rem;
+    overflow-y: auto;
+    border-inline-end: 1px solid var(--neutral-200);
+    background-color: white !important;
+  }
+  .sidebar li {
+    padding: 0px !important;
+    cursor: pointer;
+  }
+

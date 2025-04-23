@@ -145,15 +145,9 @@ const MasterLayout = ({ children }) => {
                                       Reports
                                   </NavLink>
                               </li>
-
-
+                              
                           </ul>
                       </li>
-
-                      <li className='sidebar-menu-group-title'>Application</li>
-                    
-
-                      {/* Invoice Dropdown */}
                       <li className='dropdown'>
                           <Link to='#'>
                               <Icon icon='hugeicons:invoice-03' className='menu-icon' />
@@ -173,7 +167,7 @@ const MasterLayout = ({ children }) => {
                               </li>
                               <li>
                                   <NavLink
-                                      to='/Form'
+                                      to='/Add-products'
                                       className={(navData) =>
                                           navData.isActive ? "active-page" : ""
                                       }
@@ -186,6 +180,8 @@ const MasterLayout = ({ children }) => {
 
                           </ul>
                       </li>
+
+
                       {/* <li>
                           <NavLink
                               to='/email'
@@ -199,6 +195,8 @@ const MasterLayout = ({ children }) => {
 
 
                   </ul>
+                 
+                  
               </div>
           </aside>
 
@@ -887,6 +885,7 @@ const MasterLayout = ({ children }) => {
                   </div>
               </footer>
           </main>
+          
       </section>
   );
 };
