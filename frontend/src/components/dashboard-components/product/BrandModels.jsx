@@ -20,6 +20,7 @@ const BrandModels = ({ id ,carMakes}) => {
        
         fetchCarModel();
       }, []);
+      
     return (
 
         <div className="category-area-1 pb-100 brand-logo-display mt-5">

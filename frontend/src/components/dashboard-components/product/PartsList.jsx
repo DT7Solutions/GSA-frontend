@@ -29,12 +29,6 @@ const PartListsection = ({id , partItem}) => {
                            <ProductListTable itemids={id}/>
                         </div>
                     </div>
-              
-
-
-
-
-
                 </div>
             </div>
         </div>

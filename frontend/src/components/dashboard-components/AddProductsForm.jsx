@@ -1,14 +1,28 @@
 import { Icon } from '@iconify/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import Select from 'react-select';
+import axios from "axios";
+import API_BASE_URL from "../../config";
+import Swal from "sweetalert2";
 
 const AddProductsForm = () => {
     const [showModal, setShowModal] = useState(false);
     const [showCarModelModal, setShowCarModelModal] = useState(false);
     const [showCarVariantModal, setShowCarVariantModal] = useState(false);
-    const [showPartSelectionModal, setShowPartSelectionModal] = useState(false);
+    const [showPartSelectionCatModal, setShowPartSelectionCatModal] = useState(false);
+    const [showPartGroupModal, setShowPartGroupModal] = useState(false);
     const [showPartCompatibilityModal, setShowPartCompatibilityModal] = useState(false);
     const [selectedParts, setSelectedParts] = useState([]);
+
+    const token = localStorage.getItem("accessToken");
+
+    const [carModels, setCarModels] = useState([]);
+    const [carVariant, setModelVariant] = useState([]);
+    const [CarModelVariant, setCarModelVariant] = useState([]);
+    const [carPartCat, setcarPartCat] = useState([]);
+    const [carcatGroup, setcarPartgroupItem] = useState([]);
+
+
 
 
     // State for Car Brand (Add Car)
@@ -23,6 +37,9 @@ const AddProductsForm = () => {
         modelName: '',
         bodyType: '',
         fuelType: '',
+        generation: '',
+        MproductionStart: '',
+        MproductionEnd: '',
         image: null,
     });
 
@@ -41,57 +58,443 @@ const AddProductsForm = () => {
     const [partSelectionData, setPartSelectionData] = useState({
         carVariant: '',
         name: '',
+        image: null,
     });
 
-    // Handle Add Car (Brand)
-    const handleAddCar = (e) => {
+    // State for Part Selection
+    const [partGrouponData, setPartGroupData] = useState({
+        partcat: '',
+        name: '',
+        image: null,
+    });
+
+
+    // Handle save product 
+    const [formData, setFormData] = useState({
+        carMakeId: '',
+        carModelId: '',
+        carVariantId: '',
+        partCategoryId: '',
+        partId: '',
+        partNumber: '',
+        figureNumber: '',
+        price: '',
+        salePrice: '',
+        discount: '',
+        qty: '',
+        sku: '',
+        remarks: '',
+        compatibility: [],
+        description: ''
+    });
+    // console.log(formData)
+
+    // Handle final product save logic 
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Car Brand Data:', carBrandData);
-        setShowModal(false);
-        setCarBrandData({ brandname: '', image: null });
+     alert(" form triggering")
+        try {
+            const response = await axios.post(`${API_BASE_URL}api/home/create_car_part/`, formData,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            Swal.fire({
+                title: "Success Created Car Part Sucessfully",
+                text: response.data.message,
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Failed to save part";
+            Swal.fire({
+                title: "Request Failed",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "Retry",
+            });
+        }
     };
+
+
+    // Handle Add Car (Brand)
+    const handleAddCar = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("name", carBrandData.brandname);
+        formData.append("image", carBrandData.image);
+
+        try {
+            const response = await axios.post(`${API_BASE_URL}api/home/add_car/`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            Swal.fire({
+                title: "success created Car Brand",
+                text: response.data.message,
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+
+            setShowModal(false);
+            setCarBrandData({ brandname: '', image: null });
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Something went wrong. Please try again.";
+            Swal.fire({
+                title: "Request Failed",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "Retry",
+            });
+        }
+    };
+
+    // bindin data 
+    const [carMakes, setCarMakes] = useState([]);
+
+    useEffect(() => {
+        const fetchCarMakes = async () => {
+            try {
+                const response = await axios.get(`${API_BASE_URL}api/home/car-makes/`);
+                setCarMakes(response.data);
+            } catch (error) {
+                console.error('Error fetching car makes:', error);
+            }
+        };
+
+        fetchCarMakes();
+    }, []);
+
+
 
     // Handle Add Car Model
-    const handleAddCarModel = (e) => {
+    const handleAddCarModel = async (e) => {
         e.preventDefault();
-        console.log('Car Model Data:', carModelData);
-        setShowCarModelModal(false);
-        setCarModelData({ car: '', modelName: '', bodyType: '', fuelType: '', image: null });
+
+        const formData = new FormData();
+        formData.append("car_make", carModelData.car);
+        formData.append("name", carModelData.modelName);
+        formData.append("body_type", carModelData.bodyType);
+        formData.append("fuel_type", carModelData.fuelType);
+        formData.append("generation", carModelData.generation);
+        formData.append("production_start_date", carModelData.MproductionStart);
+        formData.append("production_end_date", carModelData.MproductionEnd);
+        formData.append("image", carModelData.image);
+
+
+        try {
+            debugger;
+            const response = await axios.post(`${API_BASE_URL}api/home/add_car_model/`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            Swal.fire({
+                title: "success created Car Brand",
+                text: response.data.message,
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+
+            setShowModal(false);
+            setCarBrandData({ brandname: '', image: null });
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Something went wrong. Please try again.";
+            Swal.fire({
+                title: "Request Failed",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "Retry",
+            });
+        }
+
+
     };
 
+    const handleCarMakeChange = async (e) => {
+        const makeId = parseInt(e.target.value);
+       
+        setFormData((formData) => ({
+            ...formData,
+            carMakeId: makeId,
+        }));
+        
+        try {
+            const response = await axios.get(`${API_BASE_URL}api/home/car-models/${makeId}/`);
+            setCarModels(response.data);
+
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+        }
+    };
+
+    const [carModelList, setcarModelList] = useState([]);
+
+    const [partOptions, setPartOptions] = useState([]);
+    useEffect(() => {
+        const fetchCarMakes = async () => {
+            try {
+                const response = await axios.get(`${API_BASE_URL}api/home/car-models/`);
+                setcarModelList(response.data);
+              
+            const options = response.data.map(item => ({
+                  value: item.id,
+                label: `${item.name} (${item.fuel_type})(${item.production_start_date} - ${item.production_end_date})`
+            }));
+
+            setPartOptions(options);
+
+            } catch (error) {
+                console.error('Error fetching car makes:', error);
+            }
+        };
+
+        fetchCarMakes();
+    }, []);
+
+
+
+
     // Handle Add Car Variant
-    const handleAddCarVariant = (e) => {
+    const handleAddCarVariant = async (e) => {
         e.preventDefault();
-        console.log('Car Variant Data:', carVariantData);
-        setShowCarVariantModal(false);
-        setCarVariantData({
-            carModel: '',
-            name: '',
-            region: '',
-            productionStart: '',
-            productionEnd: '',
-            chassisType: '',
-            description: '',
-        });
+
+
+        const formData = new FormData();
+        formData.append("car_model", carVariantData.carModel);
+        formData.append("name", carVariantData.name);
+        formData.append("region", "India");
+        formData.append("production_start_date", carVariantData.productionStart);
+        formData.append("production_end_date", carVariantData.productionEnd);
+        formData.append("chassis_type", carVariantData.chassisType);
+        formData.append("engine", carVariantData.engine);
+        formData.append("v_no", " ");
+        formData.append("description", carVariantData.description);
+
+
+        try {
+            debugger;
+            const response = await axios.post(`${API_BASE_URL}api/home/create_car_Variant/`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            Swal.fire({
+                title: "success created car variant",
+                text: response.data.message,
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+
+            setShowCarVariantModal(false);
+            setCarVariantData({
+                carModel: '',
+                name: '',
+                region: 'India',
+                productionStart: '',
+                productionEnd: '',
+                chassisType: '',
+                engine: '',
+                description: '',
+            });
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Something went wrong. Please try again.";
+            Swal.fire({
+                title: "Request Failed",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "Retry",
+            });
+        }
+    };
+
+    const [PartsCategoryList, setPartsCategoryList] = useState([]);
+
+    useEffect(() => {
+        const fetchCarMakes = async () => {
+            try {
+                const response = await axios.get(`${API_BASE_URL}api/home/get_parts_category_list/`);
+                setPartsCategoryList(response.data);
+            } catch (error) {
+                console.error('Error fetching car makes:', error);
+            }
+        };
+
+        fetchCarMakes();
+    }, []);
+
+
+
+    const handleCarModelChange = async (e) => {
+        const modelId = parseInt(e.target.value);
+        setFormData((formData) => ({
+            ...formData,
+            carModelId: modelId,
+        }));
+
+        try {
+            const response = await axios.get(`${API_BASE_URL}api/home/car_variant/${modelId}/`);
+            setModelVariant(response.data);
+
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+        }
+    };
+
+
+    // Handle Add Part Selection
+    const handleAddPartSelection = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("variant", partSelectionData.carVariant);
+        formData.append("name", partSelectionData.name);
+        formData.append("image", partSelectionData.image);
+
+        console.log('Part Selection Data:', partSelectionData);
+        try {
+            debugger;
+            const response = await axios.post(`${API_BASE_URL}api/home/create_car_part_categories/`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            Swal.fire({
+                title: "success created car category",
+                text: response.data.message,
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+
+            setShowPartSelectionCatModal(false);
+            setPartSelectionData({ carVariant: '', name: '', partGroup: '' });
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Something went wrong. Please try again.";
+            Swal.fire({
+                title: "Request Failed",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "Retry",
+            });
+        }
+
+
+    };
+
+    useEffect(() => {
+        const fetchCarMakes = async () => {
+            try {
+                const response = await axios.get(`${API_BASE_URL}api/home/car_model_varian_list/`);
+                setCarModelVariant(response.data);
+            } catch (error) {
+                console.error('Error fetching car makes:', error);
+            }
+        };
+
+        fetchCarMakes();
+    }, []);
+
+    const handleCarVariantChange = async (e) => {
+        const variantId = parseInt(e.target.value);
+        setFormData((formData) => ({
+            ...formData,
+            carVariantId: variantId,
+        }));
+       
+        try {
+            const response = await axios.get(`${API_BASE_URL}api/home/car_variant_category/${variantId}/`);
+            setcarPartCat(response.data);
+
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+        }
     };
 
     // Handle Add Part Selection
-    const handleAddPartSelection = (e) => {
+    const handleAddPartGroupSelection = async (e) => {
         e.preventDefault();
-        console.log('Part Selection Data:', partSelectionData);
-        setShowPartSelectionModal(false);
-        setPartSelectionData({ carVariant: '', name: '', partGroup: '' });
+        const formData = new FormData();
+        formData.append("section", partGrouponData.partcat);
+        formData.append("name", partGrouponData.name);
+        formData.append("image", partGrouponData.image);
+
+        try {
+            debugger;
+            const response = await axios.post(`${API_BASE_URL}api/home/create_car_part_group_item/`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            Swal.fire({
+                title: "success created car group",
+                text: response.data.message,
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+
+            setShowPartGroupModal(false);
+            setPartGroupData({ partSection: '', name: '', image: '' });
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Something went wrong. Please try again.";
+            Swal.fire({
+                title: "Request Failed",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "Retry",
+            });
+        }
+
+
     };
 
-    // For Part Compatibility, you might manage it differently since it is a multi-select.
-    const partOptions = [
-        { value: 'variant1', label: '5DR 1.4 E (DIESEL)(06.2015-05.2018)' },
-        { value: 'variant2', label: '5DR 1.5L 6S (DIESEL)(06.2021 -02.2023)' },
-    ];
 
+    const handleCarcategorytChange = async (e) => {
+        const partcatId = parseInt(e.target.value);
+        setFormData((formData) => ({
+            ...formData,
+            partCategoryId: partcatId,
+        }));
+        try {
+            const response = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${partcatId}/`);
+            setcarPartgroupItem(response.data);
+
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+        }
+    };
+
+    const handleCarpartitemChange =async (e) =>{
+        const partitemId = parseInt(e.target.value);
+        setFormData((formData) => ({
+            ...formData,
+            partId: partitemId,
+        }));
+    }
+   
     // Handle Part Compatibility
     const handleChange = (selectedOptions) => {
         setSelectedParts(selectedOptions);
+        setFormData((formData) => ({
+            ...formData,
+            compatibility: selectedOptions,
+        }));
         console.log("Selected Parts:", selectedOptions);
     }
 
@@ -102,16 +505,16 @@ const AddProductsForm = () => {
                     <h5 className="card-title mb-0">Add Products</h5>
                 </div>
                 <div className="card-body">
-                    <form className="row gy-3 needs-validation input-style" noValidate>
+                    <form className="row gy-3 needs-validation input-style" noValidate onSubmit={handleSubmit}>
                         {/* Car Brand Selection */}
                         <div className="col-md-4">
                             <label className="form-label">Select Car</label>
                             <div className="input-group has-validation">
-                                <select className="form-select form-select input-g">
+                                <select className="form-select form-select input-g" onChange={handleCarMakeChange} >
                                     <option >-- select car --</option>
-                                    <option value="hyundai">Hyundai</option>
-                                    <option value="kia">Kia</option>
-                                    <option value="maruthi">Maruthi Suzuki</option>
+                                    {carMakes.map((make) => (
+                                        <option value={make.id}>{make.name}</option>
+                                    ))}
                                 </select>
                                 <button
                                     type="button"
@@ -127,10 +530,12 @@ const AddProductsForm = () => {
                         <div className="col-md-4">
                             <label className="form-label">Select Car Model</label>
                             <div className="input-group has-validation">
-                                <select className="form-select form-select input-g">
+                                <select className="form-select form-select input-g" onChange={handleCarModelChange}>
                                     <option >-- select car model --</option>
-                                    <option value="model1">ALCAZAR 1ST GEN (2021-2023)</option>
-                                    <option value="model2">CRETA 1ST GEN (2015-2018)</option>
+                                    {carModels.map((model) => (
+                                        <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
+                                        </option>
+                                    ))}
                                 </select>
                                 <button
                                     type="button"
@@ -146,10 +551,11 @@ const AddProductsForm = () => {
                         <div className="col-md-4">
                             <label className="form-label">Select Car Variant</label>
                             <div className="input-group has-validation">
-                                <select className="form-select form-select input-g">
+                                <select className="form-select form-select input-g" onChange={handleCarVariantChange}>
                                     <option >-- select Car Variant --</option>
-                                    <option value="variant1">5DR 1.4 E (DIESEL)(06.2015-05.2018)</option>
-                                    <option value="variant2">5DR 1.5L 6S (DIESEL)(06.2021 -02.2023)</option>
+                                    {carVariant.map((varient) => (
+                                        <option value={varient.id}>{varient.name}({new Date(varient.production_start_date).getFullYear()} - {new Date(varient.production_end_date).getFullYear()})</option>
+                                    ))}
                                 </select>
                                 <button
                                     type="button"
@@ -163,37 +569,46 @@ const AddProductsForm = () => {
 
                         {/* Part Selection */}
                         <div className="col-md-4">
-                            <label className="form-label">Select Part Type</label>
+                            <label className="form-label">Select Part category</label>
                             <div className="input-group has-validation">
-                                <select className="form-select form-select input-g">
-                                    <option >-- select Car  PartGroup --  </option>
-                                    <option value="part1">Body</option>
-                                    <option value="part2">CHassis</option>
-                                    <option value="part2">Electric</option>
-                                    <option value="part2">Engine</option>
-                                    <option value="part2">Trim</option>
-                                    <option value="part2">Transmission</option>
+                                <select className="form-select form-select input-g" onChange={handleCarcategorytChange}>
+                                    <option >-- select car  part category --  </option>
+                                    {carPartCat.map((item) => (
+                                        <option value={item.id}>{item.name}</option>
+                                    ))}
+
                                 </select>
                                 <button
                                     type="button"
                                     className="input-group-text bg-base"
-                                    onClick={() => setShowPartSelectionModal(true)}
+                                    onClick={() => setShowPartSelectionCatModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Part
                                 </button>
                             </div>
                         </div>
+
+                        {/* Part */}
                         <div className="col-md-4">
-                            <label className="form-label">Part Name</label>
-                            <input
-                                type="text"
-                                name="#0"
-                                className="form-control"
-                                placeholder="Enter part name,"
-                                required
-                            />
-                            <div className="invalid-feedback">Please part name</div>
+                            <label className="form-label">Select Part </label>
+                            <div className="input-group has-validation">
+                                <select className="form-select form-select input-g" onChange={handleCarpartitemChange}>
+                                    <option >-- select car  part  --  </option>
+                                    {carcatGroup.map((item) => (
+                                        <option value={item.id}>{item.name}</option>
+                                    ))}
+
+                                </select>
+                                <button
+                                    type="button"
+                                    className="input-group-text bg-base"
+                                    onClick={() => setShowPartGroupModal(true)}
+                                >
+                                    <Icon icon="lucide:plus" /> Add Part
+                                </button>
+                            </div>
                         </div>
+
 
                         <div className="col-md-4">
                             <label className="form-label">Part Number</label>
@@ -202,11 +617,69 @@ const AddProductsForm = () => {
                                 name="#0"
                                 className="form-control"
                                 placeholder="Enter part number,"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, partNumber: e.target.value })
+                                }
                                 required
                             />
                             <div className="invalid-feedback">Please part number</div>
                         </div>
-
+                        <div className="col-md-4">
+                            <label className="form-label">Part figure Number</label>
+                            <input
+                                type="text"
+                                name="#0"
+                                className="form-control"
+                                placeholder="Enter figure no,"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, figureNumber: e.target.value })
+                                }
+                                required
+                            />
+                            <div className="invalid-feedback">Please figure number</div>
+                        </div>
+                        <div className="col-md-4">
+                            <label className="form-label">Price</label>
+                            <input
+                                type="number"
+                                name="#0"
+                                className="form-control"
+                                placeholder="Enter part price,"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, price: e.target.value })
+                                }
+                                required
+                            />
+                            <div className="invalid-feedback">Please part price</div>
+                        </div>
+                        <div className="col-md-4">
+                            <label className="form-label">Sale Price</label>
+                            <input
+                                type="number"
+                                name="#0"
+                                className="form-control"
+                                placeholder="Enter part sale price"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, salePrice: e.target.value })
+                                }
+                                required
+                            />
+                            <div className="invalid-feedback">Please part sale price</div>
+                        </div>
+                        <div className="col-md-4">
+                            <label className="form-label">Part discount</label>
+                            <input
+                                type="number"
+                                name="#0"
+                                className="form-control"
+                                placeholder="Enter discount"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, discount: e.target.value })
+                                }
+                                required
+                            />
+                            <div className="invalid-feedback">Please discount.</div>
+                        </div>
                         <div className="col-md-4">
                             <label className="form-label">Part QTY</label>
                             <input
@@ -214,31 +687,28 @@ const AddProductsForm = () => {
                                 name="#0"
                                 className="form-control"
                                 placeholder="Enter number of QTY,"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, qty: e.target.value })
+                                }
                                 required
                             />
                             <div className="invalid-feedback">Please provide qty.</div>
                         </div>
-
                         <div className="col-md-4">
-                            <label className="form-label">Part Image Number</label>
+                            <label className="form-label">Part SKU</label>
                             <input
                                 type="text"
                                 name="#0"
                                 className="form-control"
-                                placeholder="Enter figure no,"
+                                placeholder="Enter number of sku,"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, sku: e.target.value })
+                                }
                                 required
                             />
-                            <div className="invalid-feedback">Please figure number</div>
+                            <div className="invalid-feedback">Please provide sku.</div>
                         </div>
-
-                        <div class="col-lg-4">
-                            <label className="form-label">Upload Image</label>
-                            <input
-                                type="file"
-                                className="form-control"
-                            />
-                        </div>
-
+                      
                         <div className="col-md-4">
                             <label className="form-label">Remarks</label>
                             <input
@@ -246,12 +716,12 @@ const AddProductsForm = () => {
                                 name="#0"
                                 className="form-control"
                                 placeholder="Enter remarks,"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, remarks: e.target.value })
+                                }
                                 required
                             />
                         </div>
-
-
-
                         {/* Part Compatibility */}
                         <div className="col-md-8">
                             <label className="form-label">Part Compatibility</label>
@@ -267,12 +737,15 @@ const AddProductsForm = () => {
 
                         <div class="col-lg-8 was-validated">
                             <label class="form-label">Description</label>
-                            <textarea class="form-control" rows="4" cols="50" placeholder="Enter a description...">
+                            <textarea class="form-control" rows="4" cols="50" placeholder="Enter a description..."
+                             onChange={(e) =>
+                                setFormData({ ...formData, description: e.target.value })
+                            }>
                             </textarea>
                             <div class="invalid-feedback">Please enter a message in the textarea.</div>
                         </div>
 
-                    
+
                         <div className="col-12">
                             <button className="btn btn-primary-600 style2" type="submit">
                                 Submit form
@@ -352,9 +825,10 @@ const AddProductsForm = () => {
                                             }
                                             required
                                         >
-                                            <option value="">Select Car</option>
-                                            <option value="hyundai">Hyundai</option>
-                                            <option value="kia">Kia</option>
+                                            <option value=""> -- Select Car Brand-- </option>
+                                            {carMakes.map((make) => (
+                                                <option value={make.id}>{make.name}</option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="mb-3">
@@ -381,6 +855,45 @@ const AddProductsForm = () => {
                                             required
                                         />
                                     </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Generation</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={carModelData.generation}
+                                            onChange={(e) =>
+                                                setCarModelData({ ...carModelData, generation: e.target.value })
+                                            }
+                                            required
+                                        />
+                                    </div>
+                                    <div className="row mb-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">Production Start</label>
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                value={carModelData.MproductionStart}
+                                                onChange={(e) =>
+                                                    setCarModelData({ ...carModelData, MproductionStart: e.target.value })
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">Production End</label>
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                value={carVariantData.MproductionEnd}
+                                                onChange={(e) =>
+                                                    setCarModelData({ ...carModelData, MproductionEnd: e.target.value })
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
                                     <div className="mb-3">
                                         <label className="form-label">Fuel Type</label>
                                         <select
@@ -442,8 +955,11 @@ const AddProductsForm = () => {
                                             required
                                         >
                                             <option value="">Select Model</option>
-                                            <option value="model1">Model 1</option>
-                                            <option value="model2">Model 2</option>
+                                            {carModelList.map((model) => (
+                                                <option value={model.id}>{model.name}{model.generation}</option>
+                                            ))}
+
+
                                         </select>
                                     </div>
                                     <div className="mb-3">
@@ -451,6 +967,7 @@ const AddProductsForm = () => {
                                         <input
                                             type="text"
                                             className="form-control"
+                                            placeholder='enter variant name '
                                             value={carVariantData.name}
                                             onChange={(e) =>
                                                 setCarVariantData({ ...carVariantData, name: e.target.value })
@@ -458,18 +975,19 @@ const AddProductsForm = () => {
                                             required
                                         />
                                     </div>
-                                    <div className="mb-3">
+                                    {/* <div className="mb-3">
                                         <label className="form-label">Region</label>
                                         <input
                                             type="text"
                                             className="form-control"
+                                            placeholder='enter regian' 
                                             value={carVariantData.region}
                                             onChange={(e) =>
                                                 setCarVariantData({ ...carVariantData, region: e.target.value })
                                             }
                                             required
                                         />
-                                    </div>
+                                    </div> */}
                                     <div className="row mb-3">
                                         <div className="col-md-6">
                                             <label className="form-label">Production Start</label>
@@ -496,22 +1014,39 @@ const AddProductsForm = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="mb-3">
-                                        <label className="form-label">Chassis Type</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            value={carVariantData.chassisType}
-                                            onChange={(e) =>
-                                                setCarVariantData({ ...carVariantData, chassisType: e.target.value })
-                                            }
-                                            required
-                                        />
+                                    <div className="row mb-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">Chassis Type</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder='enter chassis Type'
+                                                value={carVariantData.chassisType}
+                                                onChange={(e) =>
+                                                    setCarVariantData({ ...carVariantData, chassisType: e.target.value })
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">Engine</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder='enter engine type'
+                                                value={carVariantData.engine}
+                                                onChange={(e) =>
+                                                    setCarVariantData({ ...carVariantData, engine: e.target.value })
+                                                }
+                                                required
+                                            />
+                                        </div>
                                     </div>
                                     <div className="mb-3">
                                         <label className="form-label">Description</label>
                                         <textarea
                                             className="form-control"
+                                            placeholder='enter description ....'
                                             value={carVariantData.description}
                                             onChange={(e) =>
                                                 setCarVariantData({ ...carVariantData, description: e.target.value })
@@ -530,13 +1065,13 @@ const AddProductsForm = () => {
             )}
 
             {/* Modal for Adding Part Selection */}
-            {showPartSelectionModal && (
+            {showPartSelectionCatModal && (
                 <div className="modal d-block" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">Add Part Selection</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowPartSelectionModal(false)}>
+                                <button type="button" className="btn-close" onClick={() => setShowPartSelectionCatModal(false)}>
                                     X
                                 </button>
                             </div>
@@ -552,13 +1087,14 @@ const AddProductsForm = () => {
                                             }
                                             required
                                         >
-                                            <option value="">Select Variant</option>
-                                            <option value="variant1">Variant 1</option>
-                                            <option value="variant2">Variant 2</option>
+                                            <option value="">-- Select Variant -- </option>
+                                            {CarModelVariant.map((item) => (
+                                                <option value={item.id}>{item.name}</option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label">Part Name</label>
+                                        <label className="form-label">Part category Name</label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -569,24 +1105,81 @@ const AddProductsForm = () => {
                                             required
                                         />
                                     </div>
-                                    {/* <div className="mb-3">
-                                        <label className="form-label">Part Group</label>
+                                    <div className="mb-3">
+                                        <label className="form-label">Upload Image</label>
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            onChange={(e) =>
+                                                setPartSelectionData({ ...partSelectionData, image: e.target.files[0] })
+                                            }
+                                            required
+                                        />
+                                    </div>
+                                    <button type="submit" className="btn btn-primary style2">
+                                        Save Part
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Modal for Adding Part Group */}
+            {showPartGroupModal && (
+                <div className="modal d-block" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Add Part Group</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowPartGroupModal(false)}>
+                                    X
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                <form onSubmit={handleAddPartGroupSelection} className="input-style">
+                                    <div className="mb-3">
+                                        <label className="form-label">Select Car Variant</label>
                                         <select
                                             className="form-select"
-                                            value={partSelectionData.partGroup}
+                                            value={partGrouponData.partcat}
                                             onChange={(e) =>
-                                                setPartSelectionData({ ...partSelectionData, partGroup: e.target.value })
+                                                setPartGroupData({ ...partGrouponData, partcat: e.target.value })
                                             }
                                             required
                                         >
-                                            <option value="">Select Group</option>
-                                            <option value="engine">Engine</option>
-                                            <option value="suspension">Suspension</option>
-                                            <option value="electrical">Electrical</option>
+                                            <option value="">-- Select Variant -- </option>
+                                            {PartsCategoryList.map((item) => (
+                                                <option value={item.id}>{item.name}</option>
+                                            ))}
                                         </select>
-                                    </div> */}
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Part category Name</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={partGrouponData.name}
+                                            onChange={(e) =>
+                                                setPartGroupData({ ...partGrouponData, name: e.target.value })
+                                            }
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Upload Image</label>
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            onChange={(e) =>
+                                                setPartGroupData({ ...partGrouponData, image: e.target.files[0] })
+                                            }
+                                            required
+                                        />
+                                    </div>
+
                                     <button type="submit" className="btn btn-primary style2">
-                                        Save Part
+                                        Save Part Group
                                     </button>
                                 </form>
                             </div>

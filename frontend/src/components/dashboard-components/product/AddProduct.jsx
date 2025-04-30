@@ -5,9 +5,7 @@ import InputStatus from '../child/InputStatus'
 const AddProduct = () => {
     return (
         <div className="row gy-4">
-
             <AddProductsForm />
-
         </div>
 
     )

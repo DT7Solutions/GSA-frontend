@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import axios from "axios";
 import API_BASE_URL from "../../../config";
-
+import Swal from "sweetalert2";
 
 const ProductListTable = () => {
 const { id } = useParams();
@@ -26,6 +26,16 @@ const { id } = useParams();
 
         fetchCarModel();
     }, []);
+
+
+    const handelAddToCart = (e) => {
+        Swal.fire({
+            title: "Success Added to cart",
+            text:"your product sucessfully added to cart",
+            icon: "success",
+            confirmButtonText: "OK",
+        });
+    }
 
     return (
         <div className="card">
@@ -104,6 +114,7 @@ const { id } = useParams();
                                 </Link>
                                 <Link
                                     to="#"
+                                    onClick={handelAddToCart}
                                     className="w-32-px h-32-px  me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
                                 >
                                   <Icon icon="lucide:shopping-cart" />
