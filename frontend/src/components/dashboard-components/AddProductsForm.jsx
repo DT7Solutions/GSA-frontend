@@ -92,7 +92,6 @@ const AddProductsForm = () => {
     // Handle final product save logic 
     const handleSubmit = async (e) => {
         e.preventDefault();
-     alert(" form triggering")
         try {
             const response = await axios.post(`${API_BASE_URL}api/home/create_car_part/`, formData,{
                 headers: {
