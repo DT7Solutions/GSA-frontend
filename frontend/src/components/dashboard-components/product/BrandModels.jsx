@@ -32,8 +32,8 @@ const BrandModels = ({ id ,carMakes}) => {
                         <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
                             <div className="brand-models">
                                 <Link to={`/models-variant/${model.id}`}><img
-                                    src={`${API_BASE_URL}${model.image}`}
-                                    alt="Fixturbo"
+                                    src={model.image}
+                                    alt={carMakes.name}
                                 /></Link>
                                 <div className="text-center">
                                     <Link to={`/models-variant/${model.id}`} className="text-center brand-name">

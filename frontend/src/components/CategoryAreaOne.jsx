@@ -40,7 +40,7 @@ const CategoryAreaOne = () => {
               />
             </Link>
             <div className="text-center">
-              <Link to={`/brand-models/${make.id}`} className="text-center brand-name">
+              <Link to={`/brand-models/${make.id}`} className="text-center brand-name car-brand-name">
                 {make.name}
               </Link>
             </div>

@@ -31,8 +31,8 @@ const ModelVariantsList = ({id , carModelItem}) => {
                     <div className="col-sm-12 col-md-4 col-lg-4 mb-3">
                         <div className="brand-models">
                         <img
-                               src={`${API_BASE_URL}${carModelItem.image}`}
-                                alt="Fixturbo"
+                               src={carModelItem.image}
+                                alt={carModelItem.name}
                             />
                             <div className="text-center">
                                 {carModelItem.car_make} {carModelItem.name} {carModelItem.generation}

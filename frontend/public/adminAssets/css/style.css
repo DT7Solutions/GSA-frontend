@@ -15742,3 +15742,6 @@ td.fc-header-center {
   .search-select .select__control .select__indicator-separator {
    display: none !important;
   }
+  .car-brand-name{
+    font-size: 35px !important;
+  }

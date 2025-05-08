@@ -35,8 +35,8 @@ const Partsection = ({id, Modelveriant}) => {
                         <div className="col-sm-12 col-md-2 col-lg-2 mb-3">
                             <div className="brand-models">
                                 <Link to={`/part-list/${item.id}`}><img
-                                    src={`${API_BASE_URL}${item.image}`}
-                                    alt="Fixturbo"
+                                    src={item.image}
+                                    alt={item.name}
                                 /></Link>
                                 <div className="text-center">
                                     <Link  to={`/part-list/${item.id}`} className="text-center brand-name">
