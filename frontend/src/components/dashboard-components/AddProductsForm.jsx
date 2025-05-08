@@ -93,7 +93,7 @@ const AddProductsForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${API_BASE_URL}api/home/create_car_part/`, formData,{
+            const response = await axios.post(`${API_BASE_URL}api/home/create_car_part/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -221,12 +221,12 @@ const AddProductsForm = () => {
 
     const handleCarMakeChange = async (e) => {
         const makeId = parseInt(e.target.value);
-       
+
         setFormData((formData) => ({
             ...formData,
             carMakeId: makeId,
         }));
-        
+
         try {
             const response = await axios.get(`${API_BASE_URL}api/home/car-models/${makeId}/`);
             setCarModels(response.data);
@@ -244,13 +244,13 @@ const AddProductsForm = () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}api/home/car-models/`);
                 setcarModelList(response.data);
-              
-            const options = response.data.map(item => ({
-                  value: item.id,
-                label: `${item.name} (${item.fuel_type})(${item.production_start_date} - ${item.production_end_date})`
-            }));
 
-            setPartOptions(options);
+                const options = response.data.map(item => ({
+                    value: item.id,
+                    label: `${item.name} (${item.fuel_type})(${item.production_start_date} - ${item.production_end_date})`
+                }));
+
+                setPartOptions(options);
 
             } catch (error) {
                 console.error('Error fetching car makes:', error);
@@ -413,7 +413,7 @@ const AddProductsForm = () => {
             ...formData,
             carVariantId: variantId,
         }));
-       
+
         try {
             const response = await axios.get(`${API_BASE_URL}api/home/car_variant_category/${variantId}/`);
             setcarPartCat(response.data);
@@ -479,14 +479,14 @@ const AddProductsForm = () => {
         }
     };
 
-    const handleCarpartitemChange =async (e) =>{
+    const handleCarpartitemChange = async (e) => {
         const partitemId = parseInt(e.target.value);
         setFormData((formData) => ({
             ...formData,
             partId: partitemId,
         }));
     }
-   
+
     // Handle Part Compatibility
     const handleChange = (selectedOptions) => {
         setSelectedParts(selectedOptions);
@@ -497,6 +497,12 @@ const AddProductsForm = () => {
         console.log("Selected Parts:", selectedOptions);
     }
 
+
+    const carOptions = carMakes.map(make => ({
+        value: make.id,
+        label: make.name
+      }));
+      
     return (
         <div className="col-lg-12">
             <div className="card">
@@ -509,12 +515,22 @@ const AddProductsForm = () => {
                         <div className="col-md-4">
                             <label className="form-label">Select Car</label>
                             <div className="input-group has-validation">
-                                <select className="form-select form-select input-g" onChange={handleCarMakeChange} >
-                                    <option >-- select car --</option>
-                                    {carMakes.map((make) => (
-                                        <option value={make.id}>{make.name}</option>
-                                    ))}
-                                </select>
+                                <div className='search-select'>
+                                <Select
+                                    className="basic-single input-g"
+                                    classNamePrefix="select"
+                                    options={carMakes.map(make => ({
+                                        value: make.id,
+                                        label: make.name,
+                                  
+                                    }))}
+                                    onChange={(selectedOption) =>
+                                        handleCarMakeChange({ target: { value: selectedOption.value } })
+                                    }
+                                    placeholder="-- Select Your Car --"
+                                    isSearchable={true}
+                                />
+                                </div>
                                 <button
                                     type="button"
                                     className="input-group-text bg-base"
@@ -524,8 +540,7 @@ const AddProductsForm = () => {
                                 </button>
                             </div>
                         </div>
-
-                        {/* Car Model Selection */}
+                                                    {/* Car Model Selection */}
                         <div className="col-md-4">
                             <label className="form-label">Select Car Model</label>
                             <div className="input-group has-validation">
@@ -707,7 +722,7 @@ const AddProductsForm = () => {
                             />
                             <div className="invalid-feedback">Please provide sku.</div>
                         </div>
-                      
+
                         <div className="col-md-4">
                             <label className="form-label">Remarks</label>
                             <input
@@ -737,9 +752,9 @@ const AddProductsForm = () => {
                         <div class="col-lg-8 was-validated">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" rows="4" cols="50" placeholder="Enter a description..."
-                             onChange={(e) =>
-                                setFormData({ ...formData, description: e.target.value })
-                            }>
+                                onChange={(e) =>
+                                    setFormData({ ...formData, description: e.target.value })
+                                }>
                             </textarea>
                             <div class="invalid-feedback">Please enter a message in the textarea.</div>
                         </div>

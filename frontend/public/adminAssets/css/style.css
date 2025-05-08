@@ -15728,3 +15728,17 @@ td.fc-header-center {
 .breadcumb-content h1{
   font-size: 45px !important;
 }
+
+.search-select {
+    flex-grow: 1 !important;
+    width: 70% !important;
+  }
+
+  .search-select .select__control {
+  border-top-right-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+  }
+
+  .search-select .select__control .select__indicator-separator {
+   display: none !important;
+  }

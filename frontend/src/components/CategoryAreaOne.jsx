@@ -30,11 +30,11 @@ const CategoryAreaOne = () => {
         <div className="row mt-5 brands-sec">
 
         {carMakes.map((make) => (
-        <div key={make.id} className="col-sm-12 col-md-3 col-lg-2 mb-3">
-          <div className="category-card-item">
+        <div key={make.id} className="col-sm-12 col-md-3 col-lg-3 mb-3">
+          <div className="category-card-item aligen-items-center">
             <Link to={`/brand-models/${make.id}`}>
               <img
-               src={`${API_BASE_URL}${make.image}`}
+                src={make.image} 
                 alt={make.name}
                 onError={(e) => { e.target.src = `${process.env.PUBLIC_URL}/assets/img/brands/default.png`; }}
               />
