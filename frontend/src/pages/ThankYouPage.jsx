@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import HeaderFive from "../components/HeaderFive";
 
 import FooterAreaFour from "../components/FooterAreaFour";
-import Breadcrumb from "../components/Breadcrumb";
-import SubscribeOne from "../components/SubscribeOne";
-import Cart from "../components/Cart";
+import Thankyou from "../components/Thankyou.jsx";
 import Preloader from "../helper/Preloader";
 
-const CartPage = () => {
+const ThankyouPage = () => {
+    
+  
   let [active, setActive] = useState(true);
   useEffect(() => {
     setTimeout(function () {
@@ -19,13 +19,12 @@ const CartPage = () => {
       {/* Preloader */}
       {active === true && <Preloader />}
       <HeaderFive />
-      <Breadcrumb title={"Cart"} />
 
-      <Cart />
+      <Thankyou />
       
       <FooterAreaFour />
     </>
   );
 };
 
-export default CartPage;
+export default ThankyouPage;

@@ -14,6 +14,10 @@ const HeaderFive = () => {
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
 
+  const [cartCount, setCartCount] = useState(0);
+
+
+
   useEffect(() => {
     var offCanvasNav = document.getElementById("offcanvas-navigation");
     var offCanvasNavSubMenu = offCanvasNav.querySelectorAll(".sub-menu");
@@ -104,6 +108,8 @@ const HeaderFive = () => {
       setUserName("Guest");
       setUserRole("User");
     }
+
+    
   }, []);
 
 
@@ -112,24 +118,38 @@ const HeaderFive = () => {
   };
 
 
-  // useEffect(() => {
-  //   const token = localStorage.getItem("accessToken");
-   
-  //   if (token) {
-  //     debugger;
-  //     setIsLoggedIn(true);
-  //     setUserName(localStorage.getItem("username") || "Guest");
-  //     setUserRole(localStorage.getItem("role") || "User");
-  //   } else {
-  //     setIsLoggedIn(false);
-  //   }
-  // }, []);
+  // cart value increment and decrement 
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+  
+      try {
+        const res = await axios.get(`${API_BASE_URL}api/home/cart/count/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setCartCount(res.data.count);
+      } catch (error) {
+        console.error("Error fetching cart count:", error);
+      }
+    };
+  
+    if (isLoggedIn) {
+
+      fetchCartCount();
+      
+    }
+  }, [isLoggedIn]);
+  
+
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     setIsLoggedIn(false);
-    navigate("/login"); // Redirect to login page
+    navigate("/login"); 
   };
 
 
@@ -276,17 +296,17 @@ const HeaderFive = () => {
 
 
                   <li>
-                    <Link to="/wishlist" className="simple-icon">
+                    {/* <Link to="/wishlist" className="simple-icon">
                       <i className="far fa-heart" />
                       <span className="badge">1</span>
-                    </Link>
+                    </Link> */}
                   </li>
                   <li>
                     <div className="header-grid-wrap">
                       <div className="simple-icon">
                         <Link to="/cart">
                           <svg
-                            width={27}
+                            width={27} 
                             height={24}
                             viewBox="0 0 27 24"
                             fill="none"
@@ -297,10 +317,14 @@ const HeaderFive = () => {
                               fill="#1B1F22"
                             />
                           </svg>
-                          <span className="badge">3</span>
+                           <span className="badge">{cartCount}</span> 
                         </Link>
                       </div>
-                      {/* <div className="header-grid-details ">
+                    </div>
+                  </li>
+
+
+                  {/* <div className="header-grid-details ">
                         <button
                           type="button"
                           className="menu-toggle icon-btn"
@@ -309,9 +333,6 @@ const HeaderFive = () => {
                           <i className="fas fa-bars" />
                         </button>
                       </div> */}
-                    </div>
-                  </li>
-
                 </ul>
               </div>
             </div>

@@ -21,6 +21,7 @@ import ViewProfilePage from "./pages/ViewProfilePage"
 import BrandModelspage from "./pages/dashboard-pages/ProductsPages/BrandModelsPage";
 import ChnagePassword from "./components/ChnagePassword";
 import ForgotPassword from "./components/ForgotPassword";
+import ThankyouPage from "./pages/ThankYouPage";
 // import DashboardPage from "./pages/dashboard-pages/MainPage" 
 
 
@@ -66,6 +67,8 @@ function App() {
         <Route exact path="/part-group/:id" element={<PartGroupPage />} />
         <Route exact path="/part-list/:id" element={<PartListPage />} />
 
+        <Route exact path="/thank-you" element={<ThankyouPage />} />
+
 
 
 
@@ -79,6 +82,8 @@ function App() {
           <Route exact path="/Add-products" element={<AddProductPage />} /> 
           <Route exact path="/view-profile" element={<ViewProfilePage />} />
           <Route exact path="/change-password" element={<ChnagePassword />} />
+         
+          
           
         </Route>
         

@@ -14,7 +14,7 @@ const PartListsection = ({id , partItem}) => {
                     <div className="col-sm-12 col-md-4 col-lg-4 mb-3">
                         <div className="brand-models">
                             <Link to=""><img
-                               src={`${API_BASE_URL}${partItem.image}`}
+                               src={partItem.image}
                                 alt="Fixturbo"
                             /></Link>
                             <div className="text-center">

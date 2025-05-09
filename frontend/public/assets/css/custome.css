@@ -254,3 +254,68 @@ select.form-select option {
     font-size: 28px !important;
 }
 
+
+
+
+
+
+
+.cart-dropdown {
+    position: relative;
+  }
+  
+  .mini-cart-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 250px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1000;
+  }
+  
+  .mini-cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .cart-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 10px;
+  }
+  
+  .cart-details {
+    flex: 1;
+  }
+  
+  .remove-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: red;
+    cursor: pointer;
+  }
+  
+  .view-cart-btn {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .view-cart-btn a {
+    text-decoration: none;
+    background: #333;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  
+  .tot-amount{
+    font-size: 35px !important;
+  }

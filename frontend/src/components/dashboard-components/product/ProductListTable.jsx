@@ -16,7 +16,7 @@ const { id } = useParams();
         const fetchCarModel = async () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}api/home/car_part_items/${id}/`);
-                debugger;
+              
                 setpartList(response.data);
                 console.log('got car-models payload:', response.data);
             } catch (error) {
@@ -28,14 +28,31 @@ const { id } = useParams();
     }, []);
 
 
-    const handelAddToCart = (e) => {
-        Swal.fire({
-            title: "Success Added to cart",
-            text:"your product sucessfully added to cart",
-            icon: "success",
-            confirmButtonText: "OK",
-        });
-    }
+    const handleAddToCart = async (partId) => {
+        const token = localStorage.getItem('accessToken');
+        try {
+            await axios.post(`${API_BASE_URL}api/home/cart/add/${partId}/`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            Swal.fire({
+                title: "Successfully added to cart",
+                text: "Your product was added to the cart.",
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+            window.location.reload();
+        } catch (error) {
+            console.error('Error adding item to cart:', error);
+            Swal.fire({
+                title: "Error",
+                text: "There was an issue adding the product to the cart.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        }
+    };
 
     return (
         <div className="card">
@@ -106,19 +123,18 @@ const { id } = useParams();
                               {item.remarks}
                             </td>
                             <td>
-                                <Link
+                                {/* <Link
                                     to="#"
                                     className="w-32-px h-32-px  me-8 bg-primary-light text-primary-600 rounded-circle d-inline-flex align-items-center justify-content-center"
                                 >
                                     <Icon icon="iconamoon:eye-light" />
-                                </Link>
-                                <Link
-                                    to="#"
-                                    onClick={handelAddToCart}
-                                    className="w-32-px h-32-px  me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
-                                >
-                                  <Icon icon="lucide:shopping-cart" />
-                                </Link>
+                                </Link> */}
+                                <button
+                                        onClick={() => handleAddToCart(item.id)}
+                                        className="btn btn-success"
+                                    >
+                                        <Icon icon="lucide:shopping-cart" /> Add to Cart
+                                    </button>
                                 {/* <Link
                                     to="#"
                                     className="w-32-px h-32-px  me-8 bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center"
