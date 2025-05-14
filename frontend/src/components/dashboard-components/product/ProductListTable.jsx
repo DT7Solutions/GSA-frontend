@@ -6,9 +6,21 @@ import axios from "axios";
 import API_BASE_URL from "../../../config";
 import Swal from "sweetalert2";
 
+import { jwtDecode } from "jwt-decode";
+
+
 const ProductListTable = () => {
 const { id } = useParams();
 
+const isTokenValid = (token) => {
+    try {
+        const decoded = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+        return decoded.exp > currentTime;
+    } catch (error) {
+        return false; 
+    }
+};
 
     const [partList, setpartList] = useState([]);
 
@@ -30,6 +42,21 @@ const { id } = useParams();
 
     const handleAddToCart = async (partId) => {
         const token = localStorage.getItem('accessToken');
+
+        if (!token || !isTokenValid(token)) {
+            Swal.fire({
+                title: "Your session has expired. Please login again",
+                text: "",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+
+            window.location.href = '#/login';
+            return;
+        }
+       
         try {
             await axios.post(`${API_BASE_URL}api/home/cart/add/${partId}/`, {}, {
                 headers: {
@@ -44,7 +71,6 @@ const { id } = useParams();
             });
             window.location.reload();
         } catch (error) {
-            console.error('Error adding item to cart:', error);
             Swal.fire({
                 title: "Error",
                 text: "There was an issue adding the product to the cart.",
@@ -117,7 +143,7 @@ const { id } = useParams();
                             <td>{item.description}</td>
                             <td>{" "}
                                 <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
-                                {item.qty}
+                                {item.stock_count}
                                 </span></td>
                             <td>
                               {item.remarks}

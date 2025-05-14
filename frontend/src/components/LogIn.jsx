@@ -20,7 +20,7 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
-      navigate("/Dashboard2");
+      navigate("/Dashboard");
     }
   }, [navigate]);
 
@@ -63,7 +63,7 @@ const Login = () => {
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
 
-        navigate("/Dashboard2");
+        navigate("/Dashboard");
       }
     } catch (error) {
       console.error("OTP Verification Failed:", error.response ? error.response.data : error.message);
@@ -99,10 +99,11 @@ const Login = () => {
         });
           const { username, role_id } = userResponse;
             if (userResponse.data.role_id == 1) {
-              navigate("/Dashboard2");
+
+              navigate("/Dashboard");
             } else if (userResponse.data.role_id == 2) {
             
-              navigate("/Dashboard");
+              navigate("/");
             } else {
               navigate("/");
             }

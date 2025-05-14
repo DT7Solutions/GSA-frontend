@@ -34,6 +34,7 @@ import PartGroupPage from './pages/dashboard-pages/ProductsPages/PartGroupPage'
 import BrandModelVariantPage from './pages/dashboard-pages/ProductsPages/BrandModelVariantPage'
 import PartCategoryPage from './pages/dashboard-pages/ProductsPages/PartSectionPage'
 import PartListPage from './pages/dashboard-pages/ProductsPages/PartsListPage'
+import OrdersListPage from "./pages/dashboard-pages/OrdersListPage"
 
 
 function App() {
@@ -60,7 +61,7 @@ function App() {
         <Route exact path="/Login" element={<LoginPage />} />
         <Route exact path="/Register" element={<RegisterPage />} />
         <Route exact path="/forgot-password" element={<ForgotPassword />} />
-        <Route exact path="/Dashboard" element={<DashboardPage />} />
+        {/* <Route exact path="/Dashboard2" element={<DashboardPage />} /> */}
         <Route exact path="/brand-models/:id" element={<BrandModelspage />} />
         <Route exact path="/models-variant/:id" element={<BrandModelVariantPage />} />
         <Route exact path="/part-category/:id" element={<PartCategoryPage />} />
@@ -76,9 +77,10 @@ function App() {
     
       
         <Route element={<PrivateRoute />}>
-          <Route exact path="/Dashboard2" element={<AdminPage />} />
+          <Route exact path="/Dashboard" element={<AdminPage />} />
           <Route exact path="/Tables" element={<TableDataPage />} />
-          <Route exact path="/form" element={<FormValidationPage />} />   for demo  form code
+          <Route exact path="/OrderList" element={<OrdersListPage />} />
+          <Route exact path="/form" element={<FormValidationPage />} /> 
           <Route exact path="/Add-products" element={<AddProductPage />} /> 
           <Route exact path="/view-profile" element={<ViewProfilePage />} />
           <Route exact path="/change-password" element={<ChnagePassword />} />

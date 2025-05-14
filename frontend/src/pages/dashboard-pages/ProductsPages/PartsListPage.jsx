@@ -13,11 +13,11 @@ const PartListPage = () => {
   const [partItem, setpartItem] = useState([]);
   let [active, setActive] = useState(true);
 
-  useEffect(() => {
-    setTimeout(function () {
-      setActive(false);
-    }, 2000);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(function () {
+  //     setActive(false);
+  //   }, 2000);
+  // }, []);
 
 
   
@@ -36,7 +36,7 @@ const PartListPage = () => {
 
   return (
     <>
-      {active === true && <Preloader />}
+      {/* {active === true && <Preloader />} */}
       <HeaderFive />
 
       <Breadcrumb title={partItem.name} />

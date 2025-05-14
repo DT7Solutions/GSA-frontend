@@ -319,3 +319,20 @@ select.form-select option {
   .tot-amount{
     font-size: 35px !important;
   }
+
+.dash-board-menu{
+    margin-left: -255px !important;
+  }
+
+
+.to-top-list li {
+    list-style: none;
+}
+
+
+.basic-data-table .dt-layout-row .dt-length {
+    width: 50% !important;
+}
+.basic-data-table .dt-layout-row .dt-input{
+    width: 40% !important;
+}

@@ -39,7 +39,7 @@ const Register =  () => {
         });
 
         console.log("Registration Successful:", response.data);
-        navigate("/Dashboard2");
+        navigate("/Dashboard");
       
 
     } catch (error) {
