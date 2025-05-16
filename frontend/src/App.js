@@ -35,6 +35,7 @@ import BrandModelVariantPage from './pages/dashboard-pages/ProductsPages/BrandMo
 import PartCategoryPage from './pages/dashboard-pages/ProductsPages/PartSectionPage'
 import PartListPage from './pages/dashboard-pages/ProductsPages/PartsListPage'
 import OrdersListPage from "./pages/dashboard-pages/OrdersListPage"
+import ProductListDisplayPage from "./pages/dashboard-pages/ProductsPages/ProductListDisplayPage"
 
 
 function App() {
@@ -82,6 +83,7 @@ function App() {
           <Route exact path="/OrderList" element={<OrdersListPage />} />
           <Route exact path="/form" element={<FormValidationPage />} /> 
           <Route exact path="/Add-products" element={<AddProductPage />} /> 
+          <Route exact path="/products-list" element={<ProductListDisplayPage />} /> 
           <Route exact path="/view-profile" element={<ViewProfilePage />} />
           <Route exact path="/change-password" element={<ChnagePassword />} />
          

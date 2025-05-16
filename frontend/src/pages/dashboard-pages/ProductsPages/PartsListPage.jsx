@@ -13,11 +13,11 @@ const PartListPage = () => {
   const [partItem, setpartItem] = useState([]);
   let [active, setActive] = useState(true);
 
-  // useEffect(() => {
-  //   setTimeout(function () {
-  //     setActive(false);
-  //   }, 2000);
-  // }, []);
+  useEffect(() => {
+    setTimeout(function () {
+      setActive(false);
+    }, 2000);
+  }, []);
 
 
   

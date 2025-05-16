@@ -15745,3 +15745,46 @@ td.fc-header-center {
   .car-brand-name{
     font-size: 25px !important;
   }
+
+
+ 
+
+.badge-yellow {
+  background-color: #f1c40f;
+  color: black;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.badge-green {
+  background-color: #2ecc71;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.badge-blue {
+  background-color: #3498db;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.badge-red {
+  background-color: #e74c3c;
+  color: white;
+   padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: capitalize;
+  display: inline-block;
+}
