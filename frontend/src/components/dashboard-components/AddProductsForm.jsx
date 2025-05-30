@@ -5,6 +5,9 @@ import axios from "axios";
 import API_BASE_URL from "../../config";
 import Swal from "sweetalert2";
 
+ 
+
+
 const AddProductsForm = () => {
     const [showModal, setShowModal] = useState(false);
     const [showCarModelModal, setShowCarModelModal] = useState(false);
@@ -239,8 +242,9 @@ const AddProductsForm = () => {
     const [carModelList, setcarModelList] = useState([]);
 
     const [partOptions, setPartOptions] = useState([]);
+
     useEffect(() => {
-        const fetchCarMakes = async () => {
+        const fetchCarModel = async () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}api/home/car-models/`);
                 setcarModelList(response.data);
@@ -257,7 +261,7 @@ const AddProductsForm = () => {
             }
         };
 
-        fetchCarMakes();
+        fetchCarModel();
     }, []);
 
 
@@ -333,6 +337,9 @@ const AddProductsForm = () => {
 
         fetchCarMakes();
     }, []);
+
+
+
 
 
 
@@ -503,6 +510,47 @@ const AddProductsForm = () => {
         label: make.name
       }));
       
+
+// this code for poup model - car varient 
+    const [carVariantModel, setModelVariantModel] = useState([]);
+    const [carModelPoupData, setModelPoupVarientData] = useState([]);
+    const [carcatGroups, setModelPoupVarient] = useState([]);
+
+    const handlecarmodelchange_model = async (e) => {
+        const makeId = parseInt(e.target.value);
+       try {
+            const response = await axios.get(`${API_BASE_URL}api/home/car-models/${makeId}/`);
+            setModelVariantModel(response.data);
+
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+        }
+    }
+
+    const handlecarmodelbrandchange_model = async (e) => {
+        const varientID = parseInt(e.target.value);
+       try {
+            const response = await axios.get(`${API_BASE_URL}api/home/car_variant/${varientID}/`);
+            setModelPoupVarientData(response.data);
+
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+        }
+    }
+
+    const handlecarvarient_groupchange_model = async (e) => {
+        const varientID = parseInt(e.target.value);
+       try {
+            const response = await axios.get(`${API_BASE_URL}api/home/car_variant_category/${varientID}/`);
+            setModelPoupVarient(response.data);
+
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+        }
+    }
+
+
+
     return (
         <div className="col-lg-12">
             <div className="card">
@@ -540,11 +588,12 @@ const AddProductsForm = () => {
                                 </button>
                             </div>
                         </div>
-                                                    {/* Car Model Selection */}
+                        {/* Car Model Selection */}
                         <div className="col-md-4">
                             <label className="form-label">Select Car Model</label>
                             <div className="input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarModelChange}>
+                                    
                                     <option >-- select car model --</option>
                                     {carModels.map((model) => (
                                         <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
@@ -560,7 +609,6 @@ const AddProductsForm = () => {
                                 </button>
                             </div>
                         </div>
-
                         {/* Car Variant Selection */}
                         <div className="col-md-4">
                             <label className="form-label">Select Car Variant</label>
@@ -762,7 +810,7 @@ const AddProductsForm = () => {
 
                         <div className="col-12">
                             <button className="btn btn-primary-600 style2" type="submit">
-                                Submit form
+                            Add Car Part
                             </button>
                         </div>
                     </form>
@@ -829,6 +877,7 @@ const AddProductsForm = () => {
                             </div>
                             <div className="modal-body">
                                 <form onSubmit={handleAddCarModel} className="input-style">
+
                                     <div className="mb-3">
                                         <label className="form-label">Select Car</label>
                                         <select
@@ -958,6 +1007,24 @@ const AddProductsForm = () => {
                             </div>
                             <div className="modal-body">
                                 <form onSubmit={handleAddCarVariant} className="input-style">
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Select Car</label>
+                                        <select
+                                            className="form-select"
+                                            
+                                            onChange={(e) => {
+                                              
+                                                handlecarmodelchange_model({ target: { value: e.target.value } });
+                                            }}
+                                      
+                                        >
+                                            <option value=""> -- Select Car Brand-- </option>
+                                            {carMakes.map((make) => (
+                                                <option value={make.id}>{make.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                     <div className="mb-3">
                                         <label className="form-label">Select Car Model</label>
                                         <select
@@ -969,13 +1036,19 @@ const AddProductsForm = () => {
                                             required
                                         >
                                             <option value="">Select Model</option>
-                                            {carModelList.map((model) => (
-                                                <option value={model.id}>{model.name}{model.generation}</option>
+                                            {carVariantModel.map((model) => (
+                                                <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
+                                                </option>
                                             ))}
+                                            {/* {carModelList.map((model) => (
+                                                <option value={model.id}>{model.name}{model.generation}</option>
+                                            ))} */}
 
 
                                         </select>
                                     </div>
+
+
                                     <div className="mb-3">
                                         <label className="form-label">Variant Name</label>
                                         <input
@@ -1091,22 +1164,65 @@ const AddProductsForm = () => {
                             </div>
                             <div className="modal-body">
                                 <form onSubmit={handleAddPartSelection} className="input-style">
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Select Car</label>
+                                        <select
+                                            className="form-select"
+                                            onChange={(e) => {
+                                              
+                                                handlecarmodelchange_model({ target: { value: e.target.value } });
+                                            }}
+                                         
+                                        >
+                                            <option value=""> -- Select Car Brand-- </option>
+                                            {carMakes.map((make) => (
+                                                <option value={make.id}>{make.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Select Car Model</label>
+                                        <select
+                                            className="form-select"
+                                            onChange={(e) => {
+                                              
+                                                handlecarmodelbrandchange_model({ target: { value: e.target.value } });
+                                            }}
+                                        >
+                                            <option value="">Select Model</option>
+                                            {carVariantModel.map((model) => (
+                                                <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
+                                                </option>
+                                            ))}
+                                            {/* {carModelList.map((model) => (
+                                                <option value={model.id}>{model.name}{model.generation}</option>
+                                            ))} */}
+
+
+                                        </select>
+                                    </div>
                                     <div className="mb-3">
                                         <label className="form-label">Select Car Variant</label>
                                         <select
                                             className="form-select"
-                                            value={partSelectionData.carVariant}
                                             onChange={(e) =>
                                                 setPartSelectionData({ ...partSelectionData, carVariant: e.target.value })
                                             }
                                             required
                                         >
                                             <option value="">-- Select Variant -- </option>
-                                            {CarModelVariant.map((item) => (
+                                            {/* {carVariant.map((varient) => (
+                                        <option value={varient.id}>{varient.name}({new Date(varient.production_start_date).getFullYear()} - {new Date(varient.production_end_date).getFullYear()})</option>
+                                    ))} */}
+                                            
+                                            {carModelPoupData.map((item) => (
                                                 <option value={item.id}>{item.name}</option>
                                             ))}
+                                             
                                         </select>
                                     </div>
+
                                     <div className="mb-3">
                                         <label className="form-label">Part category Name</label>
                                         <input
@@ -1152,8 +1268,62 @@ const AddProductsForm = () => {
                             </div>
                             <div className="modal-body">
                                 <form onSubmit={handleAddPartGroupSelection} className="input-style">
+                                      <div className="mb-3">
+                                        <label className="form-label">Select Car</label>
+                                        <select
+                                            className="form-select"
+                                            onChange={(e) => {
+                                              
+                                                handlecarmodelchange_model({ target: { value: e.target.value } });
+                                            }}
+                                         
+                                        >
+                                            <option value=""> -- Select Car Brand-- </option>
+                                            {carMakes.map((make) => (
+                                                <option value={make.id}>{make.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Select Car Model</label>
+                                        <select
+                                            className="form-select"
+                                            onChange={(e) => {
+                                              
+                                                handlecarmodelbrandchange_model({ target: { value: e.target.value } });
+                                            }}
+                                        >
+                                            <option value="">Select Model</option>
+                                            {carVariantModel.map((model) => (
+                                                <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
+                                                </option>
+                                            ))}
+                                            
+                                        </select>
+                                    </div>
                                     <div className="mb-3">
                                         <label className="form-label">Select Car Variant</label>
+                                        <select
+                                            className="form-select"
+                                            onChange={(e) => {
+                                              
+                                                handlecarvarient_groupchange_model({ target: { value: e.target.value } });
+                                            }}
+                                            required
+                                        >
+                                            <option value="">-- Select Variant -- </option>
+                                            {/* {carVariant.map((varient) => (
+                                        <option value={varient.id}>{varient.name}({new Date(varient.production_start_date).getFullYear()} - {new Date(varient.production_end_date).getFullYear()})</option>
+                                    ))} */}
+                                            
+                                            {carModelPoupData.map((item) => (
+                                                <option value={item.id}>{item.name}</option>
+                                            ))}
+                                             
+                                        </select>
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Select Part Category</label>
                                         <select
                                             className="form-select"
                                             value={partGrouponData.partcat}
@@ -1162,12 +1332,13 @@ const AddProductsForm = () => {
                                             }
                                             required
                                         >
-                                            <option value="">-- Select Variant -- </option>
-                                            {PartsCategoryList.map((item) => (
+                                            <option value="">-- Select Part Category -- </option>
+                                            {carcatGroups.map((item) => (
                                                 <option value={item.id}>{item.name}</option>
                                             ))}
                                         </select>
                                     </div>
+
                                     <div className="mb-3">
                                         <label className="form-label">Part category Name</label>
                                         <input

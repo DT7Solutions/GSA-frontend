@@ -30,6 +30,7 @@ import AdminPage from "./pages/dashboard-pages/AdminPage"
 import TableDataPage from "./pages/dashboard-pages/DataTablePage"
 import FormValidationPage from "./pages/dashboard-pages/FormValidationPage"
 import AddProductPage from "./pages/dashboard-pages/ProductsPages/AddProductsPages"
+import UpdateProductsFormPage from "./pages/dashboard-pages/ProductsPages/UpdateProductsFormPage"
 import PartGroupPage from './pages/dashboard-pages/ProductsPages/PartGroupPage'
 import BrandModelVariantPage from './pages/dashboard-pages/ProductsPages/BrandModelVariantPage'
 import PartCategoryPage from './pages/dashboard-pages/ProductsPages/PartSectionPage'
@@ -83,6 +84,7 @@ function App() {
           <Route exact path="/OrderList" element={<OrdersListPage />} />
           <Route exact path="/form" element={<FormValidationPage />} /> 
           <Route exact path="/Add-products" element={<AddProductPage />} /> 
+          <Route exact path="/update-products/:id" element={<UpdateProductsFormPage />} /> 
           <Route exact path="/products-list" element={<ProductListDisplayPage />} /> 
           <Route exact path="/view-profile" element={<ViewProfilePage />} />
           <Route exact path="/change-password" element={<ChnagePassword />} />

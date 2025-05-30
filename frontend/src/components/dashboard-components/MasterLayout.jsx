@@ -351,57 +351,48 @@ const MasterLayout = ({ children }) => {
                                                 />
                                             </button>
                                         </div>
+
                                         <ul className='to-top-list dash-board-li'>
-                                            <li>
-                                                <Link
-                                                    className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3'
-                                                    to='/view-profile'
-                                                >
-                                                    <Icon
-                                                        icon='solar:user-linear'
-                                                        className='icon text-xl'
-                                                    />
-                                                    My Profile
-                                                </Link>
-                                            </li>
-                                            {/* <li>
-                                                <Link
-                                                    className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3'
-                                                    to='/email'
-                                                >
-                                                    <Icon
-                                                        icon='tabler:message-check'
-                                                        className='icon text-xl'
-                                                    />
-                                                    Inbox
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3'
-                                                    to='/company'
-                                                >
-                                                    <Icon
-                                                        icon='icon-park-outline:setting-two'
-                                                        className='icon text-xl'
-                                                    />
-                                                    Setting
-                                                </Link>
-                                            </li> */}
-                                            <li>
-                                                <button
-                                                    className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 w-100 text-start border-0 bg-transparent'
-                                                    onClick={handleLogout}
-                                                >
-                                                    <Icon icon='lucide:power' className='icon text-xl' />
-                                                    Log Out
-                                                </button>
-
-
-                                            </li>
+                                            {userName ? (
+                                                <>
+                                                    <li>
+                                                        <Link
+                                                            className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3'
+                                                            to='/view-profile'
+                                                        >
+                                                            <Icon
+                                                                icon='solar:user-linear'
+                                                                className='icon text-xl'
+                                                            />
+                                                            My Profile
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <button
+                                                            className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 w-100 text-start border-0 bg-transparent'
+                                                            onClick={handleLogout}
+                                                        >
+                                                            <Icon icon='lucide:power' className='icon text-xl' />
+                                                            Log Out
+                                                        </button>
+                                                    </li>
+                                                </>
+                                            ) : (
+                                                <li>
+                                                    <Link
+                                                        className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3'
+                                                        to='/login'
+                                                    >
+                                                        <Icon
+                                                            icon='solar:user-linear'
+                                                            className='icon text-xl'
+                                                        />
+                                                        Login
+                                                    </Link>
+                                                </li>
+                                            )}
                                         </ul>
                                     </div>
-
                                 </div>
                                 {/* Profile dropdown end */}
                             </div>
