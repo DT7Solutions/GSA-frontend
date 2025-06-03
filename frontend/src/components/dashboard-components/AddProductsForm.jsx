@@ -229,13 +229,14 @@ const AddProductsForm = () => {
             ...formData,
             carMakeId: makeId,
         }));
-
+setCarModels([]);
         try {
             const response = await axios.get(`${API_BASE_URL}api/home/car-models/${makeId}/`);
             setCarModels(response.data);
 
         } catch (error) {
             console.error("Error fetching car models:", error);
+            setCarModels([]);
         }
     };
 
@@ -340,22 +341,20 @@ const AddProductsForm = () => {
 
 
 
-
-
-
     const handleCarModelChange = async (e) => {
         const modelId = parseInt(e.target.value);
         setFormData((formData) => ({
             ...formData,
             carModelId: modelId,
         }));
-
+        setModelVariant([]);
         try {
             const response = await axios.get(`${API_BASE_URL}api/home/car_variant/${modelId}/`);
             setModelVariant(response.data);
 
         } catch (error) {
             console.error("Error fetching car models:", error);
+            setModelVariant([]);
         }
     };
 
@@ -420,13 +419,14 @@ const AddProductsForm = () => {
             ...formData,
             carVariantId: variantId,
         }));
-
+        setcarPartCat([]);
         try {
             const response = await axios.get(`${API_BASE_URL}api/home/car_variant_category/${variantId}/`);
             setcarPartCat(response.data);
 
         } catch (error) {
             console.error("Error fetching car models:", error);
+            setcarPartCat([]);
         }
     };
 
@@ -477,12 +477,14 @@ const AddProductsForm = () => {
             ...formData,
             partCategoryId: partcatId,
         }));
+        setcarPartgroupItem([])
         try {
             const response = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${partcatId}/`);
             setcarPartgroupItem(response.data);
 
         } catch (error) {
             console.error("Error fetching car models:", error);
+            setcarPartgroupItem([])
         }
     };
 
@@ -616,7 +618,7 @@ const AddProductsForm = () => {
                                 <select className="form-select form-select input-g" onChange={handleCarVariantChange}>
                                     <option >-- select Car Variant --</option>
                                     {carVariant.map((varient) => (
-                                        <option value={varient.id}>{varient.name}({new Date(varient.production_start_date).getFullYear()} - {new Date(varient.production_end_date).getFullYear()})</option>
+                                        <option value={varient.id}>{varient.car_model_name}-{varient.name}({new Date(varient.production_start_date).getFullYear()} - {new Date(varient.production_end_date).getFullYear()})</option>
                                     ))}
                                 </select>
                                 <button

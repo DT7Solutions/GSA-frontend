@@ -180,7 +180,7 @@ const Login = () => {
                         required
                       />
                     </div>
-                    <div className="mb-3 position-relative">
+                    <div className="mb-3 position-relative input-g">
                       <label className="form-label">Password</label>
                       <div className="input-group password-input">
                         <input
@@ -189,13 +189,14 @@ const Login = () => {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
+                          style={{height:"47.5px"}}
                         />
                         <button
                           type="button"
                           className="btn eye-btn  btn-fw"
                           onClick={() => setShowPassword(!showPassword)}
                         >
-                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          {showPassword ? <FaEyeSlash  /> : <FaEye />}
                         </button>
                       </div>
                     </div>
