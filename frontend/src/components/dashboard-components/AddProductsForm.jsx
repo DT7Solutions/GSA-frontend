@@ -229,7 +229,7 @@ const AddProductsForm = () => {
             ...formData,
             carMakeId: makeId,
         }));
-setCarModels([]);
+        setCarModels([]);
         try {
             const response = await axios.get(`${API_BASE_URL}api/home/car-models/${makeId}/`);
             setCarModels(response.data);

@@ -265,6 +265,62 @@ const MasterLayout = ({ children }) => {
                                         Add Product
                                     </NavLink>
                                 </li>
+                                <li>
+                                    <NavLink
+                                        to='/car-barnds'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                       Car Brands
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink
+                                        to='/car-models'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                       Car Models
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink
+                                        to='/car-variants'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                       Car Variants
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink
+                                        to='/car-category'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                       Part Categorys
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink
+                                        to='/car-group-part'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                      Part Group
+                                    </NavLink>
+                                </li>
+
 
 
                             </ul>

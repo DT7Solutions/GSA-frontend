@@ -170,11 +170,11 @@ const UpdateProductsForm = () => {
                 const data = response.data;
                 
                 setFormData({
-                    car_make_id: data.car_make?.id || '', // Updated key
-                    car_model_id: data.car_model?.id || '', // Updated key
-                    car_variant_id: data.car_variant?.id || '', // Updated key
-                    part_section_id: data.part_section?.id || '', // Updated key (assuming 'section' maps to category ID)
-                    part_group_id: data.part_group?.id || '',         // Assuming part ID maps to part group ID in your form
+                    car_make_id: data.car_make?.id || '', 
+                    car_model_id: data.car_model?.id || '', 
+                    car_variant_id: data.car_variant?.id || '', 
+                    part_section_id: data.part_section?.id || '', 
+                    part_group_id: data.part_group?.id || '',    
                     partNumber: data.part_no || '',
                     figureNumber: data.fig_no || '',
                     price: data.price || '',
@@ -203,12 +203,12 @@ const UpdateProductsForm = () => {
                             fetchPartCategoriesList(variantId);
                             const categoryId = data.part_group?.section;
                             if (categoryId) {
-                                setSelectedPartCategory({ value: categoryId, label: data.part_section.name }); // Assuming 'name' in part_group is the category name
+                                setSelectedPartCategory({ value: categoryId, label: data.part_section.name });
                                 fetchPartGroupsList(categoryId);
                                 const groupId = data.part_group?.id;
                              
                                 if (groupId) {
-                                    setSelectedPartGroup({ value: groupId, label: data.part_group.name }); // Assuming 'name' in part is the group item name
+                                    setSelectedPartGroup({ value: groupId, label: data.part_group.name });
                                 }
                             }
                         }

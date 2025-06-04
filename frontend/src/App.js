@@ -38,6 +38,12 @@ import PartListPage from './pages/dashboard-pages/ProductsPages/PartsListPage'
 import OrdersListPage from "./pages/dashboard-pages/OrdersListPage"
 import ProductListDisplayPage from "./pages/dashboard-pages/ProductsPages/ProductListDisplayPage"
 
+import CarBrandsListPage from "./pages/dashboard-pages/ProductsPages/CarBrandsListPage"
+import CarModelPages from "./pages/dashboard-pages/ProductsPages/CarModelPages"
+import CarVariantListPages from "./pages/dashboard-pages/ProductsPages/CarVariantListPages"
+import CarPartCategoryPages from "./pages/dashboard-pages/ProductsPages/carPartCategoryPages"
+import CarPartGroupPages from "./pages/dashboard-pages/ProductsPages/carPartGroupPages"
+
 
 function App() {
   return (
@@ -88,6 +94,13 @@ function App() {
           <Route exact path="/products-list" element={<ProductListDisplayPage />} /> 
           <Route exact path="/view-profile" element={<ViewProfilePage />} />
           <Route exact path="/change-password" element={<ChnagePassword />} />
+
+          <Route exact path="/car-barnds" element={<CarBrandsListPage />} /> 
+          <Route exact path="/car-models" element={<CarModelPages />} /> 
+          <Route exact path="/car-variants" element={<CarVariantListPages />} /> 
+          <Route exact path="/car-category" element={<CarPartCategoryPages />} /> 
+          <Route exact path="/car-group-part" element={<CarPartGroupPages />} /> 
+
          
           
           
