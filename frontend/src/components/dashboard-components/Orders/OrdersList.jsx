@@ -259,6 +259,8 @@ const OrdersList = () => {
                                           ? 'badge-yellow'
                                           : order.status.toLowerCase() === 'confirmed'
                                               ? 'badge-green'
+                                               : order.status.toLowerCase() === 'completed'
+                                              ? 'badge-pink'
                                               : order.status.toLowerCase() === 'progress'
                                                   ? 'badge-blue'
                                                   : ['failed', 'cancelled'].includes(order.status.toLowerCase())
@@ -297,6 +299,7 @@ const OrdersList = () => {
                                       <option value="progress">Progress</option>
                                       <option value="failed">Failed</option>
                                       <option value="cancelled">Cancelled</option>
+                                      <option value="completed">Completed</option>
                                   </select>
                               </div>
                               <div className="text-end">
