@@ -163,6 +163,7 @@ const CarModelsDisplay = () => {
                         <thead>
                             <tr>
                                 <th>S.L</th>
+                                <th>Model Image</th>
                                 <th>Brand Name</th>
                                 <th>Model Name</th>
                                 <th>Generation</th>
@@ -175,7 +176,17 @@ const CarModelsDisplay = () => {
                         <tbody>
                             {carbrands.map((item, index) => (
                                 <tr key={item.id}>
+
                                     <td>{index + 1}</td>
+                                    <td>
+                                        {item.image && (
+                                            <img
+                                                src={item.image}
+                                                alt="part"
+                                                style={{ width: "60px", height: "40px", objectFit: "cover" }}
+                                            />
+                                        )}
+                                    </td>
                                     <td>{item.car_make_name}</td>
                                     <td>{item.name}</td>
                                     <td>{item.generation}</td>
@@ -208,7 +219,7 @@ const CarModelsDisplay = () => {
                                 <div className="modal-body">
                                     <form onSubmit={handleSubmit}>
                                         <div className="mb-3">
-                                            <label>Select Car Brand {carModelData.car}</label>
+                                            <label>Select Car Brand</label>
                                             <select
                                                 name="car"
                                                 className="form-control"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate   } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
@@ -32,14 +32,14 @@ const Cart = () => {
 
   const updateQuantity = async (itemId, newQuantity) => {
     const token = localStorage.getItem("accessToken");
-  
+
     try {
       const response = await axios.put(
-        `${API_BASE_URL}api/home/cart/update/${itemId}/`,  
+        `${API_BASE_URL}api/home/cart/update/${itemId}/`,
         { quantity: newQuantity },
         {
           headers: {
-            Authorization: `Bearer ${token}`,  
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -61,6 +61,8 @@ const Cart = () => {
     }
   };
 
+
+  
   const handleRemoveItem = async (itemId) => {
     const token = localStorage.getItem('accessToken');
     try {
@@ -94,9 +96,9 @@ const Cart = () => {
   // handle checkout functionality
   const handleCheckout = async () => {
     const token = localStorage.getItem("accessToken");
-  
+
     try {
-    
+
       const { data } = await axios.post(
         `${API_BASE_URL}api/home/payment/order/`,
         {},
@@ -106,14 +108,14 @@ const Cart = () => {
           },
         }
       );
-  
+
       const options = {
-        key: data.razorpay_key, 
+        key: data.razorpay_key,
         amount: data.amount,
         currency: data.currency,
         name: "Car Parts Store",
         description: "Car Parts Purchase",
-        order_id: data.order_id, 
+        order_id: data.order_id,
         handler: async function (response) {
           try {
             const verifyRes = await axios.post(
@@ -129,7 +131,7 @@ const Cart = () => {
                 },
               }
             );
-  
+
             Swal.fire("Order Placed!", "Your payment was successful.", "success");
             navigate(`/thank-you?order_id=${verifyRes.data.order_id}`);
           } catch (verifyError) {
@@ -145,7 +147,7 @@ const Cart = () => {
           color: "#3399cc",
         },
       };
-  
+
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
@@ -154,7 +156,7 @@ const Cart = () => {
     }
   };
 
-  
+
 
 
 
@@ -209,7 +211,7 @@ const Cart = () => {
                       >
                         <i className="fas fa-minus" />
                       </button>
-    
+
                       <input
                         type="number"
                         className="qty-input"
@@ -218,7 +220,7 @@ const Cart = () => {
                         max={item.part.stock_count}
                         readOnly
                       />
-    
+
                       <button
                         className="quantity-plus qty-btn"
                         onClick={() => {

@@ -36,7 +36,7 @@ const PartListPage = () => {
 
   return (
     <>
-      {/* {active === true && <Preloader />} */}
+      {active === true && <Preloader />}
       <HeaderFive />
 
       <Breadcrumb title={partItem.name} />

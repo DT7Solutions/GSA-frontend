@@ -86,9 +86,9 @@ const Login = () => {
       });
 
       if (response.data.access) {
-        debugger;
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
+        localStorage.setItem("role", response.data.role.toLowerCase());
 
         const decoded = jwtDecode(response.data.access);
         const userId = decoded.user_id;

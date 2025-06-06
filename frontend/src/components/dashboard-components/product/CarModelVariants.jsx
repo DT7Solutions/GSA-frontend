@@ -155,7 +155,7 @@ const handleCarMakeChange = async (e) => {
 
             Swal.fire("Updated!", "Car Variant has been updated.", "success");
             setShowCarVariantModal(false);
-            fetchCarVariants(); // refresh list
+            fetchCarVariants();
         } catch (error) {
             console.error("Update error:", error);
             Swal.fire("Error", "Something went wrong.", "error");

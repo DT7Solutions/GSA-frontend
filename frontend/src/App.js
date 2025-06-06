@@ -18,6 +18,7 @@ import HomePageSix from "./pages/HomePageSix";
 import LoginPage  from "./pages/LoginPage";
 import RegisterPage  from "./pages/RegisterPage";
 import ViewProfilePage from "./pages/ViewProfilePage"
+import ViewCustomerOrdersPage from "./pages/ViewCustomerOrdersPage"
 import BrandModelspage from "./pages/dashboard-pages/ProductsPages/BrandModelsPage";
 import ChnagePassword from "./components/ChnagePassword";
 import ForgotPassword from "./components/ForgotPassword";
@@ -44,6 +45,7 @@ import CarVariantListPages from "./pages/dashboard-pages/ProductsPages/CarVarian
 import CarPartCategoryPages from "./pages/dashboard-pages/ProductsPages/carPartCategoryPages"
 import CarPartGroupPages from "./pages/dashboard-pages/ProductsPages/carPartGroupPages"
 
+import UnauthorizedPage from "./pages/UnauthorizedPage"
 
 function App() {
   return (
@@ -82,30 +84,33 @@ function App() {
 
 
          {/* Private Route for Dashboard2 */}
-    
-      
-        <Route element={<PrivateRoute />}>
-          <Route exact path="/Dashboard" element={<AdminPage />} />
-          <Route exact path="/Tables" element={<TableDataPage />} />
-          <Route exact path="/OrderList" element={<OrdersListPage />} />
-          <Route exact path="/form" element={<FormValidationPage />} /> 
-          <Route exact path="/Add-products" element={<AddProductPage />} /> 
-          <Route exact path="/update-products/:id" element={<UpdateProductsFormPage />} /> 
-          <Route exact path="/products-list" element={<ProductListDisplayPage />} /> 
-          <Route exact path="/view-profile" element={<ViewProfilePage />} />
-          <Route exact path="/change-password" element={<ChnagePassword />} />
-
-          <Route exact path="/car-barnds" element={<CarBrandsListPage />} /> 
-          <Route exact path="/car-models" element={<CarModelPages />} /> 
-          <Route exact path="/car-variants" element={<CarVariantListPages />} /> 
-          <Route exact path="/car-category" element={<CarPartCategoryPages />} /> 
-          <Route exact path="/car-group-part" element={<CarPartGroupPages />} /> 
-
-         
+        <Route element={<PrivateRoute requiredRoles={["admin"]} />}>
+          <Route path="/Dashboard" element={<AdminPage />} />
+          <Route path="/Tables" element={<TableDataPage />} />
+          <Route path="/OrderList" element={<OrdersListPage />} />
+          <Route path="/form" element={<FormValidationPage />} />
+          <Route path="/Add-products" element={<AddProductPage />} />
+          <Route path="/update-products/:id" element={<UpdateProductsFormPage />} />
+          <Route path="/products-list" element={<ProductListDisplayPage />} />
           
-          
+          <Route path="/car-barnds" element={<CarBrandsListPage />} />
+          <Route path="/car-models" element={<CarModelPages />} />
+          <Route path="/car-variants" element={<CarVariantListPages />} />
+          <Route path="/car-category" element={<CarPartCategoryPages />} />
+          <Route path="/car-group-part" element={<CarPartGroupPages />} />
         </Route>
-        
+
+        <Route element={<PrivateRoute requiredRoles={["customer"]} />}>
+          <Route path="/orders" element={<ViewCustomerOrdersPage />} />
+        </Route>
+
+         <Route element={<PrivateRoute requiredRoles={["admin","customer","Dealer"]} />}>
+          <Route path="/view-profile" element={<ViewProfilePage />} />
+          <Route path="/change-password" element={<ChnagePassword />} />
+        </Route>
+
+
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
 
       </Routes>

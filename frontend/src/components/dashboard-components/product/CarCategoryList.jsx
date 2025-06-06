@@ -1,83 +1,268 @@
 import React, { useEffect, useState } from "react";
-import $ from 'jquery';
-import 'datatables.net-dt/js/dataTables.dataTables.js';
-import { Icon } from '@iconify/react/dist/iconify.js';
-import { Link } from 'react-router-dom';
+import $ from "jquery";
+import "datatables.net-dt/js/dataTables.dataTables.js";
+import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import API_BASE_URL from "../../../config";
 import Swal from "sweetalert2";
 
-
 const CarCategoryList = () => {
-    const [carCategory, setCarCategoryList] = useState([]);
-    const token = localStorage.getItem("accessToken");
+  const [carCategory, setCarCategoryList] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showPartGroupModal, setShowPartGroupModal] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [carModelVariant, setCarModelVariant] = useState([]);
+  const token = localStorage.getItem("accessToken");
 
-    useEffect(() => {
-        const fetchCarCategoryList = async () => {
-          try {
-            const response = await axios.get(`${API_BASE_URL}api/home/get_parts_category_list/`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-            setCarCategoryList(response.data); 
-            debugger;
-          } catch (error) {
-            console.error('Error fetching car brands list:', error);
-          }
-        };
-    
-        fetchCarCategoryList();
-      }, []);
+  // Fetch Category List
+  const fetchCarCategoryList = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}api/home/get_parts_category_list/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setCarCategoryList(response.data);
+    } catch (error) {
+      console.error("Error fetching car category list:", error);
+    }
+  };
 
+  // Fetch Variants List
+  const fetchCarMakes = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}api/home/car_model_varian_list/`
+      );
+      setCarModelVariant(response.data);
+    } catch (error) {
+      console.error("Error fetching car makes:", error);
+    }
+  };
 
+  // Load data on mount
+  useEffect(() => {
+    fetchCarCategoryList();
+    fetchCarMakes();
+  }, []);
 
-    return (
-        <div className="card basic-data-table">
-            <div className="card-header">
-                <h5 className="card-title mb-0">Car Part Category List</h5>
-            </div>
-            <div className="card-body">
-                <div className="table-responsive">
-                    <table className="table bordered-table mb-0" id="dataTable" data-page-length={10}>
-                        <thead>
-                            <tr>
-                                <th scope="col">
-                                    <div className="form-check style-check d-flex align-items-center">
-                                        <label className="form-check-label">S.L</label>
-                                    </div>
-                                </th>
-                                <th scope="col">Varient  Name</th>
-                                <th scope="col">Category Name</th>                            
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {carCategory.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>
-                                        <div className="form-check style-check d-flex align-items-center">
-                                            <label className="form-check-label">{index + 1}</label>
-                                        </div>
-                                    </td>
-                                    <td>{item.variant_name}</td>
-                                    <td>{item.name}</td>
-                                    <td>
-                                        <Link
-                                            to={`/update-products/${item.id}`}
-                                            className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
-                                            title="Edit"
-                                        >
-                                            <Icon icon="lucide:edit" />
-                                        </Link>
-                                    </td>
-                                    
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+  // DataTable initialization and cleanup on data change
+  useEffect(() => {
+    if (carCategory.length > 0) {
+      const table = $("#dataTable").DataTable();
+      return () => {
+        table.destroy();
+      };
+    }
+  }, [carCategory]);
+
+  const handleEditClick = (item) => {
+    // Find matching variant object by name (case insensitive)
+    const selectedvariant = carModelVariant.find(
+      (variant) =>
+        variant.name.toLowerCase() ===
+        (item.variant_name || item.variant?.name || "").toLowerCase()
     );
+
+    setSelectedItem({
+      ...item,
+      variant_id: selectedvariant || null,
+    });
+    setIsEdit(true);
+    setShowPartGroupModal(true);
+  };
+
+  const handleAddClick = () => {
+    setSelectedItem({
+      name: "",
+      variant_id: null,
+    });
+    setIsEdit(false);
+    setShowPartGroupModal(true);
+  };
+
+  const handleAddOrUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        name: selectedItem.name,
+        variant_id: selectedItem.variant_id?.id || null,
+      };
+      debugger;
+      if (isEdit && selectedItem?.id) {
+        await axios.put(
+          `${API_BASE_URL}api/home/car_update_parts_category/${selectedItem.id}/`,
+          payload,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        Swal.fire("Updated!", "Category updated successfully", "success");
+      } else {
+        await axios.post(
+          `${API_BASE_URL}api/home/create_parts_category/`,
+          payload,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        Swal.fire("Added!", "Category added successfully", "success");
+      }
+
+      setShowPartGroupModal(false);
+      setIsEdit(false);
+      setSelectedItem(null);
+      fetchCarCategoryList();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      Swal.fire("Error!", "Something went wrong.", "error");
+    }
+  };
+
+  return (
+    <div className="card basic-data-table">
+      <div className="card-header d-flex justify-content-between align-items-center">
+        <h5 className="card-title mb-0">Car Part Category List</h5>
+        {/* <button className="btn btn-primary btn-sm" onClick={handleAddClick}>
+          Add Category
+        </button> */}
+      </div>
+      <div className="card-body">
+        <div className="table-responsive">
+          <table
+            className="table bordered-table mb-0"
+            id="dataTable"
+            data-page-length={10}
+          >
+            <thead>
+              <tr>
+                <th>S.L</th>
+                <th>Image</th>
+                <th>Variant Name</th>
+                <th>Category Name</th>               
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {carCategory.map((item, index) => (
+                <tr key={item.id}>
+                  <td>{index + 1}</td>
+                  <td>
+                    {item.image && (
+                      <img
+                        src={item.image}
+                        alt="part"
+                        style={{ width: "60px", height: "40px", objectFit: "cover" }}
+                      />
+                    )}
+                  </td>
+                  <td>{item.variant_name || item.variant?.name}</td>
+                  <td>{item.name}</td>
+                  <td>
+                    <button
+                      onClick={() => handleEditClick(item)}
+                      className="btn btn-sm btn-success"
+                      title="Edit"
+                    >
+                      <Icon icon="lucide:edit" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Modal */}
+        {showPartGroupModal && (
+          <div
+            className="modal d-block"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+          >
+            <div className="modal-dialog">
+              <form onSubmit={handleAddOrUpdate}>
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">
+                      {isEdit ? "Edit Category" : "Add Category"}
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={() => {
+                        setShowPartGroupModal(false);
+                        setIsEdit(false);
+                        setSelectedItem(null);
+                      }}
+                    />
+                  </div>
+                  <div className="modal-body">
+                    <div className="mb-3">
+                      <label className="form-label">Variant</label>
+                      <select
+                        className="form-select"
+                        value={selectedItem?.variant_id?.id || ""}
+                        onChange={(e) => {
+                          const selected = carModelVariant.find(
+                            (v) => v.id === parseInt(e.target.value)
+                          );
+                          setSelectedItem((prev) => ({
+                            ...prev,
+                            variant_id: selected || null,
+                          }));
+                        }}
+                        required
+                      >
+                        <option value="">Select Variant</option>
+                        {carModelVariant.map((variant) => (
+                          <option key={variant.id} value={variant.id}>
+                            {variant.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">Category Name</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={selectedItem?.name || ""}
+                        onChange={(e) =>
+                          setSelectedItem((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                          }))
+                        }
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        setShowPartGroupModal(false);
+                        setIsEdit(false);
+                        setSelectedItem(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      {isEdit ? "Update" : "Add"}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default CarCategoryList;

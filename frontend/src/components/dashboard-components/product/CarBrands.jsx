@@ -88,6 +88,7 @@ const CarBrandDisplay = () => {
                             <tr>
                                 <th>S.L</th>
                                 <th>Brand Name</th>
+                                <th>Brand Image</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -96,6 +97,15 @@ const CarBrandDisplay = () => {
                                 <tr key={item.id}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
+                                    <td>
+                                        {item.image && (
+                                            <img
+                                                src={item.image}
+                                                alt="part"
+                                                style={{ width: "60px", height: "40px", objectFit: "cover" }}
+                                            />
+                                        )}
+                                    </td>
                                     <td>
                                         <button
                                             onClick={() => handleEditClick(item)}

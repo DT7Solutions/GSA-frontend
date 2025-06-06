@@ -4,13 +4,15 @@ import 'datatables.net-dt/js/dataTables.dataTables.js';
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
-import API_BASE_URL from "../../../config";
+import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const OrdersList = () => {
+import { jwtDecode } from "jwt-decode";
+
+const CustomerOrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -19,9 +21,13 @@ const OrdersList = () => {
 
   useEffect(() => {
     if (token) {
-      axios.get(`${API_BASE_URL}api/home/orders/get_orders_list/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+        debugger;
+        const decoded = jwtDecode(token);
+        const userId = decoded.user_id;
+
+        axios.get(`${API_BASE_URL}api/home/orders/get_orders_list/${userId}/`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
       .then((response) => {
         setOrders(response.data);
         setTimeout(() => {
@@ -237,79 +243,132 @@ const OrdersList = () => {
 
 
   return (
-      <div className="card basic-data-table">
-          <div className="card-header"><h5>Orders List</h5></div>
-          <div className="card-body">
-              <table className="table bordered-table mb-0" id="dataTable">
-                  <thead>
-                      <tr><th>S.L</th><th>Order id</th><th>Invoice</th><th>Name</th><th>Date</th><th>Amount</th><th>Status</th><th>Action</th></tr>
-                  </thead>
-                  <tbody>
-                      {orders.map((order, idx) => (
-                          <tr key={order.id}>
-                              <td>{String(idx + 1).padStart(2, '0')}</td>
-                              <td>GSA{order.id}</td>
-                              <td>#{order.razorpay_order_id}</td>
-                              <td>{order.items[0]?.part_name}</td>
-                              <td>{new Date(order.created_at).toLocaleDateString()}</td>
-                              <td>₹{order.total_price.toFixed(2)}</td>
-                              <td>
-                                  <span
-                                      className={` ${order.status.toLowerCase() === 'pending'
-                                          ? 'badge-yellow'
-                                          : order.status.toLowerCase() === 'confirmed'
-                                              ? 'badge-green'
-                                              : order.status.toLowerCase() === 'progress'
-                                                  ? 'badge-blue'
-                                                  : ['failed', 'cancelled'].includes(order.status.toLowerCase())
-                                                      ? 'badge-red'
-                                                      : ''
-                                          }`}
-                                  >
-                                      {order.status}
-                                  </span>
-                              </td>
-                              <td>
-                                  <Link to="#" onClick={() => handleEditClick(order)}><Icon icon="lucide:edit" /></Link>&nbsp;&nbsp;&nbsp;
-                                  <Link to="#" onClick={() => handlePrint(order)}> <Icon icon="mdi:file-document-outline" /> </Link>&nbsp;&nbsp;&nbsp;
-                                  <Link to="#" onClick={() => handlePackingSlipPrint(order)}><Icon icon="mdi:package-variant-closed" /> </Link>
-                              </td>
-                          </tr>
-                      ))}
-                  </tbody>
-              </table>
-          </div>
-          {showModal && selectedOrder && (
-              <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                  <div className="modal-dialog"><div className="modal-content">
-                      <div className="modal-header">
-                          <h5>Edit Order</h5>
-                          <button onClick={handleClose} className="btn-close">X</button>
-                      </div>
-                      <div className="modal-body">
-                          <form>
-                              {/* ... form fields ... */}
-                              <div className="mb-3">
-                                  <label>Status</label>
-                                  <select name="status" value={selectedOrder.status} onChange={handleChange} className="form-select">
-                                      <option value="pending">Pending</option>
-                                      <option value="confirmed">Confirmed</option>
-                                      <option value="progress">Progress</option>
-                                      <option value="failed">Failed</option>
-                                      <option value="cancelled">Cancelled</option>
-                                  </select>
-                              </div>
-                              <div className="text-end">
-                                  <button type="button" className="btn btn-secondary me-2" onClick={handleClose}>Cancel</button>
-                                  <button type="button" className="btn btn-primary" onClick={handleSave}>Save Changes</button>
-                              </div>
-                          </form>
-                      </div>
-                  </div></div>
+ 
+        <div className="card basic-data-table">
+            <div className="card-header"><h5>Orders List</h5></div>
+            <div className="card-body">
+                <table className="table bordered-table mb-0" id="dataTable">
+                    <thead>
+                        <tr><th>S.L</th><th>Order Id</th><th>Invoice Id</th><th>Order Date</th><th>Order Amount</th><th>Order Status</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {orders.map((order, idx) => (
+                            <tr key={order.id}>
+                                <td>{String(idx + 1).padStart(2, '0')}</td>
+                                 <td>{order.id}</td>
+                                <td>#{order.razorpay_order_id}</td>
+                                <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                                <td>₹{order.total_price.toFixed(2)}</td>
+                                <td>
+                                    <span
+                                        className={` ${order.status.toLowerCase() === 'pending'
+                                            ? 'badge-yellow'
+                                            : order.status.toLowerCase() === 'confirmed'
+                                                ? 'badge-green'
+                                                : order.status.toLowerCase() === 'progress'
+                                                    ? 'badge-blue'
+                                                    : ['failed', 'cancelled'].includes(order.status.toLowerCase())
+                                                        ? 'badge-red'
+                                                        : ''
+                                            }`}
+                                    >
+                                        {order.status}
+                                    </span>
+                                </td>
+                                <td>
+                                    <Link to="#" onClick={() => handleEditClick(order)}><Icon icon="lucide:edit" /></Link>&nbsp;&nbsp;&nbsp;
+                                    <Link to="#" onClick={() => handlePrint(order)}> <Icon icon="mdi:file-document-outline" /> </Link>&nbsp;&nbsp;&nbsp;
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            {showModal && selectedOrder && (
+                <div
+                    className="modal d-flex align-items-center justify-content-center"
+                    style={{
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        zIndex: 1000,
+
+
+                    }}
+                >
+                    <div className="modal-dialog order-model-dialog" >
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5>View Order</h5>
+                            <button onClick={handleClose} className="btn-close">X</button>
+                        </div>
+                        <div className="modal-body">
+                            <h5 className="mb-3">Order Details</h5>
+                            <table className="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <td>{selectedOrder.id}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>User Email</th>
+                                        <td>{selectedOrder.user.email}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Price</th>
+                                        <td>{selectedOrder.total_price}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Status</th>
+                                        <td>{selectedOrder.status}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Razorpay Order ID</th>
+                                        <td>{selectedOrder.razorpay_order_id}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Payment ID</th>
+                                        <td>{selectedOrder.razorpay_payment_id}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Signature</th>
+                                        <td>{selectedOrder.razorpay_signature}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Created At</th>
+                                        <td>{selectedOrder.created_at}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h6 className="mt-4">Ordered Items</h6>
+                              <table className="table table-striped">
+                                  <thead>
+                                      <tr>
+                                          <th>#</th>
+                                          <th>Part Name</th>
+                                          <th>Quantity</th>
+                                          <th>Price</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      {selectedOrder.items?.map((item, index) => (
+                                          <tr key={item.id}>
+                                              <td>{index + 1}</td>
+                                              <td>{item.part_name}</td>
+                                              <td>{item.quantity}</td>
+                                              <td>₹{item.price}</td>
+                                          </tr>
+                                      ))}
+                                  </tbody>
+                              </table>
+                        </div>
+
+                    </div>
+                </div>
               </div>
-          )}
-      </div>
+            )}
+      </div >
+      
   );
 };
 
-export default OrdersList;
+export default CustomerOrdersList;

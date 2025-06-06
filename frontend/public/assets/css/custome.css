@@ -238,7 +238,14 @@ select.form-select option {
     height: 250px !important;
     /* border-radius: 50%; */
     cursor: pointer !important;
+    
 }
+
+.brands-sec .category-card-item img:hover{
+    transition: all ease 0.5s;
+    transform: scale(0.9);
+}
+
 .brand-logo-display {
     align-items: center;
     justify-content: center;
@@ -335,4 +342,9 @@ select.form-select option {
 }
 .basic-data-table .dt-layout-row .dt-input{
     width: 40% !important;
+}
+
+.order-model-dialog {
+    max-width: 900px !important;
+    margin: 1.75rem auto !important;
 }
