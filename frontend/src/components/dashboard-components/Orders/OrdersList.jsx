@@ -104,7 +104,7 @@ const handlePrint = (order) => {
     const unitPrice = item.price || 0; // Use item.price as unit price
     const amount = qty * unitPrice;
     const tax = amount * 0.18;
-
+    const amount_tax = amount+tax
     subtotal += amount;
 
     return [
@@ -113,7 +113,7 @@ const handlePrint = (order) => {
       String(qty),
       `INR ${unitPrice}`,
       `INR ${tax.toFixed(2)}`,
-      `INR ${amount.toFixed(2)}`
+      `INR ${amount_tax.toFixed(2)}`
     ];
   });
 
