@@ -143,7 +143,7 @@ const OrdersList = () => {
     const rightAlignX = pageWidth - margin.right-10;
 
     doc.setFontSize(11);
-    doc.text(`Subtotal: INR ${order.total_price.toFixed(2)}`, rightAlignX, finalY + 20, { align: 'right' });
+    doc.text(`Subtotal: INR ${order.total_price}`, rightAlignX, finalY + 20, { align: 'right' });
     doc.text(`SGST (9%): INR ${sgst.toFixed(2)}`, rightAlignX, finalY + 35, { align: 'right' });
     doc.text(`CGST (9%): INR ${cgst.toFixed(2)}`, rightAlignX, finalY + 50, { align: 'right' });
 
@@ -241,7 +241,7 @@ const OrdersList = () => {
   
     // Grand Total
     doc.setFontSize(12);
-    doc.text(`Grand Total: ₹${order.total_price.toFixed(2)}`, margin.left, finalY + 30);
+    doc.text(`Grand Total: ₹${order.total_price}`, margin.left, finalY + 30);
   
     // Footer
     doc.setFontSize(10);
@@ -271,7 +271,7 @@ const OrdersList = () => {
                               <td>#{order.razorpay_order_id}</td>
                               <td>{order.items[0]?.part_group_name}-{order.items[0]?.part_no}</td>
                               <td>{new Date(order.created_at).toLocaleDateString()}</td>
-                              <td>₹{order.total_price.toFixed(2)}</td>
+                              <td>₹{order.total_price}</td>
                               <td>
                                   <span
                                       className={` ${order.status.toLowerCase() === 'pending'

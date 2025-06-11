@@ -138,7 +138,7 @@ const CustomerOrdersList = () => {
 
     const finalY = doc.lastAutoTable?.finalY || margin.top + 100;
     doc.setFontSize(14);
-    doc.text(`Grand Total: ₹${order.total_price.toFixed(2)}`, margin.left, finalY + 30);
+    doc.text(`Grand Total: ₹${order.total_price}`, margin.left, finalY + 30);
 
     doc.save(`invoice_${order.razorpay_order_id}.pdf`);
   };
@@ -228,7 +228,7 @@ const CustomerOrdersList = () => {
   
     // Grand Total
     doc.setFontSize(12);
-    doc.text(`Grand Total: ₹${order.total_price.toFixed(2)}`, margin.left, finalY + 30);
+    doc.text(`Grand Total: ₹${order.total_price}`, margin.left, finalY + 30);
   
     // Footer
     doc.setFontSize(10);
@@ -258,7 +258,7 @@ const CustomerOrdersList = () => {
                                  <td>{order.id}</td>
                                 <td>#{order.razorpay_order_id}</td>
                                 <td>{new Date(order.created_at).toLocaleDateString()}</td>
-                                <td>₹{order.total_price.toFixed(2)}</td>
+                                <td>₹{order.total_price}</td>
                                 <td>
                                     <span
                                         className={` ${order.status.toLowerCase() === 'pending'
