@@ -73,6 +73,7 @@ const OrdersList = () => {
 
 //   invoice pdf 
   const handlePrint = (order) => {
+    debugger;
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     const margin = { top: 60, left: 40, right: 40, bottom: 40 };
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -99,10 +100,10 @@ const OrdersList = () => {
       const amount = (qty * parseFloat(unitPrice)).toFixed(2);
       return [
         String(idx + 1).padStart(2, '0'),
-        item.part_name || 'N/A',
+        item.part_group_name + item.part_no || 'N/A',
         String(qty),
-        `₹${unitPrice}`,
-        `₹${amount}`,
+        `INR ${unitPrice}`,
+        `INR ${amount}`,
         order.status.charAt(0).toUpperCase() + order.status.slice(1),
       ];
     });
@@ -130,9 +131,26 @@ const OrdersList = () => {
       }
     });
 
+    
+
     const finalY = doc.lastAutoTable?.finalY || margin.top + 100;
+    const taxRate = 0.18;
+    const taxAmount = order.total_price * taxRate;
+    const sgst = taxAmount / 2;
+    const cgst = taxAmount / 2;
+    const totalWithTax = order.total_price + taxAmount;
+
+    const rightAlignX = pageWidth - margin.right-10;
+
+    doc.setFontSize(11);
+    doc.text(`Subtotal: INR ${order.total_price.toFixed(2)}`, rightAlignX, finalY + 20, { align: 'right' });
+    doc.text(`SGST (9%): INR ${sgst.toFixed(2)}`, rightAlignX, finalY + 35, { align: 'right' });
+    doc.text(`CGST (9%): INR ${cgst.toFixed(2)}`, rightAlignX, finalY + 50, { align: 'right' });
+
     doc.setFontSize(14);
-    doc.text(`Grand Total: ₹${order.total_price.toFixed(2)}`, margin.left, finalY + 30);
+    doc.text(`Grand Total: INR ${totalWithTax.toFixed(2)}`, rightAlignX, finalY + 70, { align: 'right' });
+
+
 
     doc.save(`invoice_${order.razorpay_order_id}.pdf`);
   };
@@ -182,12 +200,13 @@ const OrdersList = () => {
   
     // Table Data
     const rows = order.items.map((item, idx) => {
+      debugger;
       const qty = item.quantity || 1;
       const unitPrice = item.unit_price ? item.unit_price.toFixed(2) : (order.total_price / order.items.length).toFixed(2);
       const amount = (qty * parseFloat(unitPrice)).toFixed(2);
       return [
         String(idx + 1).padStart(2, '0'),
-        item.part_name || 'N/A',
+        item.part_group_name|| 'N/A',
         String(qty),
         `₹${unitPrice}`,
         `₹${amount}`,
@@ -250,7 +269,7 @@ const OrdersList = () => {
                               <td>{String(idx + 1).padStart(2, '0')}</td>
                               <td>GSA{order.id}</td>
                               <td>#{order.razorpay_order_id}</td>
-                              <td>{order.items[0]?.part_name}</td>
+                              <td>{order.items[0]?.part_group_name}-{order.items[0]?.part_no}</td>
                               <td>{new Date(order.created_at).toLocaleDateString()}</td>
                               <td>₹{order.total_price.toFixed(2)}</td>
                               <td>

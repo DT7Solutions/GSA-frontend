@@ -90,13 +90,17 @@ const Cart = () => {
     }
   };
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.total_price, 0);
+const subtotal = cartItems.reduce((acc, item) => acc + item.total_price, 0);
+const cgst = subtotal * 0.09;
+const sgst = subtotal * 0.09;
+const totalWithGST = subtotal + cgst + sgst;
+  
 
 
   // handle checkout functionality
   const handleCheckout = async () => {
     const token = localStorage.getItem("accessToken");
-
+  debugger;
     try {
 
       const { data } = await axios.post(
@@ -108,10 +112,12 @@ const Cart = () => {
           },
         }
       );
-
+      // const gstRate = 0.18;
+      // const gstAmount = data.amount * gstRate;
+      // const totalAmountWithGST = Math.round(data.amount + gstAmount);
       const options = {
         key: data.razorpay_key,
-        amount: data.amount,
+        amount: totalWithGST,
         currency: data.currency,
         name: "Car Parts Store",
         description: "Car Parts Purchase",
@@ -256,10 +262,26 @@ const Cart = () => {
             <table className="cart_totals">
               <tbody>
                 <tr>
-                  <td>Cart Subtotal</td>
+                  <td>Subtotal</td>
                   <td data-title="Cart Subtotal">
                     <span className="amount">
-                      <bdi>₹{subtotal}</bdi>
+                      <bdi>₹{subtotal.toFixed(2)}</bdi>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>CGST (9%)</td>
+                  <td>
+                    <span className="amount">
+                      <bdi>₹{cgst.toFixed(2)}</bdi>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>SGST (9%)</td>
+                  <td>
+                    <span className="amount">
+                      <bdi>₹{sgst.toFixed(2)}</bdi>
                     </span>
                   </td>
                 </tr>
@@ -270,13 +292,14 @@ const Cart = () => {
                   <td data-title="Total">
                     <strong>
                       <span className="amount">
-                        <bdi className="tot-amount">₹{subtotal}</bdi>
+                        <bdi className="tot-amount">₹{totalWithGST.toFixed(2)}</bdi>
                       </span>
                     </strong>
                   </td>
                 </tr>
               </tfoot>
             </table>
+
 
             <div className="wc-proceed-to-checkout mb-30">
               <button onClick={handleCheckout} className="btn style2 btn-fw">

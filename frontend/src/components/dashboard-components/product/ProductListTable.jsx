@@ -50,6 +50,7 @@ const isTokenValid = (token) => {
                 icon: "error",
                 confirmButtonText: "OK",
             });
+            localStorage.setItem("redirectAfterLogin", window.location.href);
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
 
@@ -68,8 +69,10 @@ const isTokenValid = (token) => {
                 text: "Your product was added to the cart.",
                 icon: "success",
                 confirmButtonText: "OK",
+            }).then(() => {
+                window.location.reload();
             });
-            window.location.reload();
+            // window.location.reload();
         } catch (error) {
             Swal.fire({
                 title: "Error",

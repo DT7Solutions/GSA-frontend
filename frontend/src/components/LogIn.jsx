@@ -77,49 +77,60 @@ const Login = () => {
   };
 
   // Function to handle username/password login
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(`${API_BASE_URL}api/auth/login/`, {
-        email: email.toLowerCase(), 
-        password,
+// Function to handle username/password login
+const handleLogin = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await axios.post(`${API_BASE_URL}api/auth/login/`, {
+      email: email.toLowerCase(),
+      password,
+    });
+
+    if (response.data.access) {
+      // Store tokens and role
+      localStorage.setItem("accessToken", response.data.access);
+      localStorage.setItem("refreshToken", response.data.refresh);
+      localStorage.setItem("role", response.data.role.toLowerCase());
+
+      // Decode user ID from JWT token
+      const decoded = jwtDecode(response.data.access);
+      const userId = decoded.user_id;
+
+      // Get user details using the token
+      const userResponse = await axios.get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
+        headers: {
+          Authorization: `Bearer ${response.data.access}`,
+        },
       });
 
-      if (response.data.access) {
-        localStorage.setItem("accessToken", response.data.access);
-        localStorage.setItem("refreshToken", response.data.refresh);
-        localStorage.setItem("role", response.data.role.toLowerCase());
-
-        const decoded = jwtDecode(response.data.access);
-        const userId = decoded.user_id;
-        const userResponse = await axios.get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
-          headers: {
-            Authorization: `Bearer ${response.data.access}`,
-          },
-        });
-          const { username, role_id } = userResponse;
-            if (userResponse.data.role_id == 1) {
-
-              navigate("/Dashboard");
-            } else if (userResponse.data.role_id == 2) {
-            
-              navigate("/");
-            } else {
-              navigate("/");
-            }
-    
-        // navigate("/");
+      // Check for a saved redirect URL and go there
+      const redirectUrl = localStorage.getItem("redirectAfterLogin");
+      if (redirectUrl) {
+        localStorage.removeItem("redirectAfterLogin");
+        window.location.href = redirectUrl;
+        return;
       }
-    } catch (error) {
-      console.error("Login Failed:", error.response ? error.response.data : error.message);
-      Swal.fire({
-        title: "Login Failed",
-        text: "Incorrect email or password.",
-        icon: "error",
-        confirmButtonText: "Retry",
-      });
+
+      // Role-based default redirection
+      const { role_id } = userResponse.data;
+      if (role_id === 1) {
+        navigate("/Dashboard");
+      } else {
+        navigate("/");
+      }
     }
-  };
+  } catch (error) {
+    console.error("Login Failed:", error.response ? error.response.data : error.message);
+    Swal.fire({
+      title: "Login Failed",
+      text: "Incorrect email or password.",
+      icon: "error",
+      confirmButtonText: "Retry",
+    });
+  }
+};
+
 
   
   return (
