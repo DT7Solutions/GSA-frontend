@@ -148,7 +148,7 @@ const OrdersList = () => {
     doc.text(`CGST (9%): INR ${cgst.toFixed(2)}`, rightAlignX, finalY + 50, { align: 'right' });
 
     doc.setFontSize(14);
-    doc.text(`Grand Total: INR ${totalWithTax.toFixed(2)}`, rightAlignX, finalY + 70, { align: 'right' });
+    doc.text(`Grand Total: INR ${totalWithTax}`, rightAlignX, finalY + 70, { align: 'right' });
 
 
 
