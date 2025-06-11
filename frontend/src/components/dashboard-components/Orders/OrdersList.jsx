@@ -71,89 +71,99 @@ const OrdersList = () => {
     }
   };
 
+
+
+
 //   invoice pdf 
-  const handlePrint = (order) => {
-    debugger;
-    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-    const margin = { top: 60, left: 40, right: 40, bottom: 40 };
-    const pageWidth = doc.internal.pageSize.getWidth();
+const handlePrint = (order) => {
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const margin = { top: 60, left: 40, right: 40, bottom: 40 };
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Company Header
-    doc.setFontSize(20);
-    doc.text('GowriSankar Agencies', margin.left, margin.top - 20);
-    doc.setFontSize(10);
-    doc.text('PLOT NO.381,PHASE 1&2,INDIRA', margin.left, margin.top);
-    doc.text('AUTONAGAR ,Guntur,Andhra Pradesh 522001', margin.left, margin.top + 12);
-    doc.text('Phone:+91 92480 22760', margin.left, margin.top + 24);
+  // Company Header
+  doc.setFontSize(20);
+  doc.text('GowriSankar Agencies', margin.left, margin.top - 20);
+  doc.setFontSize(10);
+  doc.text('PLOT NO.381,PHASE 1&2,INDIRA', margin.left, margin.top);
+  doc.text('AUTONAGAR, Guntur, Andhra Pradesh 522001', margin.left, margin.top + 12);
+  doc.text('Phone: +91 92480 22760', margin.left, margin.top + 24);
 
-    // Invoice Metadata
-    doc.setFontSize(16);
-    doc.text('INVOICE', pageWidth - margin.right - 100, margin.top - 20, { align: 'right' });
-    doc.setFontSize(12);
-    doc.text(`Invoice #: ${order.razorpay_order_id}`, pageWidth - margin.right - 165, margin.top);
-    doc.text(`Date: ${new Date(order.created_at).toLocaleDateString()}`, pageWidth - margin.right - 165, margin.top + 14);
+  // Invoice Metadata
+  doc.setFontSize(16);
+  doc.text('INVOICE', pageWidth - margin.right - 100, margin.top - 20, { align: 'right' });
+  doc.setFontSize(12);
+  doc.text(`Invoice #: ${order.razorpay_order_id}`, pageWidth - margin.right - 165, margin.top);
+  doc.text(`Date: ${new Date(order.created_at).toLocaleDateString()}`, pageWidth - margin.right - 165, margin.top + 14);
 
-    // Table Rows
-    const rows = order.items.map((item, idx) => {
-      const qty = item.quantity || 1;
-      const unitPrice = item.unit_price ? item.unit_price.toFixed(2) : (order.total_price / order.items.length).toFixed(2);
-      const amount = (qty * parseFloat(unitPrice)).toFixed(2);
-      return [
-        String(idx + 1).padStart(2, '0'),
-        item.part_group_name + item.part_no || 'N/A',
-        String(qty),
-        `INR ${unitPrice}`,
-        `INR ${amount}`,
-        order.status.charAt(0).toUpperCase() + order.status.slice(1),
-      ];
-    });
+  // Subtotal initialization
+  let subtotal = 0;
 
-    autoTable(doc, {
-      startY: margin.top + 60,
-      margin: { left: margin.left, right: margin.right },
-      head: [['S.L', 'Name', 'Quantity', 'Unit Price', 'Amount', 'Status']],
-      body: rows,
-      theme: 'striped',
-      styles: { cellPadding: 4, fontSize: 10 },
-      headStyles: { fillColor: [40, 40, 40], textColor: 255 },
-      columnStyles: {
-        0: { cellWidth: 30 },
-        1: { cellWidth: 200 },
-        2: { cellWidth: 50 },
-        3: { cellWidth: 80 },
-        4: { cellWidth: 80 },
-        5: { cellWidth: 100 }
-      },
-      didDrawPage: (data) => {
-        const pageCount = doc.internal.getNumberOfPages();
-        doc.setFontSize(9);
-        doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`, margin.left, doc.internal.pageSize.getHeight() - margin.bottom / 2);
-      }
-    });
+  // Table rows
+  const rows = order.items.map((item, idx) => {
+    const qty = item.quantity || 1;
+    const unitPrice = item.price || 0; // Use item.price as unit price
+    const amount = qty * unitPrice;
+    const tax = amount * 0.18;
 
-    
+    subtotal += amount;
 
-    const finalY = doc.lastAutoTable?.finalY || margin.top + 100;
-    const taxRate = 0.18;
-    const taxAmount = order.total_price * taxRate;
-    const sgst = taxAmount / 2;
-    const cgst = taxAmount / 2;
-    const totalWithTax = order.total_price + taxAmount;
+    return [
+      String(idx + 1).padStart(2, '0'),
+      item.part_group_name + item.part_no || 'N/A',
+      String(qty),
+      `INR ${unitPrice}`,
+      `INR ${tax.toFixed(2)}`,
+      `INR ${amount.toFixed(2)}`
+    ];
+  });
 
-    const rightAlignX = pageWidth - margin.right-10;
+  // Draw table
+  autoTable(doc, {
+    startY: margin.top + 60,
+    margin: { left: margin.left, right: margin.right },
+    head: [['S.L', 'Name', 'Quantity', 'Unit Price', 'Tax (18%)', 'Amount']],
+    body: rows,
+    theme: 'striped',
+    styles: { cellPadding: 4, fontSize: 10 },
+    headStyles: { fillColor: [40, 40, 40], textColor: 255 },
+    columnStyles: {
+      0: { cellWidth: 30 },
+      1: { cellWidth: 200 },
+      2: { cellWidth: 50 },
+      3: { cellWidth: 80 },
+      4: { cellWidth: 80 },
+      5: { cellWidth: 100 }
+    },
+    didDrawPage: () => {
+      const pageCount = doc.internal.getNumberOfPages();
+      doc.setFontSize(9);
+      doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`, margin.left, doc.internal.pageSize.getHeight() - margin.bottom / 2);
+    }
+  });
 
-    doc.setFontSize(11);
-    doc.text(`Subtotal: INR ${order.total_price}`, rightAlignX, finalY + 20, { align: 'right' });
-    doc.text(`SGST (9%): INR ${sgst.toFixed(2)}`, rightAlignX, finalY + 35, { align: 'right' });
-    doc.text(`CGST (9%): INR ${cgst.toFixed(2)}`, rightAlignX, finalY + 50, { align: 'right' });
+  // Tax calculations
+  const finalY = doc.lastAutoTable?.finalY || margin.top + 100;
+  const cgst = subtotal * 0.09;
+  const sgst = subtotal * 0.09;
+  const grandTotal = subtotal + cgst + sgst;
 
-    doc.setFontSize(14);
-    doc.text(`Grand Total: INR ${totalWithTax}`, rightAlignX, finalY + 70, { align: 'right' });
+  // Totals section
+  const rightAlignX = pageWidth - margin.right - 10;
+
+  doc.setFontSize(11);
+  doc.text(`Subtotal: INR ${subtotal.toFixed(2)}`, rightAlignX, finalY + 20, { align: 'right' });
+  doc.text(`CGST (9%): INR ${cgst.toFixed(2)}`, rightAlignX, finalY + 35, { align: 'right' });
+  doc.text(`SGST (9%): INR ${sgst.toFixed(2)}`, rightAlignX, finalY + 50, { align: 'right' });
+
+  doc.setFontSize(14);
+  doc.text(`Grand Total: INR ${grandTotal.toFixed(2)}`, rightAlignX, finalY + 70, { align: 'right' });
+
+  // Save PDF
+  doc.save(`invoice_${order.razorpay_order_id}.pdf`);
+};
 
 
 
-    doc.save(`invoice_${order.razorpay_order_id}.pdf`);
-  };
 
 
 //   packing slip
