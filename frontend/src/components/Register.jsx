@@ -17,42 +17,43 @@ const Register =  () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-      // Check if passwords match
-      if (password !== confirmPassword) {
-        Swal.fire({
-            title: "Error",
-            text: "Passwords do not match!",
-            icon: "error",
-            confirmButtonText: "OK",
-        });
-        return;
-    }
+        // Check if passwords match
+        if (password !== confirmPassword) {
+            Swal.fire({
+                title: "Error",
+                text: "Passwords do not match!",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
 
-    try {
-        debugger;
-        const response = await axios.post(`${API_BASE_URL}api/auth/register/`, {
-            username,
-            email: email.toLowerCase(), 
-            phone: phoneNumber,
-            password,
-            role_id: 2
-        });
+        try {
+            debugger;
+            const response = await axios.post(`${API_BASE_URL}api/auth/register/`, {
+                username,
+                email: email.toLowerCase(),
+                phone: phoneNumber,
+                password,
+                role_id: 2
+            });
 
-        console.log("Registration Successful:", response.data);
-        navigate("/Dashboard");
-      
+            console.log("Registration Successful:", response.data);
+            navigate("/Dashboard");
 
-    } catch (error) {
-        console.error("Registration Failed:", error.response ? error.response.data : error.message);
-        
-        Swal.fire({
-            title: "Registration Failed",
-            text: error.response?.data?.message || "Something went wrong. Please try again.",
-            icon: "error",
-            confirmButtonText: "Retry",
-        });
-    }
-};
+
+        } catch (error) {
+            console.error("Registration Failed:", error.response ? error.response.data : error.message);
+
+            Swal.fire({
+                title: "Registration Failed",
+                text: error.response?.data?.message || "Something went wrong. Please try again.",
+                icon: "error",
+                confirmButtonText: "Retry",
+            });
+        }
+    };
+    
     return (
         <div className="mt-3 space-extra-bottom login-screen" style={{ height: "125vh" }}>
             <div className="container">
