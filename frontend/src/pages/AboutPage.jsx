@@ -35,7 +35,7 @@ const AboutPage = () => {
       {/* Process Area One */}
  
       {/* CTA Area One */}
-      <CTAAreaTwo />
+      
 
       {/* Testimonial One */}
       <TestimonialOne />
@@ -43,8 +43,6 @@ const AboutPage = () => {
       {/* Team Area Two */}
       {/* <TeamAreaTwo /> */}
 
-      {/* Subscribe One */}
-      <SubscribeOne />
 
       {/* Footer Area One */}
       <FooterAreaFour />

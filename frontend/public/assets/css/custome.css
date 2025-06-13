@@ -348,3 +348,29 @@ select.form-select option {
     max-width: 900px !important;
     margin: 1.75rem auto !important;
 }
+
+.contact-info {
+    min-height: 280px;
+}
+
+/* legal pages css  */
+.policy-box {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  height: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.policy-box h5 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.read-more-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #007bff;
+  font-weight: 500;
+  text-decoration: none;
+}

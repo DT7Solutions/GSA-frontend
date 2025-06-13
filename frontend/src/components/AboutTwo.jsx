@@ -9,13 +9,13 @@ const AboutTwo = () => {
           <div className="col-xxl-7 col-xl-6">
             <div className="about-thumb2 mb-40 mb-xl-0">
               <div className="about-img-1">
-                <img src="assets/img/normal/about_2-1.png" alt="Fixturbo" />
+                <img src={`${process.env.PUBLIC_URL}assets/img/normal/about_2-1.png`} alt="GSA" />
               </div>
               <div className="about-img-2">
-                <img src="assets/img/normal/about_2-2.png" alt="Fixturbo" />
+                <img src={`${process.env.PUBLIC_URL}assets/img/normal/about_2-2.png`} alt="GSA" />
               </div>
               <div className="about-counter-wrap jump-reverse">
-                <img src="assets/img/icon/about_icon2-1.svg" alt="Fixturbo" />
+                <img src="assets/img/icon/about_icon2-1.svg" alt="GSA" />
                 <h3 className="about-counter">
                   <TrackVisibility once>
                     {({ isVisible }) =>
@@ -33,7 +33,7 @@ const AboutTwo = () => {
               <div className="about-year-wrap2 movingX">
                 <div className="about-year-grid-wrap">
                   <div className="icon">
-                    <img src="assets/img/icon/about_icon2-2.png" alt="Fixturbo" />
+                    <img src={`${process.env.PUBLIC_URL}assets/img/icon/about_icon2-2.png`} alt="GSA" />
                   </div>
                   <h3 className="about-counter">
                     <span className="counter-number">10</span>+
@@ -48,23 +48,20 @@ const AboutTwo = () => {
               <div className="title-area mb-30">
                 <span className="sub-title">Know About Us</span>
                 <h2 className="sec-title">
-                  Non Leo Libero Amet The Maecenas Gravida{" "}
+                 Trusted Auto Body Parts Dealer in Guntur{" "}
                   <img
                     className="title-bg-shape shape-center"
                     src="assets/img/bg/title-bg-shape.png"
-                    alt="Fixturbo"
+                    alt="GSA"
                   />
                 </h2>
                 <p className="sec-text">
-                  A car repair is a service provided to fix any issues or
-                  damages with a your vehicle. It involves diagnosing the
-                  problem, repairing or replacing the necessary parts, and
-                  ensuring that the car
+                  Gowrisankar Agencies is an authorized dealer for Hyundai and Toyota auto body parts in Guntur. We specialize in supplying high-quality, genuine components for both brands, ensuring perfect fit and performance. From bumpers and lights to mirrors and doors, we stock a wide range of parts for various models. With a commitment to quality, competitive pricing, and expert customer service, we have become a trusted name among car owners and workshops. Whether you need a replacement part or a full body solution, Gowrisankar Agencies is your go-to destination for reliable Hyundai and Toyota body parts in Guntur.
                 </p>
               </div>
-              <div className="about-feature-wrap style-shadow">
+              {/* <div className="about-feature-wrap style-shadow">
                 <div className="icon">
-                  <img src="assets/img/icon/about_icon2-3.svg" alt="Fixturbo" />
+                  <img src="assets/img/icon/about_icon2-3.svg" alt="GSA" />
                 </div>
                 <div className="about-feature-wrap-details">
                   <h5 className="about-feature-title">
@@ -75,10 +72,10 @@ const AboutTwo = () => {
                     quis venenatis cras sed{" "}
                   </p>
                 </div>
-              </div>
+              </div> 
               <div className="about-feature-wrap style-shadow">
                 <div className="icon">
-                  <img src="assets/img/icon/about_icon2-4.svg" alt="Fixturbo" />
+                  <img src="assets/img/icon/about_icon2-4.svg" alt="GSA" />
                 </div>
                 <div className="about-feature-wrap-details">
                   <h5 className="about-feature-title">Pro Drive Garage</h5>
@@ -87,7 +84,7 @@ const AboutTwo = () => {
                     quis venenatis cras sed{" "}
                   </p>
                 </div>
-              </div>
+              </div>*/}
             </div>
           </div>
         </div>

@@ -23,6 +23,11 @@ import BrandModelspage from "./pages/dashboard-pages/ProductsPages/BrandModelsPa
 import ChnagePassword from "./components/ChnagePassword";
 import ForgotPassword from "./components/ForgotPassword";
 import ThankyouPage from "./pages/ThankYouPage";
+
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
+import RefundPolicyPage from "./pages/RefundPolicyPage";
+import ShippingPolicyPage from "./pages/ShippingPolicyPage";
 // import DashboardPage from "./pages/dashboard-pages/MainPage" 
 
 
@@ -55,7 +60,7 @@ function App() {
       <Routes>
        
         <Route exact path="/" element={<HomePageSix />} />
-        <Route exact path="/about" element={<AboutPage />} />
+        <Route exact path="/about-us" element={<AboutPage />} />
         <Route exact path="/service" element={<ServicePage />} />
         <Route exact path="/service-details" element={<ServiceDetailsPage />} />
 
@@ -67,7 +72,7 @@ function App() {
         <Route exact path="/cart" element={<CartPage />} />
         <Route exact path="/checkout" element={<CheckoutPage />} />
         <Route exact path="/wishlist" element={<WishlistPage />} />
-        <Route exact path="/contact" element={<ContactPage />} />
+        <Route exact path="/contact-us" element={<ContactPage />} />
         <Route exact path="/Login" element={<LoginPage />} />
         <Route exact path="/Register" element={<RegisterPage />} />
         <Route exact path="/forgot-password" element={<ForgotPassword />} />
@@ -79,6 +84,11 @@ function App() {
         <Route exact path="/part-list/:id" element={<PartListPage />} />
 
         <Route exact path="/thank-you" element={<ThankyouPage />} />
+        
+        <Route exact path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route exact path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
+        <Route exact path="/shipping-policy" element={<ShippingPolicyPage />} />
+        <Route exact path="/refund-policy" element={<RefundPolicyPage />} />
 
 
 

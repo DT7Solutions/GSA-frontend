@@ -39,11 +39,11 @@ const HeroFive = () => {
                         massa tempus in.
                       </p>
                       <div className="btn-group">
-                        <Link to="/about" className="btn">
+                        <Link to="/about-us" className="btn">
                           Learn About Us
                         </Link>
-                        <Link to="/service" className="btn style-border">
-                          Our Service
+                        <Link to="/contact-us" className="btn style-border">
+                         Contact Us
                         </Link>
                       </div>
                     </div>
@@ -81,11 +81,11 @@ const HeroFive = () => {
                         massa tempus in.
                       </p>
                       <div className="btn-group">
-                        <Link to="/about" className="btn">
+                        <Link to="/about-us" className="btn">
                           Learn About Us
                         </Link>
-                        <Link to="/service" className="btn style-border">
-                          Our Service
+                        <Link to="/contact-us" className="btn style-border">
+                         Contact Us
                         </Link>
                       </div>
                     </div>

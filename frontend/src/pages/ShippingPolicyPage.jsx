@@ -3,11 +3,10 @@ import HeaderFive from "../components/HeaderFive";
 
 import FooterAreaFour from "../components/FooterAreaFour";
 import Breadcrumb from "../components/Breadcrumb";
-import SubscribeOne from "../components/SubscribeOne";
-import ContactArea from "../components/ContactArea";
+import ShippingPolicy from "../components/ShippingPolicy";
 import Preloader from "../helper/Preloader";
 
-const ContactPage = () => {
+const ShippingPolicyPage = () => {
   let [active, setActive] = useState(true);
   useEffect(() => {
     setTimeout(function () {
@@ -18,20 +17,14 @@ const ContactPage = () => {
     <>
       {/* Preloader */}
       {active === true && <Preloader />}
-
-      {/* Header one */}
       <HeaderFive />
+      <Breadcrumb title={"Shipping Policy"} />
 
-      {/* Breadcrumb */}
-      <Breadcrumb title={"Contact"} />
-
-      {/* Contact Area */}
-      <ContactArea />
-
-      {/* Footer Area One */}
+      <ShippingPolicy />
+      
       <FooterAreaFour />
     </>
   );
 };
 
-export default ContactPage;
+export default ShippingPolicyPage;

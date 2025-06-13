@@ -14,19 +14,15 @@ const FooterAreaFour = () => {
               <div className="widget footer-widget widget-about">
                 <h3 className="widget_title">About Us</h3>
                 <p className="footer-text mb-30">
-                  It is a long established fact that a reader will be distracted
+                 A one stop service corner for all your car needs.
+Authorised dealers for Hyundai, Toyota and Ford.
+Available in Guntur
                 </p>
                 <div className="social-btn style3">
-                  <Link to="https://www.instagram.com/" tabIndex={-1}>
+                  <Link to="https://www.instagram.com/gowrisankaragencies/" tabIndex={-1}>
                     <i className="fab fa-instagram" />
                   </Link>
-                  <Link to="https://linkedin.com/" tabIndex={-1}>
-                    <i className="fab fa-linkedin-in" />
-                  </Link>
-                  <Link to="https://twitter.com/" tabIndex={-1}>
-                    <i className="fab fa-twitter" />
-                  </Link>
-                  <Link to="https://facebook.com/" tabIndex={-1}>
+                  <Link to="https://www.facebook.com/gowrisankaragencies" tabIndex={-1}>
                     <i className="fab fa-facebook-f" />
                   </Link>
                 </div>
@@ -38,40 +34,32 @@ const FooterAreaFour = () => {
                 <div className="menu-all-pages-container">
                   <ul className="menu">
                     <li>
-                      <Link to="/about">About</Link>
+                      <Link to="/about-us">About</Link>
+                    </li><li>
+                      <Link to="/contact-us">Contact us</Link>
                     </li>
-                    <li>
-                      <Link to="/team">Team</Link>
-                    </li>
-                    <li>
-                      <Link to="/contact">Faq</Link>
-                    </li>
-                    <li>
-                      <Link to="/contact">Privacy Policy</Link>
-                    </li>
+                   
+                  
                   </ul>
                 </div>
               </div>
             </div>
             <div className="col-md-6 col-xl-3">
               <div className="widget widget_nav_menu footer-widget">
-                <h3 className="widget_title">Our Services</h3>
+                <h3 className="widget_title">Legal Links</h3>
                 <div className="menu-all-pages-container">
                   <ul className="menu">
                     <li>
-                      <Link to="/service">Mechanic Masters</Link>
+                      <Link to="/privacy-policy">Privacy Policy</Link>
                     </li>
                     <li>
-                      <Link to="/service">Speedy Auto Repair</Link>
+                      <Link to="/terms-and-conditions">Terms and Conditions</Link>
                     </li>
                     <li>
-                      <Link to="/service">Mobile Car Repair</Link>
+                      <Link to="/refund-policy">Refund Policy</Link>
                     </li>
                     <li>
-                      <Link to="/service">Pro Auto Fix</Link>
-                    </li>
-                    <li>
-                      <Link to="/service">Precision Auto Works</Link>
+                      <Link to="/shipping-policy">Shipping Policy </Link>
                     </li>
                   </ul>
                 </div>
@@ -113,7 +101,7 @@ const FooterAreaFour = () => {
                       <p>Email Address</p>
                       <h6>
                         <Link to="mailto:infoname@mail.com">
-                          abcd@gmail.com
+                        rajesh.katakam@gmail.com
                         </Link>
                         <p />
                       </h6>
@@ -135,9 +123,11 @@ const FooterAreaFour = () => {
             </div>
             <div className="col-auto">
               <div className="footer-links">
-                <Link to="/contact">Tarms &amp; Condition</Link>
-                <Link to="/contact">Privacy Policy</Link>
-                <Link to="/contact">Contact Us</Link>
+                <p> Designed by <a href="https://dt7.agency/" target="_blank" rel="noopener noreferrer">
+                  Dt7 Agency
+                </a></p>
+                
+                
               </div>
             </div>
           </div>

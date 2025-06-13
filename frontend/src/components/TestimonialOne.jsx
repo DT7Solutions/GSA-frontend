@@ -12,8 +12,8 @@ const TestimonialOne = () => {
           <div className="col-lg-12">
             <div className="space1">
               <div className="title-area">
-                <h2 className="sec-title  text-center mt-5 gsa-title" style={{color:"white"}}>
-                Clients  Says
+                <h2 className="sec-title  text-center mt-5 gsa-title" style={{ color: "white" }}>
+                  Clients  Says
                 </h2>
               </div>
               <div className="row global-carousel testmonial-slider">
@@ -58,7 +58,7 @@ const TestimonialOne = () => {
                           <div className="testi-card-profile">
                             <div className="testi-card-profile-details">
                               <h4 className="testi-profile-title">
-                                Nafiz Bhuiyan
+                                Ramesh Kumar
                               </h4>
                               <span className="testi-profile-desig">
                                 Customer
@@ -67,16 +67,12 @@ const TestimonialOne = () => {
                             <div className="quote-icon">
                               <img
                                 src={`${process.env.PUBLIC_URL}/assets/img/icon/quote1-1.svg`}
-                                alt="Fixturbo"
+                                alt="Gowrisankar Agencies"
                               />
                             </div>
                           </div>
                           <p className="testi-card_text">
-                            Roof services include repairs installations, and
-                            maintena resident commercial buildings. Expert the a
-                            technicians diagnose and ther address issues roofing
-                            mater gutter systems, and ventilation a Roof
-                            services
+                            I bought a Hyundai bumper and mirror from Gowrisankar Agencies. The quality was top-notch and delivery was very fast. Highly recommend for genuine auto parts in Guntur!
                           </p>
                           <div className="rating">
                             <i className="fas fa-star" />
@@ -89,6 +85,7 @@ const TestimonialOne = () => {
                       </div>
                     </div>
                   </SwiperSlide>
+
                   <SwiperSlide>
                     <div>
                       <div className="testi-card">
@@ -96,25 +93,21 @@ const TestimonialOne = () => {
                           <div className="testi-card-profile">
                             <div className="testi-card-profile-details">
                               <h4 className="testi-profile-title">
-                                Nafiz Bhuiyan
+                                Priya Sharma
                               </h4>
                               <span className="testi-profile-desig">
-                                Customer
+                                Car Owner
                               </span>
                             </div>
                             <div className="quote-icon">
                               <img
                                 src={`${process.env.PUBLIC_URL}/assets/img/icon/quote1-1.svg`}
-                                alt="Fixturbo"
+                                alt="Gowrisankar Agencies"
                               />
                             </div>
                           </div>
                           <p className="testi-card_text">
-                            Roof services include repairs installations, and
-                            maintena resident commercial buildings. Expert the a
-                            technicians diagnose and ther address issues roofing
-                            mater gutter systems, and ventilation a Roof
-                            services
+                            Their customer service is excellent. I needed a Toyota tail lamp urgently, and they helped me with the right part and guidance. Very reliable team.
                           </p>
                           <div className="rating">
                             <i className="fas fa-star" />
@@ -127,6 +120,7 @@ const TestimonialOne = () => {
                       </div>
                     </div>
                   </SwiperSlide>
+
                   <SwiperSlide>
                     <div>
                       <div className="testi-card">
@@ -134,25 +128,21 @@ const TestimonialOne = () => {
                           <div className="testi-card-profile">
                             <div className="testi-card-profile-details">
                               <h4 className="testi-profile-title">
-                                Nafiz Bhuiyan
+                                Arvind Raj
                               </h4>
                               <span className="testi-profile-desig">
-                                Customer
+                                Workshop Owner
                               </span>
                             </div>
                             <div className="quote-icon">
                               <img
                                 src={`${process.env.PUBLIC_URL}/assets/img/icon/quote1-1.svg`}
-                                alt="Fixturbo"
+                                alt="Gowrisankar Agencies"
                               />
                             </div>
                           </div>
                           <p className="testi-card_text">
-                            Roof services include repairs installations, and
-                            maintena resident commercial buildings. Expert the a
-                            technicians diagnose and ther address issues roofing
-                            mater gutter systems, and ventilation a Roof
-                            services
+                            I regularly purchase Hyundai and Toyota parts from them. Genuine products, great prices, and the staff is knowledgeable. My go-to supplier in Guntur.
                           </p>
                           <div className="rating">
                             <i className="fas fa-star" />
@@ -165,6 +155,9 @@ const TestimonialOne = () => {
                       </div>
                     </div>
                   </SwiperSlide>
+
+
+
                 </Swiper>
 
                 <div className="testimonialOne arrow">
