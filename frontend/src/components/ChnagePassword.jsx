@@ -46,6 +46,7 @@ const ForgotPassword = () => {
             const userId = decoded.user_id;  
 
             if (password === confirmPassword) {
+                Swal.fire("Success", "OTP sent to registe email id !.", "success");
                 sendOTP(userId); 
             } else {
                 Swal.fire("Error", "Passwords do not match!", "error");
