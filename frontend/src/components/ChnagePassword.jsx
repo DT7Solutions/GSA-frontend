@@ -158,7 +158,7 @@ const ForgotPassword = () => {
                         {step === 2 && (
                             <form onSubmit={handleVerifyOtp} className="input-style">
                                 <h4 className="text-center mb-2">Enter OTP</h4>
-                                <p className="text-center">OTP sent to <strong>{email}</strong></p>
+                                <p className="text-center">OTP sent to register email id !</p>
                                 <div className="mb-3">
                                     <label className="form-label">OTP</label>
                                     <input

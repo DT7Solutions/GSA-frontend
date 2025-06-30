@@ -49,7 +49,7 @@ const HomePageSix = () => {
       <CategoryAreaOne />
 
       {/* Product Area One */}
-      <ProductAreaTwo />
+      {/* <ProductAreaTwo />   -------------------------------------- */}
       {/* <ProductAreaOne /> */}
 
       {/* CTA Area Two */}
@@ -62,11 +62,11 @@ const HomePageSix = () => {
       <CarBrands />
       </div> */}
 
-      <CurrentOffers />
+      {/* <CurrentOffers /> --------------------------------------- */}
 
 
       {/* Faq Area three */}
-      <FaqAreaThree />
+      {/* <FaqAreaThree />  -------------------------------- */}
 
       {/* Client Area Four */}
       <ClientAreaFour />
@@ -74,9 +74,9 @@ const HomePageSix = () => {
       <TestimonialOne />
 
       {/* Blog Area Two */}
-      <div className="space-top">
+      {/* <div className="space-top">
         <BlogAreaTwo />
-      </div>
+      </div> */}
 
       {/* Subscribe Two */}
       {/* <SubscribeTwo /> */}
