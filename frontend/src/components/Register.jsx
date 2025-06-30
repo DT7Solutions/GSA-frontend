@@ -35,7 +35,7 @@ const Register =  () => {
                 email: email.toLowerCase(),
                 phone: phoneNumber,
                 password,
-                role_id: 2
+                role_id: 3
             });
 
             console.log("Registration Successful:", response.data);
