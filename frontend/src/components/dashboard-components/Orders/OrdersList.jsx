@@ -52,11 +52,13 @@ const OrdersList = () => {
 
   const handleSave = async () => {
     try {
+      debugger;
       const response = await axios.put(
         `${API_BASE_URL}/api/home/orders/${selectedOrder.id}/status/`,
         { status: selectedOrder.status },
         { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
       );
+      alert("request sending sucess")
       if (response.status === 200) {
         setOrders(prev =>
           prev.map(o => o.id === selectedOrder.id ? { ...o, status: response.data.new_status || selectedOrder.status } : o)
