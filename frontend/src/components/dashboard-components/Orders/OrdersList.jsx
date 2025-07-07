@@ -51,14 +51,23 @@ const OrdersList = () => {
   };
 
   const handleSave = async () => {
+    if (!token) {
+    Swal.fire({
+      title: 'No Token',
+      text: 'You are not logged in. Please login to continue.',
+      icon: 'warning',
+      confirmButtonText: 'OK'
+    });
+    return;
+  }
     try {
       debugger;
       const response = await axios.put(
-        `${API_BASE_URL}/api/home/orders/${selectedOrder.id}/status/`,
+        `${API_BASE_URL}api/home/orders/${selectedOrder.id}/status/`,
         { status: selectedOrder.status },
         { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
       );
-      alert("request sending sucess")
+  
       if (response.status === 200) {
         setOrders(prev =>
           prev.map(o => o.id === selectedOrder.id ? { ...o, status: response.data.new_status || selectedOrder.status } : o)
