@@ -7,6 +7,8 @@ import Preloader from "../../../helper/Preloader";
 import { useParams } from 'react-router-dom';
 import axios from "axios";
 import API_BASE_URL from "../../../config";
+// import ShopArea from "../components/ShopArea";
+// import ShopArea from "../../../components/ShopArea";
 
 const PartCategoryPage = () => {
   const { id } = useParams();

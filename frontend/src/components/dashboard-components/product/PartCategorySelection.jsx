@@ -38,7 +38,7 @@ const PartCategorySelection = ({id, modelvariant}) => {
                                 alt={variant.name}
                             /></Link>
                             <div className="text-center">
-                                <Link to={`/part-group/${variant.id}`} className="text-center brand-name">
+                                <Link to={`/shop/${variant.id}`} className="text-center brand-name">
                                 {variant.name}
                                 </Link>
                             </div>

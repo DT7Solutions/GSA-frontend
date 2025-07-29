@@ -16,22 +16,14 @@ const ShopDetailsPage = () => {
   }, []);
   return (
     <>
-      {/* Preloader */}
       {active === true && <Preloader />}
-
-      {/* Header one */}
       <HeaderFive />
 
-      {/* Breadcrumb */}
       <Breadcrumb title={"Shop Details"} />
 
-      {/* Shop Details */}
       <ShopDetails />
 
-      {/* Subscribe One */}
-      <SubscribeOne />
-
-      {/* Footer Area One */}
+  
       <FooterAreaFour />
     </>
   );

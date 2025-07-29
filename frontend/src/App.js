@@ -83,6 +83,9 @@ function App() {
         <Route exact path="/part-group/:id" element={<PartGroupPage />} />
         <Route exact path="/part-list/:id" element={<PartListPage />} />
 
+        <Route exact path="/shop/:id" element={<ShopPage />} />
+        <Route exact path="/shop-details" element={<ShopDetailsPage />} />
+
         <Route exact path="/thank-you" element={<ThankyouPage />} />
         
         <Route exact path="/privacy-policy" element={<PrivacyPolicyPage />} />

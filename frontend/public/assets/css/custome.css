@@ -374,3 +374,11 @@ select.form-select option {
   font-weight: 500;
   text-decoration: none;
 }
+
+.product-content .product-title{
+    font-size: 20px !important;
+}
+.widget_title{}
+ .widget_title{
+    font-size: 25px !important;
+}
