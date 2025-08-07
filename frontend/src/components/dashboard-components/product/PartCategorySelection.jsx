@@ -33,13 +33,32 @@ const PartCategorySelection = ({id, modelvariant}) => {
                 {variantCategory.map((variant) => (
                     <div className="col-sm-12 col-md-2 col-lg-2 mb-3">
                         <div className="brand-models">
-                            <Link to={`/part-group/${variant.id}`}><img
-                               src={variant.image}
-                                alt={variant.name}
-                            /></Link>
+                            {/* to={`/part-group/${variant.id}`} */}
+                            <Link to={`/shop/${variant.id}`}
+                                onClick={() => {
+                                    const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
+                                    const updated = {
+                                        ...existing,
+                                        brand_category: variant.id
+                                    };
+                                    localStorage.setItem("selected_brand", JSON.stringify(updated));
+                                }}
+                            ><img
+                                    src={variant.image}
+                                    alt={variant.name}
+                                /></Link>
                             <div className="text-center">
-                                <Link to={`/shop/${variant.id}`} className="text-center brand-name">
-                                {variant.name}
+                                <Link to={`/shop/${variant.id}`}
+                                    onClick={() => {
+                                        const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
+                                        const updated = {
+                                            ...existing,
+                                            brand_category: variant.id
+                                        };
+                                        localStorage.setItem("selected_brand", JSON.stringify(updated));
+                                    }}
+                                    className="text-center brand-name">
+                                    {variant.name}
                                 </Link>
                             </div>
                         </div>

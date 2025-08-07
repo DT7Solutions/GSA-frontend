@@ -189,14 +189,14 @@ const totalWithGST = subtotal + cgst + sgst;
                       <img
                         width={91}
                         height={91}
-                        src={item.part.part_group_image}
-                        alt={item.part.part_group_name}
+                        src={item.part.product_image}
+                        alt={item.part.product_name}
                       />
                     </Link>
                   </td>
                   <td data-title="Name">
                     <Link className="cart-productname" to="/shop-details">
-                      {item.part.part_group_name}-{item.part.part_no}
+                      {item.part.product_name}-{item.part.part_no}
                     </Link>
                   </td>
                   <td data-title="Price">

@@ -471,22 +471,22 @@ const AddProductsForm = () => {
     };
 
 
-    const handleCarcategorytChange = async (e) => {
-        const partcatId = parseInt(e.target.value);
-        setFormData((formData) => ({
-            ...formData,
-            partCategoryId: partcatId,
-        }));
-        setcarPartgroupItem([])
-        try {
-            const response = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${partcatId}/`);
-            setcarPartgroupItem(response.data);
+    // const handleCarcategorytChange = async (e) => {
+    //     const partcatId = parseInt(e.target.value);
+    //     setFormData((formData) => ({
+    //         ...formData,
+    //         partCategoryId: partcatId,
+    //     }));
+    //     setcarPartgroupItem([])
+    //     try {
+    //         const response = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${partcatId}/`);
+    //         setcarPartgroupItem(response.data);
 
-        } catch (error) {
-            console.error("Error fetching car models:", error);
-            setcarPartgroupItem([])
-        }
-    };
+    //     } catch (error) {
+    //         console.error("Error fetching car models:", error);
+    //         setcarPartgroupItem([])
+    //     }
+    // };
 
     const handleCarpartitemChange = async (e) => {
         const partitemId = parseInt(e.target.value);
@@ -632,7 +632,7 @@ const AddProductsForm = () => {
                         </div>
 
                         {/* Part Selection */}
-                        <div className="col-md-4">
+                        {/* <div className="col-md-4">
                             <label className="form-label">Select Part category</label>
                             <div className="input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarcategorytChange}>
@@ -650,7 +650,7 @@ const AddProductsForm = () => {
                                     <Icon icon="lucide:plus" /> Add Part
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Part */}
                         <div className="col-md-4">
@@ -787,7 +787,7 @@ const AddProductsForm = () => {
                             />
                         </div>
                         {/* Part Compatibility */}
-                        <div className="col-md-8">
+                        <div className="col-md-6">
                             <label className="form-label">Part Compatibility</label>
                             <div className="input-group">
                                 <Select
@@ -799,7 +799,7 @@ const AddProductsForm = () => {
                             </div>
                         </div>
 
-                        <div class="col-lg-8 was-validated">
+                        <div class="col-lg-6 was-validated">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" rows="4" cols="50" placeholder="Enter a description..."
                                 onChange={(e) =>

@@ -22,22 +22,37 @@ const BrandModels = ({ id ,carMakes}) => {
       }, []);
       
     return (
-
         <div className="category-area-1 pb-100 brand-logo-display mt-5">
             <div className="container-fluid">
                 <h4 className="text-center fw-extrabold mb-20">Search By {carMakes.name} Car Model</h4>
                 <div className="row mt-5 brands-sec">
-
                     {carModel.map((model) => (
                         <div className="col-sm-12 col-md-3 col-lg-3 mb-3">
                             <div className="brand-models">
-                                <Link to={`/models-variant/${model.id}`}><img
-                                    src={model.image}
-                                    alt={carMakes.name}
-                                /></Link>
+                                <Link to={`/models-variant/${model.id}`} onClick={() => {
+                                
+                                    const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
+                                    const updated = {
+                                        ...existing,
+                                        brand_model: model.id
+                                    };
+                                    localStorage.setItem("selected_brand", JSON.stringify(updated));
+                                }}><img
+                                        src={model.image}
+                                        alt={carMakes.name}
+                                    /></Link>
                                 <div className="text-center">
-                                    <Link to={`/models-variant/${model.id}`} className="text-center brand-name">
-                                    {model.name} {model.generation} <br />({model.production_start_date}-{model.production_end_date})
+                                    <Link to={`/models-variant/${model.id}`} className="text-center brand-name"
+                                        onClick={() => {
+                                            const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
+                                            const updated = {
+                                                ...existing,
+                                                brand_model: model.id
+                                            };
+                                            localStorage.setItem("selected_brand", JSON.stringify(updated));
+                                        }}
+                                    >
+                                        {model.name} {model.generation} <br />({model.production_start_date}-{model.production_end_date})
                                     </Link>
                                 </div>
                             </div>

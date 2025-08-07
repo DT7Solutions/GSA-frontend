@@ -60,8 +60,17 @@ const ModelVariantsList = ({id , carModelItem}) => {
                                         {modelvariant.map((variant) => (
                                             <tr>
                                                 <td>
-                                                    <Link to={`/part-category/${variant.id}`} className="text-primary-600">
-                                                    {variant.name} ({carModelItem.fuel_type})-{carModelItem.generation}
+                                                    <Link to={`/part-category/${variant.id}`}
+                                                        onClick={() => {
+                                                            const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
+                                                            const updated = {
+                                                                ...existing,
+                                                                model_variant: variant.id
+                                                            };
+                                                            localStorage.setItem("selected_brand", JSON.stringify(updated));
+                                                        }}
+                                                        className="text-primary-600">
+                                                        {variant.name} ({carModelItem.fuel_type})-{carModelItem.generation}
                                                     </Link>
                                                 </td>
                                                 <td>

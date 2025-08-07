@@ -309,7 +309,7 @@ const MasterLayout = ({ children }) => {
                                        Part Categorys
                                     </NavLink>
                                 </li>
-                                <li>
+                                {/* <li>
                                     <NavLink
                                         to='/car-group-part'
                                         className={(navData) =>
@@ -319,7 +319,7 @@ const MasterLayout = ({ children }) => {
                                         <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
                                       Part Group
                                     </NavLink>
-                                </li>
+                                </li> */}
 
 
 

@@ -3,6 +3,9 @@ import Slider from "rc-slider";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import API_BASE_URL from "../config";
+import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
+
 
 const ShopArea = ({ id }) => {
   const [range, setRange] = useState([0, 100]);
@@ -15,33 +18,120 @@ const ShopArea = ({ id }) => {
     setRange(value);
   };
 
-useEffect(() => {
-  const fetchProductData = async () => {
-    try {
-     const response = await axios.get(
+  useEffect(() => {
+    const fetchProductData = async () => {
+      try {
+        const response = await axios.get(
           `${API_BASE_URL}api/home/car_part_group_list/${id}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
         );
-      setProductData(response.data);
-      console.log('got car-models payload:', response.data);
+        setProductData(response.data);
+        console.log('got car-models payload:', response.data);
+      } catch (error) {
+        console.error('Error fetching car parts:', error);
+      }
+    };
+
+    if (id) {
+      fetchProductData();
+    }
+  }, [id]);
+
+  const isTokenValid = (token) => {
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decoded.exp > currentTime;
     } catch (error) {
-      console.error('Error fetching car parts:', error);
+      return false;
     }
   };
 
-  if (id) {
-    fetchProductData();
-  }
-}, [id]);
+  const handleAddToCart = async (partId) => {
+
+    const token = localStorage.getItem('accessToken');
+
+    if (!token || !isTokenValid(token)) {
+      Swal.fire({
+        title: "Your session has expired. Please login again",
+        text: "",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      localStorage.setItem("redirectAfterLogin", window.location.href);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+
+      window.location.href = '#/login';
+      return;
+    }
+
+    try {
+      await axios.post(`${API_BASE_URL}api/home/cart/add/${partId}/`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      Swal.fire({
+        title: "Successfully added to cart",
+        text: "Your product was added to the cart.",
+        icon: "success",
+        confirmButtonText: "OK",
+      }).then(() => {
+        window.location.reload();
+      });
+      // window.location.reload();
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "There was an issue adding the product to the cart.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
 
 
+  const [categories, setCategories] = useState([]);
 
 
- 
+  useEffect(() => {
+    const fetchVariantData = async () => {
+      const selectedBrand = JSON.parse(localStorage.getItem("selected_brand"));
+      if (selectedBrand && selectedBrand.model_variant) {
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}api/home/car_variant_category_group/${selectedBrand.model_variant}/`
+          );
+          setCategories(response.data);
+        } catch (error) {
+          console.error("Error fetching part sections:", error);
+        }
+      }
+    };
+
+    fetchVariantData();
+  }, []);
+
+  //  useEffect(() => {
+  //     const fetchCarMakes = async () => {
+  //       try {
+  //         const response = await axios.get(`${API_BASE_URL}api/home/model_variant_item/${4}/`);
+  //         setCategories(response.data);
+  //       } catch (error) {
+  //         console.error('Error fetching car makes:', error);
+  //       }
+  //     };
+
+  //     fetchCarMakes();
+  //   }, []);
+
+
+  const handleCategoryClick = (categoryId) => {
+    const selectedBrand = JSON.parse(localStorage.getItem("selected_brand")) || {};
+    selectedBrand.brand_category = categoryId;
+    localStorage.setItem("selected_brand", JSON.stringify(selectedBrand));
+  };
+
 
   return (
     <section className="space-top space-extra-bottom shop-sec">
@@ -78,10 +168,10 @@ useEffect(() => {
                           {/* {product.discount > 0 && (
                            
                           )}{" "} */}
-                           ₹{product.sale_price} &nbsp;
+                          ₹{product.sale_price} &nbsp;
                           <del>₹{product.price}</del>
                         </span>
-                        <Link to="#" className="link-btn">
+                        <Link to="#" className="link-btn" onClick={() => handleAddToCart(product.id)}>
                           Add to cart <i className="fas fa-arrow-right" />
                         </Link>
                       </div>
@@ -97,7 +187,7 @@ useEffect(() => {
 
           <div className="col-xl-3 col-lg-4 sidebar-widget-area">
             <aside className="sidebar-sticky-area sidebar-area sidebar-shop">
-              <div className="widget widget_search">
+              {/* <div className="widget widget_search">
                 <h3 className="widget_title">Search</h3>
                 <form className="search-form">
                   <input type="text" placeholder="Find your product" />
@@ -105,30 +195,27 @@ useEffect(() => {
                     <i className="fas fa-search" />
                   </button>
                 </form>
-              </div>
+              </div> */}
 
               <div className="widget widget_categories">
                 <h3 className="widget_title">Product categories</h3>
                 <ul>
-                  <li>
-                    <Link to="/service-details">Steering wheel</Link> <span>(12)</span>
-                  </li>
-                  <li>
-                    <Link to="/service-details">Suspension spring</Link> <span>(12)</span>
-                  </li>
-                  <li>
-                    <Link to="/service-details">Tail light</Link> <span>(08)</span>
-                  </li>
-                  <li>
-                    <Link to="/service-details">Transmission</Link> <span>(13)</span>
-                  </li>
-                  <li>
-                    <Link to="/service-details">Windshield wiper motor</Link> <span>(03)</span>
-                  </li>
-                  <li>
-                    <Link to="/service-details">Fuel injector</Link> <span>(03)</span>
-                  </li>
+                  {Array.isArray(categories) && categories.length > 0 ? (
+                    categories.map((category) => (
+                      <li key={category.id}>
+                        <Link
+                          to={`/shop/${category.id}`}
+                          onClick={() => handleCategoryClick(category.id)}
+                        >
+                          {category.name}-({category.part_count})
+                        </Link>
+                      </li> 
+                    ))
+                  ) : (
+                    <li>No categories available</li>
+                  )}
                 </ul>
+
               </div>
 
               <div className="widget widget_price_filter">
@@ -154,7 +241,7 @@ useEffect(() => {
                 </div>
               </div>
 
-              <div className="widget product_ratting_widget">
+              {/* <div className="widget product_ratting_widget">
                 <h3 className="widget_title">Sort by Rating</h3>
                 <ul>
                   <li>
@@ -188,7 +275,7 @@ useEffect(() => {
                     <span>(3)</span>
                   </li>
                 </ul>
-              </div>
+              </div> */}
             </aside>
           </div>
         </div>
