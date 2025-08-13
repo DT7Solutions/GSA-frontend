@@ -156,15 +156,15 @@ const HeaderFive = () => {
     <header className="nav-header header-layout4 header-container" >
       <div className={`sticky-wrapper ${scroll && "sticky"} header-top`}>
         <div className="container ">
-          <div className="row justify-content-center justify-content-md-between align-items-center gy-2">
-            <div className="col-auto d-none d-lg-block">
+          <div className="row justify-content-around justify-content-md-between align-items-center gy-2">
+            <div className="col-auto  d-lg-block">
               <div className="header-logo">
                 <Link to="/">
                   <img src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`} alt="Fixturbo" className="main-logo" />
                 </Link>
               </div>
             </div>
-            <div className="col-auto d-none d-md-block">
+            {/* <div className="col-auto d-none d-md-block">
               <div className="header-search-wrap">
                 <form className="search-form">
                   <input
@@ -188,7 +188,7 @@ const HeaderFive = () => {
                   </button>
                 </form>
               </div>
-            </div>
+            </div> */}
             <div className="col-auto">
               <div className="header-user-wrap">
                 <ul>

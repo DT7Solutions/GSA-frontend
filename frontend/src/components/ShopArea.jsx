@@ -6,28 +6,40 @@ import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
 
-
 const ShopArea = ({ id }) => {
   const [range, setRange] = useState([0, 100]);
   const [productData, setProductData] = useState([]);
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(null);
+
+  const [carMakes, setCarMakes] = useState([]);
+  const [carModels, setCarModels] = useState([]);
+  const [modelVariant, setModelVariant] = useState([]);
+
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedVariant, setSelectedVariant] = useState("");
+
+  const [selectedBrandName, setSelectedBrandName] = useState("");
+  const [selectedModelName, setSelectedModelName] = useState("");
+  const [selectedVariantName, setSelectedVariantName] = useState("");
+
+  const [categories, setCategories] = useState([]);
+
   const token = localStorage.getItem("accessToken");
 
   const handleRangeChange = (value) => {
     setRange(value);
   };
 
+  // Fetch product data based on id
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}api/home/car_part_group_list/${id}/`,
+          `${API_BASE_URL}api/home/car_part_group_list/${id}/`
         );
         setProductData(response.data);
-        console.log('got car-models payload:', response.data);
       } catch (error) {
-        console.error('Error fetching car parts:', error);
+        console.error("Error fetching car parts:", error);
       }
     };
 
@@ -36,41 +48,44 @@ const ShopArea = ({ id }) => {
     }
   }, [id]);
 
+  // Token validation
   const isTokenValid = (token) => {
     try {
       const decoded = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       return decoded.exp > currentTime;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
 
+  // Add to cart handler
   const handleAddToCart = async (partId) => {
-
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
 
     if (!token || !isTokenValid(token)) {
       Swal.fire({
         title: "Your session has expired. Please login again",
-        text: "",
         icon: "error",
         confirmButtonText: "OK",
       });
       localStorage.setItem("redirectAfterLogin", window.location.href);
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-
-      window.location.href = '#/login';
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      window.location.href = "#/login";
       return;
     }
 
     try {
-      await axios.post(`${API_BASE_URL}api/home/cart/add/${partId}/`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post(
+        `${API_BASE_URL}api/home/cart/add/${partId}/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       Swal.fire({
         title: "Successfully added to cart",
         text: "Your product was added to the cart.",
@@ -79,8 +94,7 @@ const ShopArea = ({ id }) => {
       }).then(() => {
         window.location.reload();
       });
-      // window.location.reload();
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error",
         text: "There was an issue adding the product to the cart.",
@@ -90,48 +104,97 @@ const ShopArea = ({ id }) => {
     }
   };
 
+  // Fetch categories based on variant id
+  const fetchCategoriesByVariant = async (variantId) => {
+    if (!variantId) return;
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}api/home/car_variant_category_group/${variantId}/`
+      );
+      setCategories(response.data);
 
-  const [categories, setCategories] = useState([]);
+      // Update localStorage
+      const selectedBrandLS =
+        JSON.parse(localStorage.getItem("selected_brand")) || {};
+      selectedBrandLS.model_variant = variantId;
+      localStorage.setItem("selected_brand", JSON.stringify(selectedBrandLS));
+    } catch (error) {
+      console.error("Error fetching part sections:", error);
+    }
+  };
 
-
+  // Load categories from localStorage on page load
   useEffect(() => {
-    const fetchVariantData = async () => {
-      const selectedBrand = JSON.parse(localStorage.getItem("selected_brand"));
-      if (selectedBrand && selectedBrand.model_variant) {
-        try {
-          const response = await axios.get(
-            `${API_BASE_URL}api/home/car_variant_category_group/${selectedBrand.model_variant}/`
-          );
-          setCategories(response.data);
-        } catch (error) {
-          console.error("Error fetching part sections:", error);
-        }
+    const selectedBrandLS = JSON.parse(localStorage.getItem("selected_brand"));
+    if (selectedBrandLS?.model_variant) {
+      setSelectedVariant(selectedBrandLS.model_variant);
+      fetchCategoriesByVariant(selectedBrandLS.model_variant);
+    }
+  }, []);
+
+  // Fetch car makes
+  useEffect(() => {
+    const fetchCarMakes = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}api/home/car-makes/`);
+        setCarMakes(response.data);
+      } catch (error) {
+        console.error("Error fetching car makes:", error);
       }
     };
 
-    fetchVariantData();
+    fetchCarMakes();
   }, []);
 
-  //  useEffect(() => {
-  //     const fetchCarMakes = async () => {
-  //       try {
-  //         const response = await axios.get(`${API_BASE_URL}api/home/model_variant_item/${4}/`);
-  //         setCategories(response.data);
-  //       } catch (error) {
-  //         console.error('Error fetching car makes:', error);
-  //       }
-  //     };
+  // Handle Brand change
+  const handleCarMakeChange = async (brandId, brandname) => {
+    setSelectedBrand(brandId);
+    setSelectedBrandName(brandname);
+    setCarModels([]);
+    setSelectedModel("");
+    setSelectedVariant("");
+    setModelVariant([]);
+    setCategories([]);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}api/home/car-models/${brandId}/`
+      );
+      debugger
+      setCarModels(response.data);
+     
+    } catch (error) {
+      console.error("Error fetching car models:", error);
+    }
+  };
 
-  //     fetchCarMakes();
-  //   }, []);
+  // Handle Model change
+  const handleCarModelChange = async (modelId) => {
+    setSelectedModel(modelId);
+    setSelectedVariant("");
+    setModelVariant([]);
+    setCategories([]);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}api/home/car_variant/${modelId}/`
+      );
+      setModelVariant(response.data);
+    } catch (error) {
+      console.error("Error fetching car variants:", error);
+    }
+  };
 
+  // Handle Variant change
+  const handleVariantChange = (variantId) => {
+    setSelectedVariant(variantId);
+    fetchCategoriesByVariant(variantId);
+  };
 
+  // Handle Category click
   const handleCategoryClick = (categoryId) => {
     const selectedBrand = JSON.parse(localStorage.getItem("selected_brand")) || {};
     selectedBrand.brand_category = categoryId;
     localStorage.setItem("selected_brand", JSON.stringify(selectedBrand));
   };
-
 
   return (
     <section className="space-top space-extra-bottom shop-sec">
@@ -139,13 +202,16 @@ const ShopArea = ({ id }) => {
         <div className="row flex-row-reverse">
           <div className="col-xl-9 col-lg-8">
             <div className="row gy-4">
-              {productData && productData.length > 0 ? (
+              {productData.length > 0 ? (
                 productData.map((product, index) => (
-                  <div className="col-xl-4 col-md-6" key={index}>
+                  <div className="col-xl-4 col-md-6 col-6" key={index}>
                     <div className="product-card style2">
                       <div className="product-img">
                         <img
-                          src={product.product_image || "/assets/img/update-img/product/1-1.png"}
+                          src={
+                            product.product_image ||
+                            "/assets/img/update-img/product/1-1.png"
+                          }
                           alt={product.product_name || "Product"}
                         />
                       </div>
@@ -155,23 +221,15 @@ const ShopArea = ({ id }) => {
                             {product.product_name || "Unnamed Product"}
                           </Link>
                         </h3>
-                        {/* <span className="star-rating">
-                          {[...Array(5)].map((_, i) => (
-                            <i
-                              key={i}
-                              className={`fas fa-star ${i >= (product.rating || 0) ? "unavailable" : ""
-                                }`}
-                            />
-                          ))}
-                        </span> */}
                         <span className="price">
-                          {/* {product.discount > 0 && (
-                           
-                          )}{" "} */}
                           ₹{product.sale_price} &nbsp;
                           <del>₹{product.price}</del>
                         </span>
-                        <Link to="#" className="link-btn" onClick={() => handleAddToCart(product.id)}>
+                        <Link
+                          to="#"
+                          className="link-btn"
+                          onClick={() => handleAddToCart(product.id)}
+                        >
                           Add to cart <i className="fas fa-arrow-right" />
                         </Link>
                       </div>
@@ -181,26 +239,72 @@ const ShopArea = ({ id }) => {
               ) : (
                 <p>No products found.</p>
               )}
-
             </div>
           </div>
 
           <div className="col-xl-3 col-lg-4 sidebar-widget-area">
             <aside className="sidebar-sticky-area sidebar-area sidebar-shop">
-              {/* <div className="widget widget_search">
-                <h3 className="widget_title">Search</h3>
-                <form className="search-form">
-                  <input type="text" placeholder="Find your product" />
-                  <button type="submit">
-                    <i className="fas fa-search" />
-                  </button>
-                </form>
-              </div> */}
+              <div>
+                <h3 className="widget_title">Search by Car Brand</h3>
 
-              <div className="widget widget_categories">
+                <select
+                  className="mb-2"
+                  value={selectedBrand}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    const selectedMake = carMakes.find(make => make.id.toString() === selectedId);
+                    handleCarMakeChange(selectedId, selectedMake ? selectedMake.name : "");
+                  }}
+                >
+                  <option value="">-- Select Your Car --</option>
+                  {carMakes.map((make) => (
+                    <option key={make.id} value={make.id}>
+                      {make.name}
+                    </option>
+                  ))}
+                </select>
+
+
+                <select
+                  className="mb-2"
+                  value={selectedModel}
+                  onChange={(e) => handleCarModelChange(e.target.value)}
+                  disabled={!selectedBrand}
+                >
+                  <option value="">-- Select Model --</option>
+                  {carModels.map((model) => (
+                    <option key={model.id} value={model.id}>
+                      {model.name}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="mb-2"
+                  value={selectedVariant}
+                  onChange={(e) => handleVariantChange(e.target.value)}
+                  disabled={!selectedModel}
+                >
+                  <option value="">-- Select Variant --</option>
+                  {modelVariant.map((variant) => (
+                    <option key={variant.id} value={variant.id}>
+                      {variant.name}
+                    </option>
+                  ))}
+                </select>
+
+                <div style={{ marginTop: "20px" }}>
+                  <strong>Selected:</strong>{" "}
+                  {selectedBrand && selectedModel && selectedVariant
+                    ? `${selectedBrandName} > ${selectedModel} > ${selectedVariant}`
+                    : "Please select all options"}
+                </div>
+              </div>
+
+              <div className="widget widget_categories mt-5">
                 <h3 className="widget_title">Product categories</h3>
                 <ul>
-                  {Array.isArray(categories) && categories.length > 0 ? (
+                  {categories.length > 0 ? (
                     categories.map((category) => (
                       <li key={category.id}>
                         <Link
@@ -209,13 +313,12 @@ const ShopArea = ({ id }) => {
                         >
                           {category.name}-({category.part_count})
                         </Link>
-                      </li> 
+                      </li>
                     ))
                   ) : (
                     <li>No categories available</li>
                   )}
                 </ul>
-
               </div>
 
               <div className="widget widget_price_filter">
@@ -240,42 +343,6 @@ const ShopArea = ({ id }) => {
                   </div>
                 </div>
               </div>
-
-              {/* <div className="widget product_ratting_widget">
-                <h3 className="widget_title">Sort by Rating</h3>
-                <ul>
-                  <li>
-                    <span className="star-rating">
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star unavailable" />
-                    </span>
-                    <span>(12)</span>
-                  </li>
-                  <li>
-                    <span className="star-rating">
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star unavailable" />
-                      <i className="fas fa-star unavailable" />
-                    </span>
-                    <span>(5)</span>
-                  </li>
-                  <li>
-                    <span className="star-rating">
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star" />
-                      <i className="fas fa-star unavailable" />
-                      <i className="fas fa-star unavailable" />
-                      <i className="fas fa-star unavailable" />
-                    </span>
-                    <span>(3)</span>
-                  </li>
-                </ul>
-              </div> */}
             </aside>
           </div>
         </div>

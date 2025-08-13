@@ -79,6 +79,8 @@ const AddProductsForm = () => {
         carVariantId: '',
         partCategoryId: '',
         partId: '',
+        partName: '',
+        partImage: '',
         partNumber: '',
         figureNumber: '',
         price: '',
@@ -471,30 +473,30 @@ const AddProductsForm = () => {
     };
 
 
-    // const handleCarcategorytChange = async (e) => {
-    //     const partcatId = parseInt(e.target.value);
-    //     setFormData((formData) => ({
-    //         ...formData,
-    //         partCategoryId: partcatId,
-    //     }));
-    //     setcarPartgroupItem([])
-    //     try {
-    //         const response = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${partcatId}/`);
-    //         setcarPartgroupItem(response.data);
-
-    //     } catch (error) {
-    //         console.error("Error fetching car models:", error);
-    //         setcarPartgroupItem([])
-    //     }
-    // };
-
-    const handleCarpartitemChange = async (e) => {
-        const partitemId = parseInt(e.target.value);
+    const handleCarcategorytChange = async (e) => {
+        const partcatId = parseInt(e.target.value);
         setFormData((formData) => ({
             ...formData,
-            partId: partitemId,
+            partCategoryId: partcatId,
         }));
-    }
+        setcarPartgroupItem([])
+        try {
+            const response = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${partcatId}/`);
+            setcarPartgroupItem(response.data);
+
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+            setcarPartgroupItem([])
+        }
+    };
+
+    // const handleCarpartitemChange = async (e) => {
+    //     const partitemId = parseInt(e.target.value);
+    //     setFormData((formData) => ({
+    //         ...formData,
+    //         partId: partitemId,
+    //     }));
+    // }
 
     // Handle Part Compatibility
     const handleChange = (selectedOptions) => {
@@ -632,7 +634,7 @@ const AddProductsForm = () => {
                         </div>
 
                         {/* Part Selection */}
-                        {/* <div className="col-md-4">
+                        <div className="col-md-4">
                             <label className="form-label">Select Part category</label>
                             <div className="input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarcategorytChange}>
@@ -650,10 +652,10 @@ const AddProductsForm = () => {
                                     <Icon icon="lucide:plus" /> Add Part
                                 </button>
                             </div>
-                        </div> */}
+                        </div>
 
                         {/* Part */}
-                        <div className="col-md-4">
+                        {/* <div className="col-md-4">
                             <label className="form-label">Select Part </label>
                             <div className="input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarpartitemChange}>
@@ -671,6 +673,37 @@ const AddProductsForm = () => {
                                     <Icon icon="lucide:plus" /> Add Part
                                 </button>
                             </div>
+                        </div> */}
+
+                        <div className="col-md-4">
+                            <label className="form-label">Part Name</label>
+                            <input
+                                type="text"
+                                name="#0"
+                                className="form-control"
+                                placeholder="Enter part name,"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, partName: e.target.value })
+                                }
+                                required
+                            />
+
+                            <div className="invalid-feedback">Please part name</div>
+                        </div>
+
+                        <div className="col-md-4">
+                            <label className="form-label">Part Image</label>
+                            <input
+                                type="file"
+                                name="partImage"
+                                className="form-control"
+                                placeholder="Select product image,"
+                                onChange={(e) =>
+                                    setFormData({ ...formData, partImage: e.target.files[0] })
+                                }
+                                required
+                            />
+                            <div className="invalid-feedback">Please part name</div>
                         </div>
 
 

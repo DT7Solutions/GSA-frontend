@@ -51,6 +51,7 @@ import CarPartCategoryPages from "./pages/dashboard-pages/ProductsPages/carPartC
 import CarPartGroupPages from "./pages/dashboard-pages/ProductsPages/carPartGroupPages"
 
 import UnauthorizedPage from "./pages/UnauthorizedPage"
+import Commingsoon from "./pages/Commingsoon"
 
 function App() {
   return (
@@ -59,7 +60,8 @@ function App() {
       <ScrollToTop smooth color="#E8092E" />
       <Routes>
        
-        <Route exact path="/" element={<HomePageSix />} />
+        <Route exact path="/" element={<Commingsoon />} />
+        <Route exact path="/home" element={<HomePageSix />} />
         <Route exact path="/about-us" element={<AboutPage />} />
         <Route exact path="/service" element={<ServicePage />} />
         <Route exact path="/service-details" element={<ServiceDetailsPage />} />

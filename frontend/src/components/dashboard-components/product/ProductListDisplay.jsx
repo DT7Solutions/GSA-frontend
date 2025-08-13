@@ -57,7 +57,7 @@ const ProductListDisplay = () => {
                                 {/* <th scope="col">Model</th>
                                 <th scope="col">Variant</th>
                                 <th scope="col">Section</th> */}
-                                <th scope="col">Parts Group</th>
+                                {/* <th scope="col">Parts Group</th> */}
                                 <th scope="col">Figure No</th>
                                 <th scope="col">Part No</th>
                                 <th scope="col" className='dt-orderable-asc dt-orderable-desc'>Price</th>
@@ -85,7 +85,7 @@ const ProductListDisplay = () => {
                                     {/* <td>{item.car_model?.name}</td>
                                     <td>{item.car_variant?.name}</td>
                                     <td>{item.part_section?.name}</td> */}
-                                    <td>{item.part_group?.name}</td>
+                                    {/* <td>{item.part_group?.name}</td> */}
                                     <td>{item.fig_no}</td>
                                     <td>{item.part_no}</td>
                                     <td>₹{item.price}</td>
