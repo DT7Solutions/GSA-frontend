@@ -10,6 +10,8 @@ import BlogPage from "./pages/BlogPage";
 import BlogDetailsPage from "./pages/BlogDetailsPage";
 import ShopPage from "./pages/ShopPage";
 import ShopDetailsPage from "./pages/ShopDetailsPage";
+
+
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import WishlistPage from "./pages/WishlistPage";
@@ -53,10 +55,13 @@ import CarPartGroupPages from "./pages/dashboard-pages/ProductsPages/carPartGrou
 import UnauthorizedPage from "./pages/UnauthorizedPage"
 import Commingsoon from "./pages/Commingsoon"
 
+
 function App() {
   return (
+
     <Router>
       <RouteScrollToTop />
+ 
       <ScrollToTop smooth color="#E8092E" />
       <Routes>
        
@@ -70,7 +75,7 @@ function App() {
         <Route exact path="/blog-details" element={<BlogDetailsPage />} />
 
         <Route exact path="/shop" element={<ShopPage />} />
-        <Route exact path="/shop-details" element={<ShopDetailsPage />} />
+        <Route exact path="/shop-details/:id" element={<ShopDetailsPage />} />
         <Route exact path="/cart" element={<CartPage />} />
         <Route exact path="/checkout" element={<CheckoutPage />} />
         <Route exact path="/wishlist" element={<WishlistPage />} />
@@ -86,7 +91,7 @@ function App() {
         <Route exact path="/part-list/:id" element={<PartListPage />} />
 
         <Route exact path="/shop/:id" element={<ShopPage />} />
-        <Route exact path="/shop-details" element={<ShopDetailsPage />} />
+        {/* <Route exact path="/shop-details" element={<ShopDetailsPage />} /> */}
 
         <Route exact path="/thank-you" element={<ThankyouPage />} />
         
@@ -94,7 +99,8 @@ function App() {
         <Route exact path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
         <Route exact path="/shipping-policy" element={<ShippingPolicyPage />} />
         <Route exact path="/refund-policy" element={<RefundPolicyPage />} />
-
+        
+       
 
 
 
@@ -130,6 +136,7 @@ function App() {
 
       </Routes>
     </Router>
+
   );
 }
 

@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import Slider from "rc-slider";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
+import { CartContext } from "../context/CartContext";
 
 const ShopArea = ({ id }) => {
   const [range, setRange] = useState([0, 100]);
   const [productData, setProductData] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 9;
 
   const [carMakes, setCarMakes] = useState([]);
   const [carModels, setCarModels] = useState([]);
@@ -21,6 +25,7 @@ const ShopArea = ({ id }) => {
   const [selectedBrandName, setSelectedBrandName] = useState("");
   const [selectedModelName, setSelectedModelName] = useState("");
   const [selectedVariantName, setSelectedVariantName] = useState("");
+   const { fetchCartCount } = useContext(CartContext);
 
   const [categories, setCategories] = useState([]);
 
@@ -47,6 +52,19 @@ const ShopArea = ({ id }) => {
       fetchProductData();
     }
   }, [id]);
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = productData.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+const totalPages = Math.ceil(productData.length / productsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   // Token validation
   const isTokenValid = (token) => {
@@ -86,14 +104,13 @@ const ShopArea = ({ id }) => {
           },
         }
       );
+      await fetchCartCount();
       Swal.fire({
         title: "Successfully added to cart",
         text: "Your product was added to the cart.",
         icon: "success",
         confirmButtonText: "OK",
-      }).then(() => {
-        window.location.reload();
-      });
+      })
     } catch {
       Swal.fire({
         title: "Error",
@@ -202,11 +219,12 @@ const ShopArea = ({ id }) => {
         <div className="row flex-row-reverse">
           <div className="col-xl-9 col-lg-8">
             <div className="row gy-4">
-              {productData.length > 0 ? (
-                productData.map((product, index) => (
+              {currentProducts.length > 0 ? (
+                currentProducts.map((product, index) => (
                   <div className="col-xl-4 col-md-6 col-6" key={index}>
                     <div className="product-card style2">
                       <div className="product-img">
+                         <Link to={`/shop-details/${product.id}`}>
                         <img
                           src={
                             product.product_image ||
@@ -214,6 +232,7 @@ const ShopArea = ({ id }) => {
                           }
                           alt={product.product_name || "Product"}
                         />
+                        </Link>
                       </div>
                       <div className="product-content">
                         <h3 className="product-title">
@@ -240,6 +259,28 @@ const ShopArea = ({ id }) => {
                 <p>No products found.</p>
               )}
             </div>
+             {/* ---- Pagination UI ---- */}
+            {totalPages > 1 && (
+              <div className="pagination mt-5">
+                <ul className="pagination-list d-flex gap-2">
+                  {[...Array(totalPages)].map((_, index) => (
+                    <li
+                      key={index}
+                      className={`page-item ${
+                        currentPage === index + 1 ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(index + 1)}
+                      >
+                        {index + 1}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           <div className="col-xl-3 col-lg-4 sidebar-widget-area">

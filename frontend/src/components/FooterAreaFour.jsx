@@ -10,7 +10,7 @@ const FooterAreaFour = () => {
       <div className="container">
         <div className="widget-area">
           <div className="row justify-content-between">
-            <div className="col-md-6 col-xl-3">
+            <div className="col-md-6 col-xl-4">
               <div className="widget footer-widget widget-about">
                 <h3 className="widget_title">About Us</h3>
                 <p className="footer-text mb-30">
@@ -28,7 +28,7 @@ Available in Guntur
                 </div>
               </div>
             </div>
-            <div className="col-md-6 col-xl-3">
+            <div className="col-md-6 col-xl-2">
               <div className="widget widget_nav_menu footer-widget">
                 <h3 className="widget_title">Company</h3>
                 <div className="menu-all-pages-container">
@@ -76,7 +76,7 @@ Available in Guntur
                     <div className="contact-grid-details">
                       <p>Address</p>
                       <h6>
-                         PLOT NO.381,PHASE 1&2,INDIRA AUTONAGAR ,, Guntur, Andhra Pradesh 522001
+                         PLOT NO.381,PHASE 1&2,INDIRA AUTONAGAR ,Guntur, Andhra Pradesh 522001
                         <p />
                       </h6>
                     </div>

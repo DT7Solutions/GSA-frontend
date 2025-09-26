@@ -4,17 +4,19 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import API_BASE_URL from "../config";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 
 const HeaderFive = () => {
   const [active, setActive] = useState(false);
   const [scroll, setScroll] = useState(false);
-  
+  const { cartCount } = useContext(CartContext);
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
 
-  const [cartCount, setCartCount] = useState(0);
+  const [ setCartCount] = useState(0);
 
 
 

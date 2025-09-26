@@ -28,7 +28,7 @@ const PartCategorySelection = ({id, modelvariant}) => {
 
         <div className="category-area-1 pb-100 brand-logo-display mt-5">
             <div className="container-fluid">
-                <h4 className="text-center fw-extrabold mb-20">filter By selecte Model Part</h4>
+                <h4 className="text-center fw-extrabold mb-20">filter By selected  Model Part</h4>
                 <div className="row mt-5 brands-sec">
                 {variantCategory.map((variant) => (
                     <div className="col-sm-12 col-md-2 col-lg-2 mb-3">
@@ -39,7 +39,8 @@ const PartCategorySelection = ({id, modelvariant}) => {
                                     const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
                                     const updated = {
                                         ...existing,
-                                        brand_category: variant.id
+                                        brand_category: variant.id,
+                                        brand_category_name: variant.name,
                                     };
                                     localStorage.setItem("selected_brand", JSON.stringify(updated));
                                 }}

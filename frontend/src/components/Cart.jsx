@@ -3,12 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
+
 
 
 const Cart = () => {
 
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
+  const { fetchCartCount } = useContext(CartContext);
+
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -55,7 +60,9 @@ const Cart = () => {
           item.id === itemId ? { ...item, quantity: newQuantity, total_price: newQuantity * item.part.sale_price } : item
         )
       );
+      fetchCartCount();
       navigate("/cart");
+      
     } catch (error) {
       console.error('Error updating cart:', error);
     }
@@ -63,7 +70,8 @@ const Cart = () => {
 
 
   
-  const handleRemoveItem = async (itemId) => {
+  const handleRemoveItem = async (itemId, e) => {
+     e.preventDefault(); 
     const token = localStorage.getItem('accessToken');
     try {
       await axios.delete(`${API_BASE_URL}api/home/cart/remove/${itemId}/`, {
@@ -72,13 +80,15 @@ const Cart = () => {
         },
       });
       setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+      fetchCartCount();
       Swal.fire({
         title: "Item Removed",
         text: "Your product has been removed from the cart.",
         icon: "success",
         confirmButtonText: "OK",
       });
-      navigate("/cart");
+      
+     
     } catch (error) {
       console.error('Error removing item from cart:', error);
       Swal.fire({
@@ -214,6 +224,7 @@ const totalWithGST = subtotal + cgst + sgst;
                             updateQuantity(item.id, item.quantity - 1);
                           }
                         }}
+                        type="button"
                       >
                         <i className="fas fa-minus" />
                       </button>
@@ -234,6 +245,7 @@ const totalWithGST = subtotal + cgst + sgst;
                             updateQuantity(item.id, item.quantity + 1);
                           }
                         }}
+                        type="button"
                       >
                         <i className="fas fa-plus" />
                       </button>
@@ -246,9 +258,17 @@ const totalWithGST = subtotal + cgst + sgst;
                     </span>
                   </td>
                   <td data-title="Remove">
-                    <button onClick={() => handleRemoveItem(item.id)} className="remove">
+                    {/* <button onClick={() => handleRemoveItem(item.id)} className="remove">
                       <i className="fas fa-trash-alt" />
-                    </button>
+                    </button> */}
+                    <button
+  onClick={(e) => handleRemoveItem(item.id, e)}
+  className="remove"
+  type="button" // <- Add this!
+>
+  <i className="fas fa-trash-alt" />
+</button>
+
                   </td>
                 </tr>
               ))}

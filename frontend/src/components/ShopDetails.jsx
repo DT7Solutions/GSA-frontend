@@ -1,7 +1,153 @@
-import React from "react";
-import { Link } from "react-router-dom";
+// import React from "react";
+// import { Link,useParams } from "react-router-dom";
+// import { Swiper, SwiperSlide } from "swiper/react";
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+// import Swal from "sweetalert2";
+// import API_BASE_URL from "../config";
+
+
+// const handleAddToCart = async (partId) => {
+// const token = localStorage.getItem("accessToken");
+
+
+//   if (!token) {
+//     Swal.fire({
+//       title: "You need to login first",
+//       icon: "warning",
+//       confirmButtonText: "OK",
+//     });
+   
+//     return;
+//   }
+
+//   try {
+//     await axios.post(
+//       `${API_BASE_URL}api/home/cart/add/${partId}/`,
+//       {},
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+
+//     Swal.fire({
+//       title: "Added to cart",
+//       text: "Product has been added to your cart.",
+//       icon: "success",
+//       confirmButtonText: "OK",
+//     });
+
+    
+//   } catch (error) {
+//     console.error("Error adding to cart:", error);
+//     Swal.fire({
+//       title: "Error",
+//       text: "Unable to add product to cart.",
+//       icon: "error",
+//       confirmButtonText: "OK",
+//     });
+//   }
+// };
+
+//   const ShopDetails = () => {
+//   const { id } = useParams();
+//   const token = localStorage.getItem("accessToken");
+//   const [product, setProduct] = useState(null);
+ 
+
+
+//   useEffect(() => {
+//           const fetchProductList = async () => {
+//             try {
+//               const response = await axios.get(`${API_BASE_URL}api/home/car_part_detail_list/${id}/`, {
+//                 headers: { Authorization: `Bearer ${token}` }
+//               });
+//               setProduct(response.data); 
+//             } catch (error) {
+//               console.error('Error fetching product list:', error);
+//             }
+//           };
+      
+//           fetchProductList();
+//         }, []);
+
+//   if (!product) return <p>Loading product details...</p>;
+
+import React, { useEffect, useState, useContext } from "react";
+import { Link, useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
+import axios from "axios";
+import Swal from "sweetalert2";
+import API_BASE_URL from "../config";
+import { CartContext } from "../context/CartContext";
+
 const ShopDetails = () => {
+  const { id } = useParams();
+  const token = localStorage.getItem("accessToken");
+  const [product, setProduct] = useState(null);
+
+  // Use CartContext
+  const { fetchCartCount } = useContext(CartContext);
+
+  // Fetch product details
+  useEffect(() => {
+    const fetchProductList = async () => {
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}api/home/car_part_detail_list/${id}/`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setProduct(response.data);
+      } catch (error) {
+        console.error("Error fetching product list:", error);
+      }
+    };
+    fetchProductList();
+  }, [id, token]);
+
+  // Add to cart handler
+  const handleAddToCart = async (partId) => {
+    if (!token) {
+      Swal.fire({
+        title: "You need to login first",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${API_BASE_URL}api/home/cart/add/${partId}/`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Immediately update cart count
+      await fetchCartCount();
+
+      Swal.fire({
+        title: "Added to cart",
+        text: "Product has been added to your cart.",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Unable to add product to cart.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
+  if (!product) return <p>Loading product details...</p>;
+
+
   return (
     <section className="product-details space-top">
       <div className="container">
@@ -10,8 +156,11 @@ const ShopDetails = () => {
             <div className="product-thumb">
               <div className="img">
                 <img
-                  src="assets/img/update-img/product/product-inner.png"
-                  alt="Fixturbo"
+                  src={
+                    product[0].product_image ||
+                    "/assets/img/update-img/product/product-inner.png"
+                  }
+                  alt={product.product_name || "Product"}
                 />
               </div>
               <div className="product-tag">Sale</div>
@@ -19,10 +168,12 @@ const ShopDetails = () => {
           </div>
           <div className="col-lg-6 align-self-center">
             <div className="product-about">
-              <p className="price">
-                $25 <del>$30</del>
+           
+              <h6 className="product-title">{product[0].product_name}</h6>
+                <p className="price">
+                ₹{product[0].sale_price}{" "}
+                {product.price && <del>₹{product.price}</del>}
               </p>
-              <h2 className="product-title">Engine pistons and cog</h2>
               <div className="product-rating">
                 <span className="star-rating">
                   <i className="fas fa-star" />
@@ -33,28 +184,65 @@ const ShopDetails = () => {
                 </span>
                 (5 Reviews)
               </div>
-              <p className="text">
-                A car shop is a place where you can find a wide range of
-                services and products related to automobiles. From vehicle
-                repairs and maintenance to car accessories and parts, a car shop
-                offers everything you need to keA car
-              </p>
-              <button className="btn style2">Buy It Now</button>
-              <div className="product_meta">
-                <span className="sku_wrapper">
-                  SKU: <span className="sku">Wheel-fits-chevy-camaro</span>
-                </span>
-                <span className="posted_in">
-                  Category:{" "}
-                  <Link to="/shop" rel="tag">
-                    Tires &amp; Wheels
-                  </Link>
-                </span>
-                <span>
-                  Tags: <Link to="/shop">Automotive parts</Link>
-                  <Link to="/shop">Wheels</Link>
-                </span>
+              
+              {/* <p className="text">
+               { product[0].description ||
+                  "No description available for this product."}
+              </p> */}
+              <p className="text">Choosing the right rim involves considering factors such as the vehicle type, intended use, and personal preferences for style performance. Regular maintenance, including cleaning and proper care, is important to preserve the appearance and functionality of car rims.</p>
+              
+                                     <button
+  className="btn style2"
+  onClick={() => handleAddToCart(product[0].id)}
+>Add to Cart</button>
+              {/* Extra Product Meta */}
+              <div className="product_meta border-top-dotted border-bottom-dotted pt-30 pb-30 ">
+                {/* sku Dynamic code */}
+                {/* {product.sku && (
+                  <span className="sku_wrapper">
+                    SKU: <span className="sku">{product.sku}</span>
+                  </span>
+                )} */}
+                   <span className="sku_wrapper">
+                    Brand Name: <span className="sku">{product[0].car_make.name}</span>
+                  </span>
+                   <span className="sku_wrapper">
+                    Model Name: <span className="sku">{product[0].car_model.name}</span>
+                  </span>
+                  <span className="sku_wrapper">
+                    SKU: <span className="sku">{product[0].sku}</span>
+                  </span>
+             {/* product category Dynamic code  */}
+
+                {/* {product.category && (
+                  <span className="posted_in">
+                    Category:{" "}
+                    <Link to="/shop" rel="tag">
+                      {product.category}
+                    </Link>
+                  </span>
+                )} */}
+                 <span className="posted_in">
+                    Category: <span>{product[0].part_section.name}</span>
+                  </span>
+
+                {/* {product.tags && product.tags.length > 0 && (
+                  <span>
+                    Vendor:{" "}
+                    {product.tags.map((tag, idx) => (
+                      <Link key={idx} to={`/shop?tag=${tag}`}>
+                        {tag}
+                      </Link>
+                    ))}
+                  </span>
+                )} */}
+                     
+                  <span>
+                    Vendor: <span> Gowrisankar agencies</span>
+                  </span>
+               
               </div>
+             
             </div>
           </div>
         </div>
@@ -73,7 +261,7 @@ const ShopDetails = () => {
                 Description
               </a>
             </li>
-            <li className="nav-item" role="presentation">
+            {/* <li className="nav-item" role="presentation">
               <a
                 className="nav-link"
                 id="info-tab"
@@ -85,8 +273,8 @@ const ShopDetails = () => {
               >
                 Additional Information
               </a>
-            </li>
-            <li className="nav-item" role="presentation">
+            </li> */}
+            {/* <li className="nav-item" role="presentation">
               <a
                 className="nav-link"
                 id="reviews-tab"
@@ -98,7 +286,7 @@ const ShopDetails = () => {
               >
                 Reviews (03)
               </a>
-            </li>
+            </li> */}
           </ul>
           <div className="tab-content" id="productTabContent">
             <div
@@ -107,6 +295,11 @@ const ShopDetails = () => {
               role="tabpanel"
               aria-labelledby="description-tab"
             >
+              {/* dynamic use this code  */}
+              {/* <p className="text">
+               { product[0].description ||
+                  "No description available for this product."}
+              </p> */}
               <p>
                 Credibly negotiate emerging materials whereas clicks-and-mortar
                 intellectual capital. Compellingly whiteboard client-centric
@@ -119,13 +312,7 @@ const ShopDetails = () => {
                 "organic" sources before client-centered human capital
                 underwhelm holistic mindshare for prospective innovation.
               </p>
-              <p className="mb-n1">
-                Seamlessly target fully tested infrastructures whereas just in
-                time process improvements. Dynamically exploit team driven
-                functionalities vis a vis global total linkage redibly
-                synthesize just in time technology rather than open-source
-                strategic theme areas.
-              </p>
+           
             </div>
             <div
               className="tab-pane fade"
@@ -341,14 +528,17 @@ const ShopDetails = () => {
                 <div>
                   <div className="product-card style2">
                     <div className="product-img">
-                      <img
-                        src="assets/img/update-img/product/1-1.png"
-                        alt="Fixturbo"
-                      />
+                     <img
+                  src={
+                    product[0].product_image ||
+                    "/assets/img/update-img/product/product-inner.png"
+                  }
+                  alt={product.product_name || "Product"}
+                />
                     </div>
                     <div className="product-content">
                       <h3 className="product-title">
-                        <Link to="/shop-details">Engine pistons and cog</Link>
+                        <Link to="/shop-details">{product[0].product_name}</Link>
                       </h3>
                       <span className="star-rating">
                         <i className="fas fa-star" />
@@ -358,7 +548,10 @@ const ShopDetails = () => {
                         <i className="fas fa-star" />
                       </span>
                       <span className="price">
-                        <del>$30</del> $25
+                       
+                ₹{product[0].sale_price}{" "}
+                {product.price && <del>₹{product.price}</del>}
+          
                       </span>
                       <Link to="#" className="link-btn">
                         Add to cart <i className="fas fa-arrow-right" />

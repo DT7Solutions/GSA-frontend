@@ -35,8 +35,9 @@ const CategoryAreaOne = () => {
               <Link
                 to={`/brand-models/${make.id}`}
                 onClick={() => {
-                  
-                  localStorage.setItem("selected_brand", JSON.stringify({ brand_name: make.id }));
+                   
+                  // localStorage.setItem("selected_brand", JSON.stringify({ brand_name: make.id }));
+                  localStorage.setItem("selected_brand", JSON.stringify({ brand_id: make.id, brand_name: make.name }));
                 }}
               >
 

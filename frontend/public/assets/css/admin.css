@@ -65,4 +65,23 @@
     transition: none !important;
  }
 
+ .scroll-to-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ }
+
+ .border-top-dotted{
+  border-top: 2px solid #BCBCBC;
+  border-style: dotted;
+ }
+  .border-bottom-dotted{
+  border-bottom: 2px solid #BCBCBC;
+  border-style: dotted;
+ }
+ .product-tab-style1 {
+   justify-content: flex-start!important;
+ }
+
+
  
