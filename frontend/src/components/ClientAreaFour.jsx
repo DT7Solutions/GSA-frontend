@@ -44,7 +44,7 @@ const ClientAreaFour = () => {
                 }}
               >
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
                         src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-1.png`}
@@ -54,7 +54,7 @@ const ClientAreaFour = () => {
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
                     src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-2.png`}
@@ -64,7 +64,7 @@ const ClientAreaFour = () => {
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
                         src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-3.png`}
@@ -74,7 +74,7 @@ const ClientAreaFour = () => {
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
                        src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-4.png`}
@@ -84,7 +84,7 @@ const ClientAreaFour = () => {
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
                      src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-5.png`}
@@ -94,7 +94,7 @@ const ClientAreaFour = () => {
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
                        src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-6.png`}
@@ -104,7 +104,7 @@ const ClientAreaFour = () => {
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
                         src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/1-7.png`}
@@ -114,40 +114,40 @@ const ClientAreaFour = () => {
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
-                        src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/client-02.png`}
+                        src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/BMW.png`}
                         alt="Fixturbo"
                       />
                     </div>
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
-                       src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/client-03.png`}
+                       src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/jaguar.png`}
                         alt="Fixturbo"
                       />
                     </div>
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
-                       src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/client-05.png`}
+                       src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/ford.png`}
                         alt="Fixturbo"
                       />
                     </div>
                   </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <div>
+                  <div className="brandslider">
                     <div className="category-card-item">
                       <img
-                        src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/client-06.png`}
+                        src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/toyota.png`}
                         alt="Fixturbo"
                       />
                     </div>

@@ -490,13 +490,13 @@ const AddProductsForm = () => {
         }
     };
 
-    // const handleCarpartitemChange = async (e) => {
-    //     const partitemId = parseInt(e.target.value);
-    //     setFormData((formData) => ({
-    //         ...formData,
-    //         partId: partitemId,
-    //     }));
-    // }
+    const handleCarpartitemChange = async (e) => {
+        const partitemId = parseInt(e.target.value);
+        setFormData((formData) => ({
+            ...formData,
+            partId: partitemId,
+        }));
+    }
 
     // Handle Part Compatibility
     const handleChange = (selectedOptions) => {
@@ -655,7 +655,7 @@ const AddProductsForm = () => {
                         </div>
 
                         {/* Part */}
-                        {/* <div className="col-md-4">
+                        <div className="col-md-4">
                             <label className="form-label">Select Part </label>
                             <div className="input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarpartitemChange}>
@@ -673,7 +673,7 @@ const AddProductsForm = () => {
                                     <Icon icon="lucide:plus" /> Add Part
                                 </button>
                             </div>
-                        </div> */}
+                        </div>
 
                         <div className="col-md-4">
                             <label className="form-label">Part Name</label>

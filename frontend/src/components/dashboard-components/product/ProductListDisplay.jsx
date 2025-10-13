@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import $ from 'jquery';
 import 'datatables.net-dt/js/dataTables.dataTables.js';
-import { Icon } from '@iconify/react/dist/iconify.js';
+
+import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import API_BASE_URL from "../../../config";
-import Swal from "sweetalert2";
-
 
 const ProductListDisplay = () => {
     const [products, setProductList] = useState([]);
@@ -14,28 +13,40 @@ const ProductListDisplay = () => {
 
     useEffect(() => {
         const fetchProductList = async () => {
-          try {
-            const response = await axios.get(`${API_BASE_URL}api/home/car-parts-list/`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-            setProductList(response.data); // update state with the product list
-          } catch (error) {
-            console.error('Error fetching product list:', error);
-          }
+            try {
+                const response = await axios.get(`${API_BASE_URL}api/home/car-parts-list/`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setProductList(response.data);
+            } catch (error) {
+                console.error('Error fetching product list:', error);
+            }
         };
-    
-        fetchProductList();
-      }, []);
 
-    // useEffect(() => {
-    //     const table = $('#dataTable').DataTable({
-    //         pageLength: 10,
-    //         destroy: true,
-    //     });
-    //     return () => {
-    //         table.destroy(true);
-    //     };
-    // }, [products]);
+        fetchProductList();
+    }, [token]);
+
+    useEffect(() => {
+        let table;
+        if (products.length > 0) {
+            table = $('#dataTable').DataTable({
+                destroy: true,
+                pageLength: 10,
+                searching: true,
+                ordering: true,
+                lengthMenu: [5, 10, 25, 50, 100],
+                language: {
+                    search: "Filter records:", // Optional customization
+                }
+            });
+        }
+
+        return () => {
+            if (table) {
+                table.destroy(true);
+            }
+        };
+    }, [products]);
 
     return (
         <div className="card basic-data-table">
@@ -44,48 +55,30 @@ const ProductListDisplay = () => {
             </div>
             <div className="card-body">
                 <div className="table-responsive">
-                    <table className="table bordered-table mb-0" id="dataTable" data-page-length={10}>
+                    <table className="display table table-striped table-bordered" id="dataTable" style={{ width: "100%" }}>
                         <thead>
                             <tr>
-                                <th scope="col">
-                                    <div className="form-check style-check d-flex align-items-center">
-                                        {/* <input className="form-check-input" type="checkbox" /> */}
-                                        <label className="form-check-label">S.L</label>
-                                    </div>
-                                </th>
-                                <th scope="col">Car Details</th>
-                                {/* <th scope="col">Model</th>
-                                <th scope="col">Variant</th>
-                                <th scope="col">Section</th> */}
-                                {/* <th scope="col">Parts Group</th> */}
-                                <th scope="col">Figure No</th>
-                                <th scope="col">Part No</th>
-                                <th scope="col" className='dt-orderable-asc dt-orderable-desc'>Price</th>
-                                <th scope="col" className='dt-orderable-asc dt-orderable-desc'>Sale Price</th>
-                                <th scope="col">Discount</th>
-                                <th scope="col">Qty</th>
-                                <th scope="col">SKU</th>
-                                <th scope="col">Stock</th>
-                                <th scope="col">Remarks</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Compatibility</th>
-                                <th scope="col">Actions</th>
+                                <th>S.L</th>
+                                <th>Car Details</th>
+                                <th>Figure No</th>
+                                <th>Part No</th>
+                                <th>Price</th>
+                                <th>Sale Price</th>
+                                <th>Discount</th>
+                                <th>Qty</th>
+                                <th>SKU</th>
+                                <th>Stock</th>
+                                <th>Remarks</th>
+                                <th>Description</th>
+                                <th>Compatibility</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {products.map((item, index) => (
                                 <tr key={item.id}>
-                                    <td>
-                                        <div className="form-check style-check d-flex align-items-center">
-                                            {/* <input className="form-check-input" type="checkbox" /> */}
-                                            <label className="form-check-label">{index + 1}</label>
-                                        </div>
-                                    </td>
+                                    <td>{index + 1}</td>
                                     <td>{item.car_make?.name}-{item.car_model?.name}-{item.car_variant?.name}-{item.part_section?.name}</td>
-                                    {/* <td>{item.car_model?.name}</td>
-                                    <td>{item.car_variant?.name}</td>
-                                    <td>{item.part_section?.name}</td> */}
-                                    {/* <td>{item.part_group?.name}</td> */}
                                     <td>{item.fig_no}</td>
                                     <td>{item.part_no}</td>
                                     <td>₹{item.price}</td>
@@ -98,20 +91,14 @@ const ProductListDisplay = () => {
                                     <td>{item.description}</td>
                                     <td>{`${item.car_make?.name} ${item.car_model?.name} ${item.car_variant?.name}`}</td>
                                     <td>
-                                        {/* View */}
-                                        
-
-                                        {/* Edit */}
                                         <Link
                                             to={`/update-products/${item.id}`}
-                                            className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
+                                            className="btn btn-sm btn-success"
                                             title="Edit"
                                         >
                                             <Icon icon="lucide:edit" />
                                         </Link>
-            
                                     </td>
-                                    
                                 </tr>
                             ))}
                         </tbody>

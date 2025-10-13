@@ -34,7 +34,7 @@ const PartCategorySelection = ({id, modelvariant}) => {
                     <div className="col-sm-12 col-md-2 col-lg-2 mb-3">
                         <div className="brand-models">
                             {/* to={`/part-group/${variant.id}`} */}
-                            <Link to={`/shop/${variant.id}`}
+                            <Link to={`/part-group/${variant.id}`}
                                 onClick={() => {
                                     const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
                                     const updated = {
@@ -49,7 +49,7 @@ const PartCategorySelection = ({id, modelvariant}) => {
                                     alt={variant.name}
                                 /></Link>
                             <div className="text-center">
-                                <Link to={`/shop/${variant.id}`}
+                                <Link to={`/part-group/${variant.id}`}
                                     onClick={() => {
                                         const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
                                         const updated = {

@@ -17,6 +17,11 @@ const ShopArea = ({ id }) => {
   const [carMakes, setCarMakes] = useState([]);
   const [carModels, setCarModels] = useState([]);
   const [modelVariant, setModelVariant] = useState([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+
+  
+  
+  
 
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
@@ -28,6 +33,14 @@ const ShopArea = ({ id }) => {
    const { fetchCartCount } = useContext(CartContext);
 
   const [categories, setCategories] = useState([]);
+  const [partGroups, setPartGroups] = useState([]);
+  const [expandedCategoryId, setExpandedCategoryId] = useState(null);
+const [partGroupsByCategory, setPartGroupsByCategory] = useState({});
+const [expandedPartGroupId, setExpandedPartGroupId] = useState(null);
+const [partItemsByGroup, setPartItemsByGroup] = useState({});
+
+
+
 
   const token = localStorage.getItem("accessToken");
 
@@ -36,22 +49,26 @@ const ShopArea = ({ id }) => {
   };
 
   // Fetch product data based on id
-  useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}api/home/car_part_group_list/${id}/`
-        );
-        setProductData(response.data);
-      } catch (error) {
-        console.error("Error fetching car parts:", error);
-      }
-    };
-
-    if (id) {
-      fetchProductData();
+useEffect(() => {
+  const fetchProductData = async () => {
+    try {
+      setIsLoadingProducts(true); // start loader
+      const response = await axios.get(
+        `${API_BASE_URL}api/home/car_part_items/${id}/`
+      );
+      setProductData(response.data);
+    } catch (error) {
+      console.error("Error fetching car parts:", error);
+    } finally {
+      setIsLoadingProducts(false); // stop loader
     }
-  }, [id]);
+  };
+
+  if (id) {
+    fetchProductData();
+  }
+}, [id]);
+
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -207,81 +224,143 @@ const totalPages = Math.ceil(productData.length / productsPerPage);
   };
 
   // Handle Category click
-  const handleCategoryClick = (categoryId) => {
-    const selectedBrand = JSON.parse(localStorage.getItem("selected_brand")) || {};
-    selectedBrand.brand_category = categoryId;
-    localStorage.setItem("selected_brand", JSON.stringify(selectedBrand));
-  };
+const handleCategoryClick = async (categoryId) => {
+  if (expandedCategoryId === categoryId) {
+    // Collapse if already open
+    setExpandedCategoryId(null);
+    return;
+  }
+
+  setExpandedCategoryId(categoryId);
+
+  // Skip fetch if already loaded
+  if (partGroupsByCategory[categoryId]) return;
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${categoryId}/`);
+    setPartGroupsByCategory((prev) => ({
+      ...prev,
+      [categoryId]: response.data,
+    }));
+  } catch (error) {
+    console.error("Error fetching part groups:", error);
+  }
+};
+const handlePartGroupClick = async (groupId) => {
+  if (expandedPartGroupId === groupId) {
+    setExpandedPartGroupId(null); // Collapse
+    return;
+  }
+
+  setExpandedPartGroupId(groupId);
+
+  // Skip fetch if already loaded
+  if (partItemsByGroup[groupId]) return;
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}api/home/car_part_items/${groupId}/`);
+    setPartItemsByGroup((prev) => ({
+      ...prev,
+      [groupId]: response.data,
+    }));
+  } catch (error) {
+    console.error("Error fetching part items:", error);
+  }
+};
+
+
+
+
 
   return (
     <section className="space-top space-extra-bottom shop-sec">
       <div className="container">
         <div className="row flex-row-reverse">
-          <div className="col-xl-9 col-lg-8">
-            <div className="row gy-4">
-              {currentProducts.length > 0 ? (
-                currentProducts.map((product, index) => (
-                  <div className="col-xl-4 col-md-6 col-6" key={index}>
-                    <div className="product-card style2">
-                      <div className="product-img">
-                         <Link to={`/shop-details/${product.id}`}>
-                        <img
-                          src={
-                            product.product_image ||
-                            "/assets/img/update-img/product/1-1.png"
-                          }
-                          alt={product.product_name || "Product"}
-                        />
-                        </Link>
-                      </div>
-                      <div className="product-content">
-                        <h3 className="product-title">
-                          <Link to={`/shop-details/${product.id}`}>
-                            {product.product_name || "Unnamed Product"}
-                          </Link>
-                        </h3>
-                        <span className="price">
-                          ₹{product.sale_price} &nbsp;
-                          <del>₹{product.price}</del>
-                        </span>
-                        <Link
-                          to="#"
-                          className="link-btn"
-                          onClick={() => handleAddToCart(product.id)}
-                        >
-                          Add to cart <i className="fas fa-arrow-right" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p>No products found.</p>
-              )}
-            </div>
-             {/* ---- Pagination UI ---- */}
-            {totalPages > 1 && (
-              <div className="pagination mt-5">
-                <ul className="pagination-list d-flex gap-2">
-                  {[...Array(totalPages)].map((_, index) => (
-                    <li
-                      key={index}
-                      className={`page-item ${
-                        currentPage === index + 1 ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(index + 1)}
-                      >
-                        {index + 1}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+        <div className="col-xl-9 col-lg-8">
+  {isLoadingProducts ? (
+    <div
+      className="text-center my-5"
+      style={{
+        minHeight: "300px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }}>
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  ) : (
+    <>
+      <div className="row gy-4">
+        {currentProducts.length > 0 ? (
+          currentProducts.map((product, index) => (
+            <div className="col-xl-4 col-md-6 col-6" key={index}>
+              <div className="product-card style2">
+                <div className="product-img">
+                  <Link to={`/shop-details/${product.id}`}>
+                    <img
+                      src={
+                        product.product_image ||
+                        "/assets/img/update-img/product/1-1.png"
+                      }
+                      alt={product.product_name || "Product"}
+                    />
+                  </Link>
+                </div>
+                <div className="product-content">
+                  <h3 className="product-title">
+                    <Link to={`/shop-details/${product.id}`}>
+                      {product.product_name || "Unnamed Product"}
+                    </Link>
+                  </h3>
+                  <span className="price">
+                    <del>₹{product.sale_price}</del> ₹{product.price} &nbsp;
+                  </span>
+
+                  <Link
+                    to="#"
+                    className="link-btn"
+                    onClick={() => handleAddToCart(product.id)}
+                  >
+                    Add to cart <i className="fas fa-arrow-right" />
+                  </Link>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          ))
+        ) : (
+          <p>No products found.</p>
+        )}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination mt-5">
+          <ul className="pagination-list d-flex gap-2">
+            {[...Array(totalPages)].map((_, index) => (
+              <li
+                key={index}
+                className={`page-item ${
+                  currentPage === index + 1 ? "active" : ""
+                }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
+  )}
+</div>
+
 
           <div className="col-xl-3 col-lg-4 sidebar-widget-area">
             <aside className="sidebar-sticky-area sidebar-area sidebar-shop">
@@ -341,26 +420,116 @@ const totalPages = Math.ceil(productData.length / productsPerPage);
                     : "Please select all options"}
                 </div>
               </div>
+{/* 
+             <div className="widget widget_categories mt-5">
+  <h3 className="widget_title">Product categories</h3>
+  <ul className="category-list">
+    {categories.length > 0 ? (
+      categories.map((category) => (
+        <li key={category.id}>
+          <div
+            className="category-toggle"
+            onClick={() => handleCategoryClick(category.id)}
+            style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+          >
+            <span>
+              {category.name} ({category.part_count})
+            </span>
+            <span>{expandedCategoryId === category.id ? "▾" : "▸"}</span>
+          </div>
 
-              <div className="widget widget_categories mt-5">
-                <h3 className="widget_title">Product categories</h3>
-                <ul>
-                  {categories.length > 0 ? (
-                    categories.map((category) => (
-                      <li key={category.id}>
-                        <Link
-                          to={`/shop/${category.id}`}
-                          onClick={() => handleCategoryClick(category.id)}
-                        >
-                          {category.name}-({category.part_count})
+        
+          {expandedCategoryId === category.id &&
+            partGroupsByCategory[category.id] &&
+            partGroupsByCategory[category.id].length > 0 && (
+              <ul className="part-group-list" style={{ paddingLeft: "15px", marginTop: "8px" }}>
+                {partGroupsByCategory[category.id].map((group) => (
+                  <li key={group.id}>
+                    <Link to={`/shop/${group.id}`}>
+                     
+                      {group.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+        </li>
+      ))
+    ) : (
+      <li>No categories available</li>
+    )}
+  </ul>
+</div> */}
+<div className="widget widget_categories mt-5">
+  <h3 className="widget_title">Product categories</h3>
+  <ul className="category-list">
+    {categories.length > 0 ? (
+      categories.map((category) => (
+        <li key={category.id}>
+          <div
+            className="category-toggle"
+            onClick={() => handleCategoryClick(category.id)}
+            style={{
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>{category.name} ({category.part_count})</span>
+            <span>{expandedCategoryId === category.id ? "▾" : "▸"}</span>
+          </div>
+
+          {expandedCategoryId === category.id &&
+            partGroupsByCategory[category.id] &&
+            partGroupsByCategory[category.id].length > 0 && (
+              <ul className="part-group-list" style={{ paddingLeft: "15px", marginTop: "8px" }}>
+                {partGroupsByCategory[category.id].map((group) => (
+                  <li key={group.id}>
+                    <div
+                      onClick={() => handlePartGroupClick(group.id)}
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span>
+                         <Link to={`/shop/${group.id}`}>
+                        {group.name}
                         </Link>
-                      </li>
-                    ))
-                  ) : (
-                    <li>No categories available</li>
-                  )}
-                </ul>
-              </div>
+                      </span>
+                      <span>{expandedPartGroupId === group.id ? "▾" : "▸"}</span>
+                    </div>
+
+                   
+                    {expandedPartGroupId === group.id &&
+                      partItemsByGroup[group.id] &&
+                      partItemsByGroup[group.id].length > 0 && (
+                        <ul className="part-item-list" style={{ paddingLeft: "15px", marginTop: "6px" }}>
+                          {partItemsByGroup[group.id].map((item) => (
+                            <li key={item.id}>
+                              <Link to={`/shop-details/${item.id}`}>
+                                {item.product_name || item.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                  </li>
+                ))}
+              </ul>
+            )}
+        </li>
+      ))
+    ) : (
+      <li>No categories available</li>
+    )}
+  </ul>
+</div>
+
+
 
               <div className="widget widget_price_filter">
                 <h4 className="widget_title">Filter By Price</h4>

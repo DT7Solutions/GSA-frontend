@@ -6,15 +6,19 @@ import Swal from "sweetalert2";
 
 const UserProfile = () => {
     const [userData, setUserData] = useState({
+       
         first_name: "",
         last_name: "",
         username: "",
         email: "",
         phone: "",
         profile_image: "",
-        date_of_birth: "",
-        pincode: "",
+        date_of_birth: "",       
+        city: "",
+        state: "",
+        district:"",
         address: "",
+        pincode: "",
     });
 
     const [selectedImage, setSelectedImage] = useState(null);
@@ -62,6 +66,9 @@ const UserProfile = () => {
 
         if (!accessToken) {
             Swal.fire("Error", "No access token found!", "error");
+
+
+
             return;
         }
 
@@ -150,16 +157,32 @@ const UserProfile = () => {
                                         <label className="form-label">Date of Birth</label>
                                         <input type="date" name="date_of_birth" className="form-control" value={userData.date_of_birth} onChange={handleChange}  />
                                     </div>
+                                    
+                                    
 
                                     <div className="col-md-6">
-                                        <label className="form-label">Pincode</label>
-                                        <input type="number" name="pincode" className="form-control" value={userData.pincode} onChange={handleChange}placeholder="enter you zip/pin code" />
+                                        <label className="form-label">D.no & Address</label>
+                                        <input name="address" className="form-control" value={userData.address} onChange={handleChange} required placeholder="Enter your address..." />
                                     </div>
 
-                                    <div className="col-md-12">
-                                        <label className="form-label">Address</label>
-                                        <textarea name="address" className="form-control" value={userData.address} onChange={handleChange} rows="3" required placeholder="enter yor adress... "></textarea>
+                                     <div className="col-md-6">
+                                        <label className="form-label">City</label>
+                                        <input type="text" name="city" className="form-control" value={userData.city} onChange={handleChange} placeholder="Enter your city" />
                                     </div>
+                                     <div className="col-md-6">
+                                        <label className="form-label">District</label>
+                                        <input type="text" name="district" className="form-control" value={userData.district} onChange={handleChange} placeholder="Enter your district"  />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label">State</label>
+                                        <input type="text" name="state" className="form-control" value={userData.state} onChange={handleChange} placeholder="Enter your state"  />
+                                    </div>
+                                   <div className="col-md-6">
+                                        <label className="form-label">Pincode</label>
+                                        <input type="number" name="pincode" className="form-control" value={userData.pincode} onChange={handleChange} placeholder="Enter you zip/pin code" />
+                                    </div>
+                                   
+                                   
 
                                     <div className="col-12">
                                         <button className="btn btn-primary-600 style2" type="submit">Update Profile</button>

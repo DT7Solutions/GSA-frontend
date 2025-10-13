@@ -47,13 +47,14 @@ const ModelVariantsList = () => {
   });
   // Handle input changes
   const handleChange = (e) => {
+    debugger;
   
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
    const handleSubmit = async (e) => {
     e.preventDefault();
-    debugger;
+  
       const token = localStorage.getItem("accessToken");
     try {
       await axios.post(`${API_BASE_URL}api/home/product_enquiry/`, formData, {

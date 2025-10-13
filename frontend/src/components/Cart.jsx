@@ -13,6 +13,23 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
   const { fetchCartCount } = useContext(CartContext);
+ const [isConfirmed, setIsConfirmed] = useState(false);
+const [isAddressUpdated, setIsAddressUpdated] = useState(false);
+
+
+
+  const [shipping, setShipping] = useState({
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  city: "",
+  
+  state: "",
+  district: "",
+  zip: "",
+});
+
 
 
   useEffect(() => {
@@ -32,7 +49,33 @@ const Cart = () => {
       }
     };
 
+    const fetchUserProfile = async () => {
+    const token = localStorage.getItem("accessToken");
+    try {
+      const res = await axios.get(`${API_BASE_URL}api/auth/user/profile/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const { first_name, last_name, email, phone, state, city, district, address, pincode } = res.data;
+
+      setShipping((prev) => ({
+        ...prev,
+        name: `${first_name} ${last_name}`.trim(),
+        email,
+        phone,
+        address,
+        city,
+        state,
+        district,
+        zip: pincode,
+      }));
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
+
     fetchCartItems();
+    fetchUserProfile();
   }, []);
 
   const updateQuantity = async (itemId, newQuantity) => {
@@ -105,80 +148,139 @@ const cgst = subtotal * 0.09;
 const sgst = subtotal * 0.09;
 const totalWithGST = subtotal + cgst + sgst;
   
+const handleUpdateAddress = async () => {
+  const { email, phone, address, city, state, district, zip } = shipping;
+
+  // Validation
+  if (!email || !phone || !address || !city || !state || !district || !zip) {
+    Swal.fire("Missing Fields", "Please fill out all shipping address fields.", "warning");
+    return;
+  }
+
+  const token = localStorage.getItem("accessToken");
+  const [first_name, ...rest] = shipping.name.split(" ");
+  const last_name = rest.join(" ");
+
+  try {
+    await axios.patch(
+      `${API_BASE_URL}api/auth/user/profile/`,
+      {
+        first_name: first_name || "",
+        last_name: last_name || "",
+        email,
+        phone,
+        address,
+        city,
+        district,
+        state,
+        pincode: zip,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    Swal.fire("Success", "Shipping address updated in your profile.", "success");
+    setIsAddressUpdated(true); // ✅ Enable Proceed to Checkout
+  } catch (error) {
+    console.error("Error updating address:", error);
+    Swal.fire("Error", "Failed to update address in profile.", "error");
+  }
+};
 
 
-  // handle checkout functionality
-  const handleCheckout = async () => {
-    const token = localStorage.getItem("accessToken");
-  debugger;
-    try {
 
-      const { data } = await axios.post(
-        `${API_BASE_URL}api/home/payment/order/`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // const gstRate = 0.18;
-      // const gstAmount = data.amount * gstRate;
-      // const totalAmountWithGST = Math.round(data.amount + gstAmount);
-      const options = {
-        key: data.razorpay_key,
-        amount: totalWithGST,
-        currency: data.currency,
-        name: "Car Parts Store",
-        description: "Car Parts Purchase",
-        order_id: data.order_id,
-        handler: async function (response) {
-          try {
-            const verifyRes = await axios.post(
-              `${API_BASE_URL}api/home/payment/verify/`,
-              {
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
+
+ const handleCheckout = async () => {
+  if (!isAddressUpdated) {
+    Swal.fire({
+      title: "Update Required",
+      text: "Please update your shipping address by clicking the Update Address button.",
+      icon: "info",
+      confirmButtonText: "OK",
+    });
+    return;
+  }
+
+  const token = localStorage.getItem("accessToken");
+
+  try {
+    const { data } = await axios.post(
+      `${API_BASE_URL}api/home/payment/order/`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const options = {
+      key: data.razorpay_key,
+      amount: totalWithGST,
+      currency: data.currency,
+      name: "Car Parts Store",
+      description: "Car Parts Purchase",
+      order_id: data.order_id,
+      handler: async function (response) {
+        try {
+          const verifyRes = await axios.post(
+            `${API_BASE_URL}api/home/payment/verify/`,
+            {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
               },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
+            }
+          );
 
-            Swal.fire("Order Placed!", "Your payment was successful.", "success");
-            navigate(`/thank-you?order_id=${verifyRes.data.order_id}`);
-          } catch (verifyError) {
-            console.error("Payment verification failed", verifyError);
-            Swal.fire("Payment Failed", "Could not verify payment.", "error");
-          }
-        },
-        prefill: {
-          name: "User",
-          email: "user@example.com",
-        },
-        theme: {
-          color: "#3399cc",
-        },
-      };
+          Swal.fire("Order Placed!", "Your payment was successful.", "success");
+          navigate(`/thank-you?order_id=${verifyRes.data.order_id}`);
+        } catch (verifyError) {
+          console.error("Payment verification failed", verifyError);
+          Swal.fire("Payment Failed", "Could not verify payment.", "error");
+        }
+      },
+      prefill: {
+        name: shipping.name,
+        email: shipping.email,
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (error) {
-      console.error("Error initiating Razorpay order", error);
-      Swal.fire("Error", "Failed to initiate payment.", "error");
-    }
-  };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (error) {
+    console.error("Error initiating Razorpay order", error);
+    Swal.fire("Error", "Failed to initiate payment.", "error");
+  }
+};
 
+
+
+const handleShippingChange = (field, value) => {
+  setShipping((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+  setIsConfirmed(false);         // ✅ Uncheck the checkbox
+  setIsAddressUpdated(false);    // ✅ Require re-update of address
+};
 
 
 
 
   return (
     <div className="space-top space-extra-bottom">
-      <div className="container">
+      <div className=" container">
         <form action="#" className="woocommerce-cart-form">
           <table className="cart_table">
             <thead>
@@ -276,58 +378,149 @@ const totalWithGST = subtotal + cgst + sgst;
           </table>
         </form>
 
-        <div className="row justify-content-end">
-          <div className="col-md-8 col-lg-7 col-xl-6">
-            <h2 className="h4 summary-title">Cart Totals</h2>
-            <table className="cart_totals">
-              <tbody>
-                <tr>
-                  <td>Subtotal</td>
-                  <td data-title="Cart Subtotal">
-                    <span className="amount">
-                      <bdi>₹{subtotal.toFixed(2)}</bdi>
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>CGST (9%)</td>
-                  <td>
-                    <span className="amount">
-                      <bdi>₹{cgst.toFixed(2)}</bdi>
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>SGST (9%)</td>
-                  <td>
-                    <span className="amount">
-                      <bdi>₹{sgst.toFixed(2)}</bdi>
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr className="order-total">
-                  <td>Order Total</td>
-                  <td data-title="Total">
-                    <strong>
-                      <span className="amount">
-                        <bdi className="tot-amount">₹{totalWithGST.toFixed(2)}</bdi>
-                      </span>
-                    </strong>
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+        <div className="row cart-page justify-content-end">
+         <div className="col-md-6   ">
+          <div className="shipping-area p-3">
+    <h2 className="h4 summary-title">Shipping Address</h2>
+    <form >
+      <div className="form-group mb-3">
+        <label>Email</label>
+        <input
+          type="email"
+          className="form-control"
+          value={shipping.email}
+          onChange={(e) => handleShippingChange('email', e.target.value)}
+          required
+        />
+      </div>
+      <div className="form-group mb-3">
+        <label>Phone Number</label>
+        <input
+          type="tel"
+          className="form-control"
+          value={shipping.phone}
+          onChange={(e) => handleShippingChange('phone', e.target.value)}
+          required
+        />
+      </div>
+        <div className="form-group mb-3">
+        <label> D.no - Area address</label>
+        <input
+          type="text"
+          className="form-control"
+          value={shipping.address}
+          onChange={(e) => handleShippingChange('address', e.target.value)}
+          required
+        />
+      </div>
+          <div className="form-group mb-3">
+        <label>City</label>
+        <input
+          type="text"
+          className="form-control"
+          value={shipping.city}
+          onChange={(e) => handleShippingChange('city', e.target.value)}
+          required
+        />
+      </div>
+           <div className="form-group mb-3">
+        <label>District</label>
+        <input
+          type="text"
+          className="form-control"
+          value={shipping.district}
+          onChange={(e) => handleShippingChange('district', e.target.value)}
+          required
+        />
+      </div>
+       <div className="form-group mb-3">
+        <label>State</label>
+        <input
+          type="text"
+          className="form-control"
+          value={shipping.state}
+          onChange={(e) => handleShippingChange('state', e.target.value)}
+          required
+        />
+      </div>
+    
+  
+     
+      <div className="form-group mb-3">
+        <label>Zip Code</label>
+        <input
+          type="text"
+          className="form-control"
+          value={shipping.zip}
+          onChange={(e) => handleShippingChange('zip', e.target.value)}
+          required
+        />
+      </div>
+      <div className="form-check my-2">
+      <input
+        type="checkbox"
+        className="form-check-input"
+        id="confirmAddress"
+        checked={isConfirmed}
+        onChange={(e) => setIsConfirmed(e.target.checked)}
+      />
+      <label className="form-check-label" htmlFor="confirmAddress">
+        I confirm that the above address is correct and products will be shipped here.
+      </label>
+    </div>
+
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        handleUpdateAddress();
+      }}
+      className="btn btn-secondary mt-2"
+      disabled={!isConfirmed} // ✅ Disable unless checkbox is checked
+    >
+      Update Address
+    </button>
+
+    </form>
+  </div>
+  </div>
+
+  {/* Cart Totals */}
+  <div className="col-md-6  ">
+    <div className="bg-white border-add p-3">
+    <h2 className="h4 summary-title  p-3 mb-0 ">Cart Totals</h2>
+    <table className="cart_totals ">
+      <tbody>
+        <tr>
+          <td>Subtotal</td>
+          <td><bdi>₹{subtotal.toFixed(2)}</bdi></td>
+        </tr>
+        <tr>
+          <td>CGST (9%)</td>
+          <td><bdi>₹{cgst.toFixed(2)}</bdi></td>
+        </tr>
+        <tr>
+          <td>SGST (9%)</td>
+          <td><bdi>₹{sgst.toFixed(2)}</bdi></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr className="order-total">
+          <td>Order Total</td>
+          <td><strong><bdi className="tot-amount">₹{totalWithGST.toFixed(2)}</bdi></strong></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div className="wc-proceed-to-checkout mb-30">
+      <button onClick={handleCheckout} className="btn style2 btn-fw">
+  Proceed to checkout
+</button>
 
 
-            <div className="wc-proceed-to-checkout mb-30">
-              <button onClick={handleCheckout} className="btn style2 btn-fw">
-                Proceed to checkout
-              </button>
-            </div>
-          </div>
-        </div>
+    </div>
+    </div>
+  </div>
+</div>
       </div>
     </div>
   );

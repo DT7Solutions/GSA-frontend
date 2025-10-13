@@ -205,18 +205,37 @@ const handlePrint = (order) => {
     // Receiver Info (Optional)
   // Receiver Info (Deliver To section)
     //   const customer_name = {order.user.first_name};
-      const address = "6-134, Alluru, PV Palem, Guntur";
+     const user = order.user;
 
-      doc.setFontSize(11);
-      const deliverY = margin.top + 60;
+// Build full address lines for PDF
+const addressLines = [
+  `${user.first_name || ''} ${user.last_name || ''}`,              
+  `${user.address || ''}`,                                         
+  `${user.city || ''}, ${user.state || ''} - ${user.pincode || ''}`, 
+  `Phone: ${user.phone || ''}`                                     
+];
 
-      // Label
-      doc.text('Deliver To:', margin.left, deliverY);
+// Starting Y position for address block
+// Starting Y position for address block
+const deliverStartY = margin.top + 60;
+const lineHeight = 14;
 
-      doc.text(`${order.user.first_name} ${order.user.last_name}`, margin.left + 70, deliverY);
+// Label
+doc.setFontSize(11);
+doc.text('Deliver To:', margin.left, deliverStartY);
 
-      const wrappedAddress = doc.splitTextToSize(`${order.user.address}`, pageWidth - margin.left - margin.right - 70);
-      doc.text(wrappedAddress, margin.left + 70, deliverY + 14);
+const addressBlockStartY = deliverStartY + lineHeight;
+
+// Print each address line
+addressLines.forEach((line, index) => {
+  doc.text(line, margin.left + 70, deliverStartY + lineHeight * index);
+});
+
+// Dynamically calculate where to start the table (after last line + some gap)
+const addressBlockHeight = lineHeight * addressLines.length;
+const tableStartY = addressBlockStartY + addressBlockHeight + 20; // Add 20pt gap
+
+
 
   
     // Table Data
@@ -229,14 +248,14 @@ const handlePrint = (order) => {
         String(idx + 1).padStart(2, '0'),
         item.part_group_name|| 'N/A',
         String(qty),
-        `₹${unitPrice}`,
-        `₹${amount}`,
+        `INR ${unitPrice}`,
+        `INR ${amount}`,
         order.status.charAt(0).toUpperCase() + order.status.slice(1),
       ];
     });
   
     autoTable(doc, {
-      startY: margin.top + 100,
+      startY: tableStartY,
       margin: { left: margin.left, right: margin.right },
       head: [['S.L', 'Product Name', 'Qty', 'Unit Price', 'Total', 'Status']],
       body: rows,
@@ -261,12 +280,13 @@ const handlePrint = (order) => {
     const finalY = doc.lastAutoTable?.finalY || margin.top + 100;
   
     // Grand Total
-    doc.setFontSize(12);
-    doc.text(`Grand Total: ₹${order.total_price}`, margin.left, finalY + 30);
+   doc.setFont("helvetica", "normal");
+doc.setFontSize(12);
+doc.text(`Grand Total: INR ${order.total_price}`, margin.left, finalY + 30);
+doc.text('Thank you for your business!', margin.left, finalY + 60);
+
   
-    // Footer
-    doc.setFontSize(10);
-    doc.text('Thank you for your business!', margin.left, finalY + 60);
+   
   
     // Save PDF
     doc.save(`PackingSlip_${order.razorpay_order_id}.pdf`);
