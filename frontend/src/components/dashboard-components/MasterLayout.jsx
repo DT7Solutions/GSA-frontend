@@ -165,17 +165,17 @@ const MasterLayout = ({ children }) => {
                 <div>
                     <Link to='/' className='sidebar-logo'>
                         <img
-                            src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
+                            src={`${process.env.PUBLIC_URL}/adminAssets/images/gallery/logo-light.png`}
                             alt='site logo'
                             className='light-logo'
                         />
                         <img
-                            src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
+                            src={`${process.env.PUBLIC_URL}/adminAssets/images/gallery/logo-light.png`}
                             alt='site logo'
                             className='dark-logo'
                         />
                         <img
-                            src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
+                            src={`${process.env.PUBLIC_URL}/adminAssets/images/gallery/logo-light.png`}
                             alt='site logo'
                             className='logo-icon'
                         />
@@ -309,7 +309,7 @@ const MasterLayout = ({ children }) => {
                                        Part Categorys
                                     </NavLink>
                                 </li>
-                                {/* <li>
+                                <li>
                                     <NavLink
                                         to='/car-group-part'
                                         className={(navData) =>
@@ -319,7 +319,7 @@ const MasterLayout = ({ children }) => {
                                         <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
                                       Part Group
                                     </NavLink>
-                                </li> */}
+                                </li>
 
 
 
@@ -368,10 +368,10 @@ const MasterLayout = ({ children }) => {
                                 >
                                     <Icon icon='heroicons:bars-3-solid' className='icon' />
                                 </button>
-                                <form className='navbar-search'>
+                                {/* <form className='navbar-search'>
                                     <input type='text' name='search' placeholder='Search' />
                                     <Icon icon='ion:search-outline' className='icon' />
-                                </form>
+                                </form> */}
                             </div>
                         </div>
                         <div className='col-auto'>

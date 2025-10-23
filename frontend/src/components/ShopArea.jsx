@@ -13,11 +13,13 @@ const ShopArea = ({ id }) => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 9;
+  
 
   const [carMakes, setCarMakes] = useState([]);
   const [carModels, setCarModels] = useState([]);
   const [modelVariant, setModelVariant] = useState([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+const [filteredProducts, setFilteredProducts] = useState([]);
 
   
   
@@ -44,23 +46,32 @@ const [partItemsByGroup, setPartItemsByGroup] = useState({});
 
   const token = localStorage.getItem("accessToken");
 
-  const handleRangeChange = (value) => {
-    setRange(value);
-  };
+ const handleRangeChange = (value) => {
+  setRange(value);
+
+  // Filter based on price range
+  const [min, max] = value;
+  const filtered = productData.filter(
+    (item) => item.price >= min && item.price <= max
+  );
+
+  setFilteredProducts(filtered);
+  setCurrentPage(1); // Reset to first page after filtering
+};
+
 
   // Fetch product data based on id
 useEffect(() => {
   const fetchProductData = async () => {
     try {
-      setIsLoadingProducts(true); // start loader
-      const response = await axios.get(
-        `${API_BASE_URL}api/home/car_part_items/${id}/`
-      );
+      setIsLoadingProducts(true);
+      const response = await axios.get(`${API_BASE_URL}api/home/car_part_items/${id}/`);
       setProductData(response.data);
+      setFilteredProducts(response.data); // 👈 initialize filter list here
     } catch (error) {
       console.error("Error fetching car parts:", error);
     } finally {
-      setIsLoadingProducts(false); // stop loader
+      setIsLoadingProducts(false);
     }
   };
 
@@ -70,14 +81,23 @@ useEffect(() => {
 }, [id]);
 
 
+
+
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = productData.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
+  // const currentProducts = productData.slice(
+  //   indexOfFirstProduct,
+  //   indexOfLastProduct
+  // );
+  const currentProducts = filteredProducts.slice(
+  indexOfFirstProduct,
+  indexOfLastProduct
+);
 
-const totalPages = Math.ceil(productData.length / productsPerPage);
+const maxPrice = productData.length > 0 ? Math.max(...productData.map(p => p.price)) : 1000;
+
+const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -157,6 +177,7 @@ const totalPages = Math.ceil(productData.length / productsPerPage);
     }
   };
 
+
   // Load categories from localStorage on page load
   useEffect(() => {
     const selectedBrandLS = JSON.parse(localStorage.getItem("selected_brand"));
@@ -202,26 +223,37 @@ const totalPages = Math.ceil(productData.length / productsPerPage);
   };
 
   // Handle Model change
-  const handleCarModelChange = async (modelId) => {
-    setSelectedModel(modelId);
-    setSelectedVariant("");
-    setModelVariant([]);
-    setCategories([]);
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}api/home/car_variant/${modelId}/`
-      );
-      setModelVariant(response.data);
-    } catch (error) {
-      console.error("Error fetching car variants:", error);
-    }
-  };
+const handleCarModelChange = async (modelId) => {
+  const selectedModelObj = carModels.find(
+    (model) => model.id.toString() === modelId.toString()
+  );
+  setSelectedModel(modelId);
+  setSelectedModelName(selectedModelObj ? selectedModelObj.name : "");
+  setSelectedVariant("");
+  setSelectedVariantName("");
+  setModelVariant([]);
+  setCategories([]);
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}api/home/car_variant/${modelId}/`
+    );
+    setModelVariant(response.data);
+  } catch (error) {
+    console.error("Error fetching car variants:", error);
+  }
+};
+
 
   // Handle Variant change
-  const handleVariantChange = (variantId) => {
-    setSelectedVariant(variantId);
-    fetchCategoriesByVariant(variantId);
-  };
+const handleVariantChange = (variantId) => {
+  const selectedVariantObj = modelVariant.find(
+    (variant) => variant.id.toString() === variantId.toString()
+  );
+  setSelectedVariant(variantId);
+  setSelectedVariantName(selectedVariantObj ? selectedVariantObj.name : "");
+  fetchCategoriesByVariant(variantId);
+};
+
 
   // Handle Category click
 const handleCategoryClick = async (categoryId) => {
@@ -335,28 +367,117 @@ const handlePartGroupClick = async (groupId) => {
         )}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="pagination mt-5">
-          <ul className="pagination-list d-flex gap-2">
-            {[...Array(totalPages)].map((_, index) => (
-              <li
-                key={index}
-                className={`page-item ${
-                  currentPage === index + 1 ? "active" : ""
-                }`}
+   
+ {totalPages > 1 && (
+  <div className="pagination mt-5 d-flex justify-content-center">
+    <ul className="pagination-list d-flex align-items-center gap-2">
+
+      {/* Previous Arrow */}
+      <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+        <button
+          className="page-link"
+          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+        >
+          &laquo;
+        </button>
+      </li>
+
+      {(() => {
+        const maxVisible = 5; // how many pages to show around current page
+        let startPage = Math.max(2, currentPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(totalPages - 1, currentPage + Math.floor(maxVisible / 2));
+
+        // Adjust if at the beginning
+        if (currentPage <= Math.floor(maxVisible / 2)) {
+          startPage = 2;
+          endPage = Math.min(totalPages - 1, maxVisible + 1);
+        }
+
+        // Adjust if at the end
+        if (currentPage + Math.floor(maxVisible / 2) >= totalPages) {
+          startPage = Math.max(2, totalPages - maxVisible);
+          endPage = totalPages - 1;
+        }
+
+        const pages = [];
+
+        // First page
+        pages.push(
+          <li
+            key={1}
+            className={`page-item ${currentPage === 1 ? "active" : ""}`}
+          >
+            <button className="page-link" onClick={() => handlePageChange(1)}>
+              1
+            </button>
+          </li>
+        );
+
+        // Ellipsis before startPage
+        if (startPage > 2) {
+          pages.push(
+            <li key="start-ellipsis" className="page-item disabled">
+              <span className="page-link">…</span>
+            </li>
+          );
+        }
+
+        // Middle pages
+        for (let i = startPage; i <= endPage; i++) {
+          pages.push(
+            <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
+              <button className="page-link" onClick={() => handlePageChange(i)}>
+                {i}
+              </button>
+            </li>
+          );
+        }
+
+        // Ellipsis after endPage
+        if (endPage < totalPages - 1) {
+          pages.push(
+            <li key="end-ellipsis" className="page-item disabled">
+              <span className="page-link">…</span>
+            </li>
+          );
+        }
+
+        // Last page
+        if (totalPages > 1) {
+          pages.push(
+            <li
+              key={totalPages}
+              className={`page-item ${currentPage === totalPages ? "active" : ""}`}
+            >
+              <button
+                className="page-link"
+                onClick={() => handlePageChange(totalPages)}
               >
-                <button
-                  className="page-link"
-                  onClick={() => handlePageChange(index + 1)}
-                >
-                  {index + 1}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+                {totalPages}
+              </button>
+            </li>
+          );
+        }
+
+        return pages;
+      })()}
+
+      {/* Next Arrow */}
+      <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+        <button
+          className="page-link"
+          onClick={() =>
+            currentPage < totalPages && handlePageChange(currentPage + 1)
+          }
+        >
+          &raquo;
+        </button>
+      </li>
+    </ul>
+  </div>
+)}
+
+
     </>
   )}
 </div>
@@ -368,7 +489,7 @@ const handlePartGroupClick = async (groupId) => {
                 <h3 className="widget_title">Search by Car Brand</h3>
 
                 <select
-                  className="mb-2"
+                  className="mb-3"
                   value={selectedBrand}
                   onChange={(e) => {
                     const selectedId = e.target.value;
@@ -386,7 +507,7 @@ const handlePartGroupClick = async (groupId) => {
 
 
                 <select
-                  className="mb-2"
+                  className="mb-3"
                   value={selectedModel}
                   onChange={(e) => handleCarModelChange(e.target.value)}
                   disabled={!selectedBrand}
@@ -400,7 +521,7 @@ const handlePartGroupClick = async (groupId) => {
                 </select>
 
                 <select
-                  className="mb-2"
+                  className="mb-3"
                   value={selectedVariant}
                   onChange={(e) => handleVariantChange(e.target.value)}
                   disabled={!selectedModel}
@@ -415,52 +536,14 @@ const handlePartGroupClick = async (groupId) => {
 
                 <div style={{ marginTop: "20px" }}>
                   <strong>Selected:</strong>{" "}
-                  {selectedBrand && selectedModel && selectedVariant
-                    ? `${selectedBrandName} > ${selectedModel} > ${selectedVariant}`
-                    : "Please select all options"}
+                 {selectedBrandName && selectedModelName && selectedVariantName
+  ? `${selectedBrandName} > ${selectedModelName} > ${selectedVariantName}`
+  : "Please select all options"}
+
                 </div>
               </div>
-{/* 
-             <div className="widget widget_categories mt-5">
-  <h3 className="widget_title">Product categories</h3>
-  <ul className="category-list">
-    {categories.length > 0 ? (
-      categories.map((category) => (
-        <li key={category.id}>
-          <div
-            className="category-toggle"
-            onClick={() => handleCategoryClick(category.id)}
-            style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
-          >
-            <span>
-              {category.name} ({category.part_count})
-            </span>
-            <span>{expandedCategoryId === category.id ? "▾" : "▸"}</span>
-          </div>
 
-        
-          {expandedCategoryId === category.id &&
-            partGroupsByCategory[category.id] &&
-            partGroupsByCategory[category.id].length > 0 && (
-              <ul className="part-group-list" style={{ paddingLeft: "15px", marginTop: "8px" }}>
-                {partGroupsByCategory[category.id].map((group) => (
-                  <li key={group.id}>
-                    <Link to={`/shop/${group.id}`}>
-                     
-                      {group.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-        </li>
-      ))
-    ) : (
-      <li>No categories available</li>
-    )}
-  </ul>
-</div> */}
-<div className="widget widget_categories mt-5">
+<div className="widget widget_categories mt-5 bg-white">
   <h3 className="widget_title">Product categories</h3>
   <ul className="category-list">
     {categories.length > 0 ? (
@@ -531,25 +614,31 @@ const handlePartGroupClick = async (groupId) => {
 
 
 
-              <div className="widget widget_price_filter">
+              <div className="widget widget_price_filter bg-white">
                 <h4 className="widget_title">Filter By Price</h4>
                 <div style={{ width: "220px", margin: "20px" }}>
-                  <Slider
-                    range
-                    min={0}
-                    max={600}
-                    defaultValue={[0, 100]}
-                    value={range}
-                    onChange={handleRangeChange}
-                  />
+                 <Slider
+  range
+  min={0}
+  max={maxPrice}
+  defaultValue={[0, maxPrice]}
+  value={range}
+  onChange={handleRangeChange}
+/>
+
                 </div>
                 <div className="price_slider_wrapper">
                   <div className="price_label">
-                    Price: <span className="from">${range[0]}</span> —{" "}
-                    <span className="to">${range[1]}</span>
-                    <button type="submit" className="button btn">
-                      Filter
-                    </button>
+                   Price: <span className="from">₹{range[0]}</span> — <span className="to">₹{range[1]}</span>
+
+                    <button
+  type="button"
+  className="button btn"
+  onClick={() => handleRangeChange(range)}
+>
+  Filter
+</button>
+
                   </div>
                 </div>
               </div>

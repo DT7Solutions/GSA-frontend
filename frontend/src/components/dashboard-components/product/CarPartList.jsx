@@ -28,11 +28,24 @@ const CarPartList = () => {
         }
       );
       setCarVariantsList(response.data);
-      $("#dataTable").DataTable(); // Initialize DataTable
+      
     } catch (error) {
       console.error("Error fetching car parts:", error);
     }
   };
+
+  useEffect(() => {
+    if (carVariants.length > 0) {
+      // Destroy existing DataTable before reinitializing
+      if ($.fn.DataTable.isDataTable("#dataTable")) {
+        $("#dataTable").DataTable().destroy();
+      }
+      $("#dataTable").DataTable({
+        pageLength: 10,
+        destroy: true,
+      });
+    }
+  }, [carVariants]);
 
   const handleEditClick = (item) => {
     setSelectedItem(item);

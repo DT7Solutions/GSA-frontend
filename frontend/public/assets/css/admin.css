@@ -141,3 +141,12 @@
 .border-add{
   border: 1px solid rgba(229, 229, 229, 1)!important;
 }
+
+/* dasboard  entries removed  */
+.single-select, .form-select, select{
+  background-image: none!important;
+}
+
+
+
+

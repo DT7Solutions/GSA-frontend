@@ -31,6 +31,7 @@ const UpdateProductsForm = () => {
         carVariantId: '',
         partCategoryId: '',
         partId: '',
+        partName : '',
         partNumber: '',
         figureNumber: '',
         price: '',
@@ -174,7 +175,8 @@ const UpdateProductsForm = () => {
                     car_model_id: data.car_model?.id || '', 
                     car_variant_id: data.car_variant?.id || '', 
                     part_section_id: data.part_section?.id || '', 
-                    part_group_id: data.part_group?.id || '',    
+                    part_group_id: data.part_group?.id || '', 
+                    partName : data.product_name || '',   
                     partNumber: data.part_no || '',
                     figureNumber: data.fig_no || '',
                     price: data.price || '',
@@ -365,6 +367,21 @@ const UpdateProductsForm = () => {
                                 </div>
                             </div>
                         </div>
+                        <div className="col-md-4">
+    <label className="form-label">Part Name</label>
+    <input
+      type="text"
+      name="partName"
+      className="form-control"
+      placeholder="Enter part name"
+      value={formData.partName}
+      onChange={(e) =>
+        setFormData({ ...formData, partName: e.target.value })
+      }
+      required
+    />
+    <div className="invalid-feedback">Please enter part name.</div>
+  </div>
 
                         {/* Part Number */}
                         <div className="col-md-4">

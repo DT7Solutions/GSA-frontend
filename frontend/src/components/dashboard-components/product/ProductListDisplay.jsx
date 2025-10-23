@@ -26,12 +26,16 @@ const ProductListDisplay = () => {
         fetchProductList();
     }, [token]);
 
+
+
+
     useEffect(() => {
         let table;
         if (products.length > 0) {
             table = $('#dataTable').DataTable({
                 destroy: true,
                 pageLength: 10,
+                
                 searching: true,
                 ordering: true,
                 lengthMenu: [5, 10, 25, 50, 100],
@@ -60,6 +64,7 @@ const ProductListDisplay = () => {
                             <tr>
                                 <th>S.L</th>
                                 <th>Car Details</th>
+                                <th>Part Name</th>
                                 <th>Figure No</th>
                                 <th>Part No</th>
                                 <th>Price</th>
@@ -78,7 +83,9 @@ const ProductListDisplay = () => {
                             {products.map((item, index) => (
                                 <tr key={item.id}>
                                     <td>{index + 1}</td>
+                                    
                                     <td>{item.car_make?.name}-{item.car_model?.name}-{item.car_variant?.name}-{item.part_section?.name}</td>
+                                    <td>{item.product_name}</td>
                                     <td>{item.fig_no}</td>
                                     <td>{item.part_no}</td>
                                     <td>₹{item.price}</td>
@@ -110,3 +117,5 @@ const ProductListDisplay = () => {
 };
 
 export default ProductListDisplay;
+
+
