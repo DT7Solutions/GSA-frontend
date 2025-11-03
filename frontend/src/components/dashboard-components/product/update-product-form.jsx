@@ -22,6 +22,9 @@ const UpdateProductsForm = () => {
     const [selectedCarVariant, setSelectedCarVariant] = useState(null);
     const [selectedPartCategory, setSelectedPartCategory] = useState(null);
     const [selectedPartGroup, setSelectedPartGroup] = useState(null);
+    const [previewImage, setPreviewImage] = useState('');
+
+   
 
 
     // Handle save product
@@ -32,6 +35,7 @@ const UpdateProductsForm = () => {
         partCategoryId: '',
         partId: '',
         partName : '',
+        partImage: '',
         partNumber: '',
         figureNumber: '',
         price: '',
@@ -188,7 +192,7 @@ const UpdateProductsForm = () => {
                     compatibility: [],
                     description: data.description || '',
                 });
-
+                setPreviewImage(data.image_url || '');
                 fetchCarMakesList();
                 const makeId = data.car_make?.id;
                 if (makeId) {
@@ -231,33 +235,84 @@ const UpdateProductsForm = () => {
     }, [id, token]);
 
 
+  const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setFormData({ ...formData, partImage: file });
+    const reader = new FileReader();
+    reader.onload = () => setPreviewImage(reader.result);
+    reader.readAsDataURL(file);
+  }
+};
+
+
     // Handle final product update logic
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            debugger;
-            const response = await axios.put(`${API_BASE_URL}api/home/car-parts-list/${id}/`, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-            Swal.fire({
-                title: "Success Updated Car Part Successfully",
-                text: response.data.message,
-                icon: "success",
-                confirmButtonText: "OK",
-            });
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || "Failed to update part";
-            Swal.fire({
-                title: "Request Failed",
-                text: errorMessage,
-                icon: "error",
-                confirmButtonText: "Retry",
-            });
-        }
+   const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    let payload;
+    let headers;
+
+    // Always use FormData when dealing with file uploads
+    payload = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      // Only append values that exist
+      if (value !== null && value !== undefined) {
+        payload.append(key, value);
+      }
+    });
+
+    headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
     };
+
+    const response = await axios.put(
+      `${API_BASE_URL}api/home/car-parts-list/${id}/`,
+      payload,
+      { headers }
+    );
+
+    // ✅ Only show success if server returns 200
+    if (response.status === 200) {
+      Swal.fire({
+        title: "Success",
+        text: "Car part updated successfully!",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+    }
+  } catch (error) {
+    console.error("Backend error:", error.response);
+
+    // Extract meaningful error messages
+    const errorData = error.response?.data;
+    let errorMessage = "Failed to update part";
+
+    if (errorData) {
+      if (errorData.message) {
+        errorMessage = errorData.message;
+      } else if (errorData.errors) {
+        // Convert field errors into a readable string
+        errorMessage = Object.entries(errorData.errors)
+          .map(([field, msgs]) => `${field}: ${msgs.join(", ")}`)
+          .join("\n");
+      } else {
+        errorMessage = JSON.stringify(errorData);
+      }
+    }
+
+    Swal.fire({
+      title: "Request Failed",
+      text: errorMessage,
+      icon: "error",
+      confirmButtonText: "Retry",
+    });
+  }
+};
+
+
 
     const carMakeOptions = carMakes.map(make => ({ value: make.id, label: make.name }));
     const carModelOptions = carModels.map(model => ({ value: model.id, label: `${model.name}-(${new Date(model.production_start_date).getFullYear()} - ${new Date(model.production_end_date).getFullYear()})` }));
@@ -382,6 +437,35 @@ const UpdateProductsForm = () => {
     />
     <div className="invalid-feedback">Please enter part name.</div>
   </div>
+ <div className="col-md-4">
+              <label className="form-label">Part Image</label>
+              <input
+                type="file"
+                name="partImage"
+                className="form-control"
+                onChange={handleImageChange}
+                accept="image/*"
+              />
+            {previewImage && (
+  <div className="mt-2">
+    <p className="mb-1">
+      {formData.partImage ? "New Preview:" : "Current Image:"}
+    </p>
+    <img
+      src={previewImage}
+      alt="Preview"
+      style={{
+        width: "120px",
+        height: "120px",
+        borderRadius: "5px",
+        border: "1px solid #ccc",
+        objectFit: "cover",
+      }}
+    />
+  </div>
+)}
+
+            </div>
 
                         {/* Part Number */}
                         <div className="col-md-4">

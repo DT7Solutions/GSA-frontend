@@ -92,20 +92,30 @@ const ShopDetails = () => {
   const { fetchCartCount } = useContext(CartContext);
 
   // Fetch product details
-  useEffect(() => {
-    const fetchProductList = async () => {
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}api/home/car_part_detail_list/${id}/`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setProduct(response.data);
-      } catch (error) {
-        console.error("Error fetching product list:", error);
-      }
-    };
-    fetchProductList();
-  }, [id, token]);
+ useEffect(() => {
+  const fetchProductList = async () => {
+    try {
+      const config = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : {}; // no header if not logged in
+
+      const response = await axios.get(
+        `${API_BASE_URL}api/home/car_part_detail_list/${id}/`,
+        config
+      );
+
+      setProduct(response.data);
+    } catch (error) {
+      console.error("Error fetching product list:", error);
+    }
+  };
+
+
+  
+
+  fetchProductList();
+}, [id, token]);
+
 
   // Add to cart handler
   const handleAddToCart = async (partId) => {

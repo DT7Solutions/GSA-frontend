@@ -1,180 +1,180 @@
-
-
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import API_BASE_URL from "../../../config";
 
-const PartGroupList = ({id, Modelveriant}) => {
-const [carMakes, setCarMakes] = useState([]);
-const [carModels, setCarModels] = useState([]);
-const [modelVariants, setModelVariants] = useState([]);
+const PartGroupList = ({ id }) => {
+  const [carMakes, setCarMakes] = useState([]);
+  const [carModels, setCarModels] = useState([]);
+  const [modelVariants, setModelVariants] = useState([]);
+  const [partList, setPartList] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-const [allParts, setAllParts] = useState([]);
-const [filteredParts, setFilteredParts] = useState([]);
-const [categories, setCategories] = useState([]);
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedVariant, setSelectedVariant] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
 
-const [selectedBrand, setSelectedBrand] = useState("");
-const [selectedModel, setSelectedModel] = useState("");
-const [selectedVariant, setSelectedVariant] = useState("");
-const [selectedCategory, setSelectedCategory] = useState("");
-
-const [searchKeyword, setSearchKeyword] = useState("");
-
-const [partList, setpartList] = useState([]);
-
-    useEffect(() => {
-            const fetchpratgroups_cat = async () => {
-              try {
-                const response = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${id}/`);
-                debugger;
-                setpartList(response.data);
-                console.log('got car-models payload:', response.data);
-              } catch (error) {
-                console.error('Error fetching car makes:', error);
-              }
-            };
-            fetchpratgroups_cat();
-          }, []);
-
-
-
-  // Fetch all part groups initially
+  // ✅ Fetch default part groups
   useEffect(() => {
-    const fetchAllPartGroups = async () => {
+    const fetchDefaultPartGroups = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}api/home/all_part_groups/`);
-        setAllParts(response.data);
-      } catch (err) {
-        console.error("Error fetching all part groups", err);
+        const res = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${id}/`);
+        const parts = res.data || [];
+        setPartList(parts);
+
+        const categoryCounts = parts.reduce((acc, part) => {
+          const catId = String(part.part_section?.id || "");
+          const catName = part.part_section?.name;
+          if (catId && catName) {
+            if (!acc[catId]) acc[catId] = { id: catId, name: catName, count: 0 };
+            acc[catId].count += 1;
+          }
+          return acc;
+        }, {});
+        setCategories(Object.values(categoryCounts));
+      } catch (error) {
+        console.error("Error fetching default part groups:", error);
       }
     };
-    fetchAllPartGroups();
-  }, []);
+    if (id) fetchDefaultPartGroups();
+  }, [id]);
 
-  // Fetch car makes
+  // ✅ Fetch parts & categories for selected variant
   useEffect(() => {
-    const fetchMakes = async () => {
+    if (!selectedVariant) return;
+    const fetchVariantParts = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}api/home/car-makes/`);
-        setCarMakes(response.data);
+        const [partsRes, catRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}api/home/part_groups_list/${selectedVariant}/`),
+          // ✅ 🔁 REPLACED OLD ENDPOINT HERE:
+          axios.get(`${API_BASE_URL}api/home/car_part_count_part_group_count/${selectedVariant}/`),
+        ]);
+
+        const parts = partsRes.data || [];
+        setPartList(parts);
+
+        // Build count per category from fetched parts
+        const categoryCounts = parts.reduce((acc, part) => {
+          const catId = String(part.part_section?.id || "");
+          const catName = part.part_section?.name;
+          if (catId && catName) {
+            if (!acc[catId]) acc[catId] = { id: catId, name: catName, count: 0 };
+            acc[catId].count += 1;
+          }
+          return acc;
+        }, {});
+
+        // ✅ Merge with new API data (which has part_groups_count)
+        const mergedCats = (catRes.data || []).map((cat) => {
+          const catId = String(cat.id);
+          return {
+            ...cat,
+            count: categoryCounts[catId]?.count || 0,
+            part_groups_count: cat.part_groups_count || 0,
+          };
+        });
+
+        setCategories(mergedCats);
       } catch (err) {
-        console.error("Error fetching car makes", err);
+        console.error("Error fetching variant data:", err);
       }
     };
-    fetchMakes();
+    fetchVariantParts();
+  }, [selectedVariant]);
+
+  // ✅ Fetch parts by selected category
+  useEffect(() => {
+    if (!selectedCategory) return;
+    const fetchCategoryParts = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${selectedCategory}/`);
+        setPartList(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.error("Error fetching parts by category:", error);
+        setPartList([]);
+      }
+    };
+    fetchCategoryParts();
+  }, [selectedCategory]);
+
+  // ✅ Fetch car dropdown data
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}api/home/car-makes/`)
+      .then((res) => setCarMakes(res.data))
+      .catch((err) => console.error("Error fetching car makes", err));
   }, []);
 
-  // When brand changes, fetch models
   useEffect(() => {
     if (!selectedBrand) return;
-    const fetchModels = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}api/home/car-models/${selectedBrand}/`);
-        setCarModels(response.data);
+    axios
+      .get(`${API_BASE_URL}api/home/car-models/${selectedBrand}/`)
+      .then((res) => {
+        setCarModels(res.data);
         setSelectedModel("");
         setSelectedVariant("");
         setModelVariants([]);
-        setFilteredParts([]);
-        setCategories([]);
-      } catch (err) {
-        console.error("Error fetching car models", err);
-      }
-    };
-    fetchModels();
+      })
+      .catch((err) => console.error("Error fetching car models", err));
   }, [selectedBrand]);
 
-  // When model changes, fetch variants
   useEffect(() => {
     if (!selectedModel) return;
-    const fetchVariants = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}api/home/car_variant/${selectedModel}/`);
-        setModelVariants(response.data);
+    axios
+      .get(`${API_BASE_URL}api/home/car_variant/${selectedModel}/`)
+      .then((res) => {
+        setModelVariants(res.data);
         setSelectedVariant("");
-        setFilteredParts([]);
-        setCategories([]);
-      } catch (err) {
-        console.error("Error fetching car variants", err);
-      }
-    };
-    fetchVariants();
+      })
+      .catch((err) => console.error("Error fetching car variants", err));
   }, [selectedModel]);
 
-  useEffect(() => {
-  if (!selectedVariant) return;
-
-  const fetchData = async () => {
-    try {
-      // Fetch both APIs in parallel
-      const [partsRes, categoryRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}api/home/part_groups_list/${selectedVariant}/`),
-        axios.get(`${API_BASE_URL}api/home/car_variant_category/${selectedVariant}/`),
-      ]);
-
-      const parts = partsRes.data;
-      const cats = categoryRes.data;
-
-      // 🔧 Count parts per category
-      const categoryCounts = parts.reduce((acc, part) => {
-        if (part.category_id) {
-          acc[part.category_id] = (acc[part.category_id] || 0) + 1;
-        }
-        return acc;
-      }, {});
-
-      // 🔗 Merge counts into categories
-      const mergedCategories = cats.map((cat) => ({
-        ...cat,
-        part_count: categoryCounts[cat.id] || 0,
-      }));
-
-      setFilteredParts(parts);
-      setCategories(mergedCategories);
-    } catch (err) {
-      console.error("Error fetching variant data", err);
-    }
-  };
-
-  fetchData();
-}, [selectedVariant]);
-
-
-  // Combine filters
-  const partsToDisplay = React.useMemo(() => {
-    let parts = selectedVariant ? filteredParts : allParts;
-
-    if (selectedCategory) {
-      parts = parts.filter(
-        (p) => p.category_id === parseInt(selectedCategory)
-      );
-    }
-
+  // ✅ Search filter
+  const partsToDisplay = useMemo(() => {
+    let parts = partList;
     if (searchKeyword.trim()) {
       const keyword = searchKeyword.toLowerCase();
-      parts = parts.filter((p) => p.name.toLowerCase().includes(keyword));
+      parts = parts.filter((p) => p.product_name?.toLowerCase().includes(keyword));
     }
-
     return parts;
-  }, [allParts, filteredParts, selectedVariant, selectedCategory, searchKeyword]);
+  }, [partList, searchKeyword]);
+
+  // ✅ Dynamic counts for displayed parts
+  const filteredCategoryCounts = useMemo(() => {
+    const counts = {};
+    partsToDisplay.forEach((p) => {
+      const catId = String(p.part_section?.id || "");
+      if (catId) counts[catId] = (counts[catId] || 0) + 1;
+    });
+    return counts;
+  }, [partsToDisplay]);
+
+  const selectedCategoryName =
+    categories.find((cat) => String(cat.id) === selectedCategory)?.name || "";
 
   return (
     <section className="space-top space-extra-bottom shop-sec">
       <div className="container">
         <div className="row flex-row-reverse">
-          {/* Part Group Cards */}
+          {/* MAIN CONTENT */}
           <div className="col-xl-9 col-lg-8">
-           
+            {/* <div className="d-flex justify-content-between align-items-center mb-3">
+              <h4 className="mb-0">
+                {selectedCategory
+                  ? `${selectedCategoryName} (${partsToDisplay.length} Items)`
+                  : `All Parts (${partsToDisplay.length} Items)`}
+              </h4>
+            </div> */}
 
             <div className="row gy-4">
-              {partList.length > 0 ? (
-                partList.map((item) => (
+              {partsToDisplay.length > 0 ? (
+                partsToDisplay.map((item) => (
                   <div className="col-xl-3 col-md-4 col-6" key={item.id}>
                     <div className="product-card style2">
                       <div className="product-img">
                         <Link to={`/shop/${item.id}`}>
-
                           <img
                             src={item.image || "/assets/img/placeholder.png"}
                             alt={item.name}
@@ -195,11 +195,12 @@ const [partList, setpartList] = useState([]);
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* SIDEBAR */}
           <div className="col-xl-3 col-lg-4 sidebar-widget-area">
             <aside className="sidebar-area sidebar-shop">
               <h4 className="widget_title">Filter by Car</h4>
 
+              {/* Brand */}
               <div className="mb-3">
                 <label className="form-label">Car Brand</label>
                 <select
@@ -216,6 +217,7 @@ const [partList, setpartList] = useState([]);
                 </select>
               </div>
 
+              {/* Model */}
               <div className="mb-3">
                 <label className="form-label">Car Model</label>
                 <select
@@ -233,6 +235,7 @@ const [partList, setpartList] = useState([]);
                 </select>
               </div>
 
+              {/* Variant */}
               <div className="mb-3">
                 <label className="form-label">Car Variant</label>
                 <select
@@ -250,25 +253,28 @@ const [partList, setpartList] = useState([]);
                 </select>
               </div>
 
-             {categories.length > 0 && (
-  <div className="widget widget_categories mt-4">
-    <h5 className="widget_title">Part Categories</h5>
-    <ul className="category-list">
+              {/* Part Sections */}
+            {/* Part Sections */}
+{categories.length > 0 && (
+  <div className="widget bg-white widget_categories mt-4 p-0">
+    <h5 className="widget_title bg-theme-sidebar p-3">Part Sections</h5>
+    <ul className="category-list p-3">
       {categories.map((cat) => (
         <li key={cat.id}>
           <Link
             to="#"
             onClick={() => setSelectedCategory(String(cat.id))}
-            className={selectedCategory === String(cat.id) ? "active-category" : ""}
+            className={
+              selectedCategory === String(cat.id) ? "active-category" : ""
+            }
           >
-            {cat.name} ({cat.part_count})
+            {cat.name} ({cat.part_groups_count ?? 0})
           </Link>
         </li>
       ))}
     </ul>
   </div>
 )}
-
 
             </aside>
           </div>
@@ -279,4 +285,3 @@ const [partList, setpartList] = useState([]);
 };
 
 export default PartGroupList;
-

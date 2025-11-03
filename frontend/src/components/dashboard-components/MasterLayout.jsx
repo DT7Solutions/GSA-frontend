@@ -325,6 +325,26 @@ const MasterLayout = ({ children }) => {
 
                             </ul>
                         </li>
+                       <li className='dropdown'>
+  <Link to='#'>
+    <Icon icon='mdi:form-outline' className='menu-icon' />
+    <span>Enquirys</span>
+  </Link>
+  <ul className='sidebar-submenu'>
+    <li>
+      <NavLink
+        to='/enquiry-queries'
+        className={(navData) =>
+          navData.isActive ? "active-page" : ""
+        }
+      >
+        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+        Queries
+      </NavLink>
+    </li>
+  </ul>
+</li>
+
 
                         {/* <li>
                             <NavLink

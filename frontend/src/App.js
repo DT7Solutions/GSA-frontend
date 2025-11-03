@@ -51,6 +51,7 @@ import CarModelPages from "./pages/dashboard-pages/ProductsPages/CarModelPages"
 import CarVariantListPages from "./pages/dashboard-pages/ProductsPages/CarVariantListPages"
 import CarPartCategoryPages from "./pages/dashboard-pages/ProductsPages/carPartCategoryPages"
 import CarPartGroupPages from "./pages/dashboard-pages/ProductsPages/carPartGroupPages"
+import Enquiryformpages from "./pages/dashboard-pages/Enquiryformpages"
 
 import UnauthorizedPage from "./pages/UnauthorizedPage"
 import Commingsoon from "./pages/Commingsoon"
@@ -119,6 +120,8 @@ function App() {
           <Route path="/car-variants" element={<CarVariantListPages />} />
           <Route path="/car-category" element={<CarPartCategoryPages />} />
           <Route path="/car-group-part" element={<CarPartGroupPages />} />
+
+          <Route path="/enquiry-queries" element={<Enquiryformpages />} />
         </Route>
 
         <Route element={<PrivateRoute requiredRoles={["customer"]} />}>

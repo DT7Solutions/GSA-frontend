@@ -150,3 +150,26 @@
 
 
 
+.bg-theme-table{
+  background-color: #0068A5!important;
+}
+.bg-theme-color{
+  color:#fff!important;
+}
+
+
+/* sidebar ui */
+/* .widget_title {
+  background-color: #0068A5!important;
+  color:#fff!important
+} */
+
+
+.sidebar-shop .widget_categories li:not(:last-child) a {
+  border:none!important;
+}
+
+.bg-theme-sidebar{
+  background-color: #0068A5!important;
+  color:#fff!important;
+}

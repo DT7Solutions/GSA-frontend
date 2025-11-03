@@ -159,23 +159,39 @@ const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   };
 
   // Fetch categories based on variant id
-  const fetchCategoriesByVariant = async (variantId) => {
-    if (!variantId) return;
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}api/home/car_variant_category_group/${variantId}/`
-      );
-      setCategories(response.data);
+  // const fetchCategoriesByVariant = async (variantId) => {
+  //   if (!variantId) return;
+  //   try {
+  //     const response = await axios.get(
+  //       `${API_BASE_URL}api/home/car_variant_category_group/${variantId}/`
+  //     );
+  //     setCategories(response.data);
 
-      // Update localStorage
-      const selectedBrandLS =
-        JSON.parse(localStorage.getItem("selected_brand")) || {};
-      selectedBrandLS.model_variant = variantId;
-      localStorage.setItem("selected_brand", JSON.stringify(selectedBrandLS));
-    } catch (error) {
-      console.error("Error fetching part sections:", error);
-    }
-  };
+     
+  //     const selectedBrandLS =
+  //       JSON.parse(localStorage.getItem("selected_brand")) || {};
+  //     selectedBrandLS.model_variant = variantId;
+  //     localStorage.setItem("selected_brand", JSON.stringify(selectedBrandLS));
+  //   } catch (error) {
+  //     console.error("Error fetching part sections:", error);
+  //   }
+  // };
+  const fetchCategoriesByVariant = async (variantId) => {
+  if (!variantId) return;
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}api/home/car_part_count_part_group_count/${variantId}/`
+    );
+    setCategories(response.data);
+
+    const selectedBrandLS =
+      JSON.parse(localStorage.getItem("selected_brand")) || {};
+    selectedBrandLS.model_variant = variantId;
+    localStorage.setItem("selected_brand", JSON.stringify(selectedBrandLS));
+  } catch (error) {
+    console.error("Error fetching part sections:", error);
+  }
+};
 
 
   // Load categories from localStorage on page load
@@ -543,57 +559,58 @@ const handlePartGroupClick = async (groupId) => {
                 </div>
               </div>
 
-<div className="widget widget_categories mt-5 bg-white">
-  <h3 className="widget_title">Product categories</h3>
-  <ul className="category-list">
+<div className="widget widget_categories mt-5 bg-white  rounded shadow-sm border p-0">
+  <h3 className="widget_title mb-3  border-bottom fw-bold text-dar p-3 bg-theme-sidebar">Product Categories</h3>
+  <ul className="category-list list-unstyled mb-0 p-3">
     {categories.length > 0 ? (
       categories.map((category) => (
-        <li key={category.id}>
+        <li key={category.id} className="mb-3">
           <div
-            className="category-toggle"
+            className="category-card d-flex justify-content-between align-items-center p-3 rounded border hover-shadow"
             onClick={() => handleCategoryClick(category.id)}
-            style={{
-              cursor: "pointer",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
+            style={{ cursor: "pointer" }}
           >
-            <span>{category.name} ({category.part_count})</span>
-            <span>{expandedCategoryId === category.id ? "▾" : "▸"}</span>
+            <span className="fw-semibold text-dark">
+              {category.name}{" "}
+              <span className="text-muted">({category.part_groups_count})</span>
+            </span>
+            <span className="toggle-square">
+              {expandedCategoryId === category.id ? "⊟" : "⊞"}
+            </span>
           </div>
 
           {expandedCategoryId === category.id &&
             partGroupsByCategory[category.id] &&
             partGroupsByCategory[category.id].length > 0 && (
-              <ul className="part-group-list" style={{ paddingLeft: "15px", marginTop: "8px" }}>
+              <ul className="part-group-list list-unstyled ps-3 mt-2">
                 {partGroupsByCategory[category.id].map((group) => (
-                  <li key={group.id}>
+                  <li key={group.id} className="mb-3 mt-3">
                     <div
+                      className="part-group-card d-flex justify-content-between align-items-center p-2 rounded border hover-bg-light"
                       onClick={() => handlePartGroupClick(group.id)}
-                      style={{
-                        cursor: "pointer",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
+                      style={{ cursor: "pointer" }}
                     >
-                      <span>
-                         <Link to={`/shop/${group.id}`}>
+                      <Link
+                        to={`/shop/${group.id}`}
+                        className="text-decoration-none text-secondary fw-medium p-3 mb-0"
+                      >
                         {group.name}
-                        </Link>
+                      </Link>
+                      <span className="toggle-square p-3">
+                        {expandedPartGroupId === group.id ? "⊟" : "⊞"}
                       </span>
-                      <span>{expandedPartGroupId === group.id ? "▾" : "▸"}</span>
                     </div>
 
-                   
                     {expandedPartGroupId === group.id &&
                       partItemsByGroup[group.id] &&
                       partItemsByGroup[group.id].length > 0 && (
-                        <ul className="part-item-list" style={{ paddingLeft: "15px", marginTop: "6px" }}>
+                        <ul className="part-item-list list-unstyled ps-4 mt-2">
                           {partItemsByGroup[group.id].map((item) => (
-                            <li key={item.id}>
-                              <Link to={`/shop-details/${item.id}`}>
+                            <li key={item.id} className="py-1">
+                              <Link
+                                to={`/shop-details/${item.id}`}
+                                className="text-decoration-none text-muted hover-text-dark"
+                              >
                                 {item.product_name || item.name}
                               </Link>
                             </li>
@@ -611,6 +628,7 @@ const handlePartGroupClick = async (groupId) => {
     )}
   </ul>
 </div>
+
 
 
 
