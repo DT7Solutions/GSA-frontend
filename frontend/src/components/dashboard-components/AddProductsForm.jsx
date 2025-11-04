@@ -4,7 +4,7 @@ import Select from 'react-select';
 import axios from "axios";
 import API_BASE_URL from "../../config";
 import Swal from "sweetalert2";
-
+import BulkProductUpload from './BulkProductUpload'; // Adjust path as needed
  
 
 
@@ -560,6 +560,7 @@ const AddProductsForm = () => {
             <div className="card">
                 <div className="card-header">
                     <h5 className="card-title mb-0">Add Products</h5>
+                    <BulkProductUpload />
                 </div>
                 <div className="card-body">
                     <form className="row gy-3 needs-validation input-style" noValidate onSubmit={handleSubmit}>

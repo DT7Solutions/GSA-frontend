@@ -235,35 +235,35 @@ const UpdateProductsForm = () => {
     }, [id, token]);
 
 
-  const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    setFormData({ ...formData, partImage: file });
-    const reader = new FileReader();
-    reader.onload = () => setPreviewImage(reader.result);
-    reader.readAsDataURL(file);
-  }
-};
-
-
-    // Handle final product update logic
-   const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    let payload;
-    let headers;
+    const payload = new FormData();
+    
+    // Add all form fields except the image first
+    payload.append('car_make_id', formData.car_make_id);
+    payload.append('car_model_id', formData.car_model_id);
+    payload.append('car_variant_id', formData.car_variant_id);
+    payload.append('part_section_id', formData.part_section_id);
+    payload.append('part_group_id', formData.part_group_id);
+    payload.append('partName', formData.partName);
+    payload.append('partNumber', formData.partNumber);
+    payload.append('figureNumber', formData.figureNumber);
+    payload.append('price', formData.price);
+    payload.append('salePrice', formData.salePrice);
+    payload.append('discount', formData.discount);
+    payload.append('qty', formData.qty);
+    payload.append('sku', formData.sku);
+    payload.append('remarks', formData.remarks);
+    payload.append('description', formData.description);
 
-    // Always use FormData when dealing with file uploads
-    payload = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      // Only append values that exist
-      if (value !== null && value !== undefined) {
-        payload.append(key, value);
-      }
-    });
+    // Only append the image if a new one was selected
+    if (formData.partImage && formData.partImage instanceof File) {
+      payload.append('partImage', formData.partImage);
+    }
 
-    headers = {
+    const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "multipart/form-data",
     };
@@ -274,7 +274,6 @@ const UpdateProductsForm = () => {
       { headers }
     );
 
-    // ✅ Only show success if server returns 200
     if (response.status === 200) {
       Swal.fire({
         title: "Success",
@@ -286,7 +285,6 @@ const UpdateProductsForm = () => {
   } catch (error) {
     console.error("Backend error:", error.response);
 
-    // Extract meaningful error messages
     const errorData = error.response?.data;
     let errorMessage = "Failed to update part";
 
@@ -294,7 +292,6 @@ const UpdateProductsForm = () => {
       if (errorData.message) {
         errorMessage = errorData.message;
       } else if (errorData.errors) {
-        // Convert field errors into a readable string
         errorMessage = Object.entries(errorData.errors)
           .map(([field, msgs]) => `${field}: ${msgs.join(", ")}`)
           .join("\n");
@@ -312,6 +309,32 @@ const UpdateProductsForm = () => {
   }
 };
 
+// Add state to track the original/existing image URL
+const [existingImageUrl, setExistingImageUrl] = useState('');
+
+// Updated handleImageChange function with clear preview
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    // Store the file object
+    setFormData({ ...formData, partImage: file });
+    
+    // Create preview for new image
+    const reader = new FileReader();
+    reader.onload = () => setPreviewImage(reader.result);
+    reader.readAsDataURL(file);
+  }
+};
+
+// Add a function to clear/remove the selected image and restore existing one
+const handleRemoveImage = () => {
+  setFormData({ ...formData, partImage: '' });
+  // Restore the existing image preview
+  setPreviewImage(existingImageUrl);
+  // Reset the file input
+  const fileInput = document.querySelector('input[name="partImage"]');
+  if (fileInput) fileInput.value = '';
+};
 
 
     const carMakeOptions = carMakes.map(make => ({ value: make.id, label: make.name }));
@@ -438,35 +461,57 @@ const UpdateProductsForm = () => {
     <div className="invalid-feedback">Please enter part name.</div>
   </div>
  <div className="col-md-4">
-              <label className="form-label">Part Image</label>
-              <input
-                type="file"
-                name="partImage"
-                className="form-control"
-                onChange={handleImageChange}
-                accept="image/*"
-              />
-            {previewImage && (
-  <div className="mt-2">
-    <p className="mb-1">
-      {formData.partImage ? "New Preview:" : "Current Image:"}
-    </p>
-    <img
-      src={previewImage}
-      alt="Preview"
-      style={{
-        width: "120px",
-        height: "120px",
-        borderRadius: "5px",
-        border: "1px solid #ccc",
-        objectFit: "cover",
-      }}
-    />
-  </div>
-)}
-
-            </div>
-
+  <label className="form-label">Part Image</label>
+  <input
+    type="file"
+    name="partImage"
+    className="form-control"
+    onChange={handleImageChange}
+    accept="image/*"
+  />
+  
+  {previewImage && (
+    <div className="mt-3">
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <p className="mb-0 text-muted small">
+          {formData.partImage instanceof File ? "New Image Preview:" : "Current Image:"}
+        </p>
+        {formData.partImage instanceof File && (
+          <button
+            type="button"
+            className="btn btn-sm btn-danger"
+            onClick={handleRemoveImage}
+          >
+            Remove
+          </button>
+        )}
+      </div>
+      <div className="position-relative" style={{ width: "120px" }}>
+        <img
+          src={previewImage}
+          alt="Preview"
+          style={{
+            width: "120px",
+            height: "120px",
+            borderRadius: "8px",
+            border: "2px solid #e0e0e0",
+            objectFit: "cover",
+          }}
+        />
+        {formData.partImage instanceof File && (
+          <span 
+            className="badge bg-success position-absolute top-0 end-0 m-1"
+            style={{ fontSize: "10px" }}
+          >
+            New
+          </span>
+        )}
+      </div>
+    </div>
+  )}
+  
+  <div className="invalid-feedback">Please select a valid image file.</div>
+</div>
                         {/* Part Number */}
                         <div className="col-md-4">
                             <label className="form-label">Part Number</label>

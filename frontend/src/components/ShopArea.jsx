@@ -651,7 +651,7 @@ const handlePartGroupClick = async (groupId) => {
 
                     <button
   type="button"
-  className="button btn"
+  className="button btn p-0"
   onClick={() => handleRangeChange(range)}
 >
   Filter
