@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
 import { CartContext } from "../context/CartContext";
 
+
 const ShopArea = ({ id }) => {
   const [range, setRange] = useState([0, 100]);
   const [productData, setProductData] = useState([]);
@@ -357,7 +358,7 @@ const handlePartGroupClick = async (groupId) => {
                     />
                   </Link>
                 </div>
-                <div className="product-content">
+                <div className="product-content text-center">
                   <h3 className="product-title">
                     <Link to={`/shop-details/${product.id}`}>
                       {product.product_name || "Unnamed Product"}
@@ -372,7 +373,7 @@ const handlePartGroupClick = async (groupId) => {
                     className="link-btn"
                     onClick={() => handleAddToCart(product.id)}
                   >
-                    Add to cart <i className="fas fa-arrow-right" />
+                    Add to cart <i className="fas fa-shopping-cart me-2" />
                   </Link>
                 </div>
               </div>
@@ -651,7 +652,7 @@ const handlePartGroupClick = async (groupId) => {
 
                     <button
   type="button"
-  className="button btn p-0"
+  className=" p-0"
   onClick={() => handleRangeChange(range)}
 >
   Filter

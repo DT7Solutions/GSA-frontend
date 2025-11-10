@@ -23,7 +23,7 @@ const HeroFive = () => {
             <div
               className="hero-slide"
               style={{
-                backgroundImage: "url(assets/img/hero/banner-2.jpg)",
+                backgroundImage: "url(assets/img/bg/GSA-banner.jpg)",
               }}
             >
               <div className="container">
@@ -64,7 +64,7 @@ const HeroFive = () => {
             <div
               className="hero-slide"
               style={{
-                backgroundImage:  `url(${process.env.PUBLIC_URL}/assets/img/hero/banner-2.jpg)`,
+                backgroundImage:  `url(${process.env.PUBLIC_URL}/assets/img/bg/GSA-bg.jpg)`,
                
               }}
             >
@@ -72,10 +72,10 @@ const HeroFive = () => {
                 <div className="row">
                   <div className="col-xxl-6 col-xl-5 col-lg-6">
                     <div className="hero-style2">
-                      <h1 className="hero-title text-white">
+                      <h1 className="hero-title text-dark">
                         The ProfessionalCar Repair system.
                       </h1>
-                      <p className="hero-text text-white">
+                      <p className="hero-text text-dark">
                         Vestibulum rhoncus nisl ac gravida porta. Mauris eu
                         sapien lacus. Etiam molestie justo neque, in convallis
                         massa tempus in.

@@ -35,7 +35,7 @@ const Login = () => {
         setOtpSent(true);
         Swal.fire({
           title: "OTP Sent",
-          text: "An OTP has been sent to your phone number.",
+          text: `An OTP has been sent to your phone number. Your OTP is ${response.data.otp}`,
           icon: "success",
           confirmButtonText: "OK",
         });
@@ -148,21 +148,29 @@ const handleLogin = async (e) => {
             
                 {isOtpLogin ? (
                   <>
-                    <div className="mb-3">
-                      <label className="form-label">Phone Number</label>
-                      <div className="input-group">
-                        <span className="input-group-text">+91</span>
-                        <input
-                          type="tel"
-                          className="form-control"
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          placeholder="Enter phone number"
-                          required
-                          disabled={otpSent}
-                        />
-                      </div>
-                    </div>
+                   <div className="mb-3">
+  <label className="form-label">Phone Number</label>
+  <div className="input-group">
+    <span className="input-group-text">+91</span>
+    <input
+      type="tel"
+      className="form-control"
+      value={phoneNumber}
+      onChange={(e) => {
+        const value = e.target.value;
+       
+        if (/^\d{0,10}$/.test(value)) {
+          setPhoneNumber(value);
+        }
+      }}
+      placeholder="Enter phone number"
+      required
+      maxLength={10}
+      disabled={otpSent}
+    />
+  </div>
+</div>
+
 
                     {/* OTP Input Field */}
                     {otpSent && (

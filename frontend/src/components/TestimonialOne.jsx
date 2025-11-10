@@ -24,7 +24,7 @@ const TestimonialOne = () => {
                     prevEl: ".testimonialOne-button-prev",
                   }}
                   spaceBetween={20}
-                  slidesPerGroup={1}
+                  slidesPerGroup={2}
                   speed={1000}
                   autoplay={{ delay: 6000 }}
                   pagination={true}
@@ -44,10 +44,10 @@ const TestimonialOne = () => {
                       slidesPerView: 1,
                     },
                     1200: {
-                      slidesPerView: 1,
+                      slidesPerView: 2,
                     },
                     1400: {
-                      slidesPerView: 1,
+                      slidesPerView: 2,
                     },
                   }}
                 >

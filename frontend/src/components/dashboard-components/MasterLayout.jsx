@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import ThemeToggleButton from "../../helper/ThemeToggleButton";
+// import ThemeToggleButton from "../../helper/ThemeToggleButton";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import API_BASE_URL from "../../config";
@@ -396,8 +396,8 @@ const MasterLayout = ({ children }) => {
                         </div>
                         <div className='col-auto'>
                             <div className='d-flex flex-wrap align-items-center gap-4'>
-                                {/* ThemeToggleButton */}
-                                <ThemeToggleButton />
+                               
+                          
                                 <div className='dropdown'>
                                     <button
                                         className='d-flex justify-content-center align-items-center rounded-circle'

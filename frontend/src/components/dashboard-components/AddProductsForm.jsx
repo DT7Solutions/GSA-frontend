@@ -845,7 +845,7 @@ const AddProductsForm = () => {
 
 
                         <div className="col-12">
-                            <button className="btn btn-primary-600 style2" type="submit">
+                            <button className="btn btn-primary-600 style2" style={{ position: "unset" }} type="submit">
                             Add Car Part
                             </button>
                         </div>

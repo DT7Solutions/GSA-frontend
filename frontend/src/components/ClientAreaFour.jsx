@@ -127,7 +127,7 @@ const ClientAreaFour = () => {
                   <div className="brandslider">
                     <div className="category-card-item">
                       <img
-                       src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/jaguar.png`}
+                       src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/Jaguar.png`}
                         alt="Fixturbo"
                       />
                     </div>
@@ -137,7 +137,7 @@ const ClientAreaFour = () => {
                   <div className="brandslider">
                     <div className="category-card-item">
                       <img
-                       src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/ford.png`}
+                       src={`${process.env.PUBLIC_URL}/assets/img/update-img/client/Ford.png`}
                         alt="Fixturbo"
                       />
                     </div>

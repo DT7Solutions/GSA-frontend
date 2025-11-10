@@ -2,7 +2,8 @@
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute"; 
 import RouteScrollToTop from "./helper/RouteScrollToTop";
-import ScrollToTop from "react-scroll-to-top";
+// import ScrollToTop from "react-scroll-to-top";
+import ScrollToTop from "./components/ScrollToTop";
 import AboutPage from "./pages/AboutPage";
 import ServicePage from "./pages/ServicePage";
 import ServiceDetailsPage from "./pages/ServiceDetailsPage";

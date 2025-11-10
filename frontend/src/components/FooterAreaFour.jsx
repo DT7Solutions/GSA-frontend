@@ -3,17 +3,24 @@ import { Link } from "react-router-dom";
 
 const FooterAreaFour = () => {
   return (
-    <footer
+    // <footer
+    //   className="footer-wrapper footer-layout4"
+    //   style={{ backgroundImage: "url(assets/img/bg/footer-bg2-1.png)" }}
+    // >
+       <footer
       className="footer-wrapper footer-layout4"
-      style={{ backgroundImage: "url(assets/img/bg/footer-bg2-1.png)" }}
+      
     >
       <div className="container">
         <div className="widget-area">
           <div className="row justify-content-between">
             <div className="col-md-6 col-xl-4">
               <div className="widget footer-widget widget-about">
-                <h3 className="widget_title">About Us</h3>
-                <p className="footer-text mb-30">
+                 <Link to="/" className="footer-logo ">
+                                  <img src={`${process.env.PUBLIC_URL}/assets/img/footer-logo.png`} alt="Gowri Sankaragencies " className="footer-logo-img" />
+                                </Link>
+                {/* <h3 className="widget_title">About Us</h3> */}
+                <p className="footer-text mb-30 mt-2">
                  A one stop service corner for all your car needs.
 Authorised dealers for Hyundai, Toyota and Ford.
 Available in Guntur
@@ -118,12 +125,12 @@ Available in Guntur
           <div className="row gy-3 justify-content-md-between justify-content-center">
             <div className="col-auto align-self-center">
               <p className="copyright-text text-center">
-                © <Link to="#">GOWRISANKAR AGENCIES</Link> 2025 | All Rights Reserved
+                © <Link to="#" className="highlight-text">GOWRISANKAR AGENCIES</Link> 2025 | All Rights Reserved
               </p>
             </div>
             <div className="col-auto">
               <div className="footer-links">
-                <p> Designed by <a href="https://dt7.agency/" target="_blank" rel="noopener noreferrer">
+                <p className="m-0"> Designed by <a href="https://dt7.agency/" target="_blank" rel="noopener noreferrer">
                   Dt7 Agency
                 </a></p>
                 
