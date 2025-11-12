@@ -365,7 +365,7 @@ const handlePartGroupClick = async (groupId) => {
                     </Link>
                   </h3>
                   <span className="price">
-                    <del>₹{product.sale_price}</del> ₹{product.price} &nbsp;
+                    <del>₹{product.price}</del> ₹{product.sale_price} &nbsp;
                   </span>
 
                   <Link

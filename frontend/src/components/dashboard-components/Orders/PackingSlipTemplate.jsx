@@ -3,6 +3,11 @@ import React, { forwardRef } from "react";
 const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
   const user = order.user || {};
   const items = order.items || [];
+  const shippingAddress = order.shipping_address || {};
+  
+  console.log("🧾 Order Data:", order);
+  console.log("📦 Items:", items);
+  console.log("🚚 Shipping Address:", shippingAddress);
 
   // ✅ Calculate totals safely (supports various backend field names)
   const subtotal = items.reduce(
@@ -44,7 +49,6 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "flex-end",
-    //   borderBottom: "1px solid #eaeaea",
       paddingBottom: "25px",
       marginBottom: "20px",
     },
@@ -97,6 +101,14 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       wordBreak: "break-word",
       whiteSpace: "normal",
     },
+    thtd2: {
+      lineHeight: "1.55em",
+      padding: "1px 1px",
+      border: "1px solid #ccc",
+      textAlign: "left",
+      wordBreak: "break-word",
+      whiteSpace: "normal",
+    },
     focusBg: {
       background: "#f6f6f6",
     },
@@ -109,6 +121,17 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       fontSize: "14px",
       color: "#333",
     },
+  };
+
+  // ✅ Use shipping address if available, otherwise fall back to user billing address
+  const deliveryAddress = {
+    name: shippingAddress?.name || `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "N/A",
+    address: shippingAddress?.address || user?.address || "N/A",
+    city: shippingAddress?.city || user?.city || "",
+    district: shippingAddress?.district || user?.district || "",
+    state: shippingAddress?.state || user?.state || "",
+    zip: shippingAddress?.zip || shippingAddress?.pincode || user?.pincode || "",
+    phone: shippingAddress?.phone || user?.phone || "",
   };
 
   return (
@@ -144,18 +167,27 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
             <div>Phone: {company.phone || "+91 92480 22760"}</div>
           </div>
 
-          {/* Deliver To (Customer) */}
+          {/* Deliver To (Shipping Address) - FIXED */}
           <div style={{ ...styles.addressBlock, ...styles.textRight }}>
             <b style={styles.strongText}>Deliver To:</b>
-            <div>
-              {user.first_name || ""} {user.last_name || ""}
-            </div>
-            <div>{user.address || ""}</div>
-            <div>
-              {user.city || ""}, {user.state || ""}{" "}
-              {user.pincode ? `- ${user.pincode}` : ""}
-            </div>
-            <div>Phone: {user.phone || ""}</div>
+            {deliveryAddress.name && <div>{deliveryAddress.name}</div>}
+            {deliveryAddress.address && <div>{deliveryAddress.address}</div>}
+            {(deliveryAddress.city || deliveryAddress.district) && (
+              <div>
+                {deliveryAddress.city}
+                {deliveryAddress.city && deliveryAddress.district && ", "}
+                {deliveryAddress.district}
+              </div>
+            )}
+            {(deliveryAddress.state || deliveryAddress.zip) && (
+              <div>
+                {deliveryAddress.state}
+                {deliveryAddress.state && deliveryAddress.zip && " - "}
+                {deliveryAddress.zip}
+              </div>
+            )}
+            {deliveryAddress.phone && <div>Phone: {deliveryAddress.phone}</div>}
+            {!deliveryAddress.name && !deliveryAddress.address && <div>N/A</div>}
           </div>
         </div>
 
@@ -175,18 +207,16 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
               {items.length ? (
                 items.map((item, idx) => {
                   const qty = Number(item.quantity) || 1;
-                  const unitPrice =
-                    Number(item.unit_price) ||
-                    Number(item.price) ||
-                    Number(item.unitPrice) ||
-                    0;
+                  const unitPrice = Number(item.unit_price) || Number(item.price) || 0;
                   const total = qty * unitPrice;
+
+                  // ✅ Correct product name field
+                  const productName = item.part_name || "N/A";
+
                   return (
                     <tr key={idx}>
                       <td style={styles.thtd}>{idx + 1}</td>
-                      <td style={styles.thtd}>
-                        {item.part_group_name || item.name || "N/A"}
-                      </td>
+                      <td style={styles.thtd}>{productName}</td>
                       <td style={styles.thtd}>{qty}</td>
                       <td style={styles.thtd}>{unitPrice.toFixed(2)}</td>
                       <td style={styles.thtd}>{total.toFixed(2)}</td>
@@ -195,10 +225,7 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                 })
               ) : (
                 <tr>
-                  <td
-                    style={{ ...styles.thtd, ...styles.textCenter }}
-                    colSpan={5}
-                  >
+                  <td style={{ ...styles.thtd, ...styles.textCenter }} colSpan={5}>
                     No items
                   </td>
                 </tr>

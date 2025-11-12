@@ -6,31 +6,33 @@ import Swal from "sweetalert2";
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 
-
-
 const Cart = () => {
-
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
   const { fetchCartCount } = useContext(CartContext);
- const [isConfirmed, setIsConfirmed] = useState(false);
-const [isAddressUpdated, setIsAddressUpdated] = useState(false);
+  const [isShippingSameAsBilling, setIsShippingSameAsBilling] = useState(false);
 
-
+  const [billing, setBilling] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    district: "",
+    zip: "",
+  });
 
   const [shipping, setShipping] = useState({
-  name: "",
-  email: "",
-  phone: "",
-  address: "",
-  city: "",
-  
-  state: "",
-  district: "",
-  zip: "",
-});
-
-
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    district: "",
+    zip: "",
+  });
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -50,29 +52,29 @@ const [isAddressUpdated, setIsAddressUpdated] = useState(false);
     };
 
     const fetchUserProfile = async () => {
-    const token = localStorage.getItem("accessToken");
-    try {
-      const res = await axios.get(`${API_BASE_URL}api/auth/user/profile/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const token = localStorage.getItem("accessToken");
+      try {
+        const res = await axios.get(`${API_BASE_URL}api/auth/user/profile/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const { first_name, last_name, email, phone, state, city, district, address, pincode } = res.data;
+        const { first_name, last_name, email, phone, state, city, district, address, pincode } = res.data;
 
-      setShipping((prev) => ({
-        ...prev,
-        name: `${first_name} ${last_name}`.trim(),
-        email,
-        phone,
-        address,
-        city,
-        state,
-        district,
-        zip: pincode,
-      }));
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-    }
-  };
+        setBilling((prev) => ({
+          ...prev,
+          name: `${first_name} ${last_name}`.trim(),
+          email,
+          phone,
+          address,
+          city,
+          state,
+          district,
+          zip: pincode,
+        }));
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
 
     fetchCartItems();
     fetchUserProfile();
@@ -92,7 +94,7 @@ const [isAddressUpdated, setIsAddressUpdated] = useState(false);
         }
       );
       Swal.fire({
-        title: "Cart updated ",
+        title: "Cart updated",
         text: "Cart updated successfully",
         icon: "success",
         confirmButtonText: "OK",
@@ -105,17 +107,14 @@ const [isAddressUpdated, setIsAddressUpdated] = useState(false);
       );
       fetchCartCount();
       navigate("/cart");
-      
     } catch (error) {
-      console.error('Error updating cart:', error);
+      console.error("Error updating cart:", error);
     }
   };
 
-
-  
   const handleRemoveItem = async (itemId, e) => {
-     e.preventDefault(); 
-    const token = localStorage.getItem('accessToken');
+    e.preventDefault();
+    const token = localStorage.getItem("accessToken");
     try {
       await axios.delete(`${API_BASE_URL}api/home/cart/remove/${itemId}/`, {
         headers: {
@@ -130,10 +129,8 @@ const [isAddressUpdated, setIsAddressUpdated] = useState(false);
         icon: "success",
         confirmButtonText: "OK",
       });
-      
-     
     } catch (error) {
-      console.error('Error removing item from cart:', error);
+      console.error("Error removing item from cart:", error);
       Swal.fire({
         title: "Error",
         text: "There was an issue removing the item from the cart.",
@@ -143,145 +140,238 @@ const [isAddressUpdated, setIsAddressUpdated] = useState(false);
     }
   };
 
-const subtotal = cartItems.reduce((acc, item) => acc + item.total_price, 0);
-const cgst = subtotal * 0.09;
-const sgst = subtotal * 0.09;
-const totalWithGST = subtotal + cgst + sgst;
-  
-const handleUpdateAddress = async () => {
-  const { email, phone, address, city, state, district, zip } = shipping;
+  const subtotal = cartItems.reduce((acc, item) => acc + item.total_price, 0);
+  const cgst = subtotal * 0.09;
+  const sgst = subtotal * 0.09;
+  const totalWithGST = subtotal + cgst + sgst;
 
-  // Validation
-  if (!email || !phone || !address || !city || !state || !district || !zip) {
-    Swal.fire("Missing Fields", "Please fill out all shipping address fields.", "warning");
-    return;
-  }
+  // ✅ NEW: Auto-save billing address to user profile
+  const handleUpdateBillingAddress = async () => {
+    const { name, email, phone, address, city, state, district, zip } = billing;
 
-  const token = localStorage.getItem("accessToken");
-  const [first_name, ...rest] = shipping.name.split(" ");
-  const last_name = rest.join(" ");
+    if (!name || !email || !phone || !address || !city || !state || !district || !zip) {
+      Swal.fire("Missing Fields", "Please fill out all billing address fields.", "warning");
+      return;
+    }
 
-  try {
-    await axios.patch(
-      `${API_BASE_URL}api/auth/user/profile/`,
-      {
-        first_name: first_name || "",
-        last_name: last_name || "",
-        email,
-        phone,
-        address,
-        city,
-        district,
-        state,
-        pincode: zip,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    const token = localStorage.getItem("accessToken");
+    const [first_name, ...rest] = name.split(" ");
+    const last_name = rest.join(" ");
+
+    try {
+      await axios.patch(
+        `${API_BASE_URL}api/auth/user/profile/`,
+        {
+          first_name: first_name || "",
+          last_name: last_name || "",
+          email,
+          phone,
+          address,
+          city,
+          district,
+          state,
+          pincode: zip,
         },
-      }
-    );
-
-    Swal.fire("Success", "Shipping address updated in your profile.", "success");
-    setIsAddressUpdated(true); // ✅ Enable Proceed to Checkout
-  } catch (error) {
-    console.error("Error updating address:", error);
-    Swal.fire("Error", "Failed to update address in profile.", "error");
-  }
-};
-
-
-
-
- const handleCheckout = async () => {
-  if (!isAddressUpdated) {
-    Swal.fire({
-      title: "Update Required",
-      text: "Please update your shipping address by clicking the Update Address button.",
-      icon: "info",
-      confirmButtonText: "OK",
-    });
-    return;
-  }
-
-  const token = localStorage.getItem("accessToken");
-
-  try {
-    const { data } = await axios.post(
-      `${API_BASE_URL}api/home/payment/order/`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const options = {
-      key: data.razorpay_key,
-      amount: totalWithGST,
-      currency: data.currency,
-      name: "Car Parts Store",
-      description: "Car Parts Purchase",
-      order_id: data.order_id,
-      handler: async function (response) {
-        try {
-          const verifyRes = await axios.post(
-            `${API_BASE_URL}api/home/payment/verify/`,
-            {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          Swal.fire("Order Placed!", "Your payment was successful.", "success");
-          navigate(`/thank-you?order_id=${verifyRes.data.order_id}`);
-        } catch (verifyError) {
-          console.error("Payment verification failed", verifyError);
-          Swal.fire("Payment Failed", "Could not verify payment.", "error");
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      },
-      prefill: {
-        name: shipping.name,
-        email: shipping.email,
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
+      );
 
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  } catch (error) {
-    console.error("Error initiating Razorpay order", error);
-    Swal.fire("Error", "Failed to initiate payment.", "error");
-  }
-};
+      Swal.fire("Success", "Billing address saved to your profile.", "success");
+    } catch (error) {
+      console.error("Error updating address:", error);
+      Swal.fire("Error", "Failed to update billing address in profile.", "error");
+    }
+  };
 
+  const handleCheckout = async () => {
+    // ✅ Auto-save billing address before checkout
+    const { name, email, phone, address, city, state, district, zip } = billing;
 
+    // Validate billing address
+    if (!name || !email || !phone || !address || !city || !state || !district || !zip) {
+      Swal.fire("Missing Fields", "Please fill out all billing address fields.", "warning");
+      return;
+    }
 
-const handleShippingChange = (field, value) => {
-  setShipping((prev) => ({
-    ...prev,
-    [field]: value,
-  }));
-  setIsConfirmed(false);         // ✅ Uncheck the checkbox
-  setIsAddressUpdated(false);    // ✅ Require re-update of address
-};
+    // Validate shipping address
+    const shippingData = isShippingSameAsBilling ? billing : shipping;
+    const { name: shipName, email: shipEmail, phone: shipPhone, address: shipAddress, 
+            city: shipCity, state: shipState, district: shipDistrict, zip: shipZip } = shippingData;
 
+    if (!shipName || !shipEmail || !shipPhone || !shipAddress || !shipCity || !shipState || !shipDistrict || !shipZip) {
+      Swal.fire("Missing Fields", "Please fill out all shipping address fields including name.", "warning");
+      return;
+    }
 
+    const token = localStorage.getItem("accessToken");
 
+    try {
+      // ✅ Save billing address to user profile first
+      const [first_name, ...rest] = name.split(" ");
+      const last_name = rest.join(" ");
+
+      await axios.patch(
+        `${API_BASE_URL}api/auth/user/profile/`,
+        {
+          first_name: first_name || "",
+          last_name: last_name || "",
+          email,
+          phone,
+          address,
+          city,
+          district,
+          state,
+          pincode: zip,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("✅ Billing address saved to profile");
+
+      // Now proceed with payment
+      const { data } = await axios.post(
+        `${API_BASE_URL}api/home/payment/order/`,
+        {
+          shipping_address: {
+            name: shippingData.name,
+            email: shippingData.email,
+            phone: shippingData.phone,
+            address: shippingData.address,
+            city: shippingData.city,
+            state: shippingData.state,
+            district: shippingData.district,
+            zip: shippingData.zip,
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const options = {
+        key: data.razorpay_key,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Car Parts Store",
+        description: "Car Parts Purchase",
+        order_id: data.order_id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await axios.post(
+              `${API_BASE_URL}api/home/payment/verify/`,
+              {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            Swal.fire("Order Placed!", "Your payment was successful.", "success");
+            navigate(`/thank-you?order_id=${verifyRes.data.order_id}`);
+          } catch (verifyError) {
+            console.error("Payment verification failed", verifyError);
+            Swal.fire("Payment Failed", "Could not verify payment.", "error");
+          }
+        },
+        prefill: {
+          name: billing.name,
+          email: billing.email,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      Swal.fire("Error", "Failed to process checkout.", "error");
+    }
+  };
+
+  const handleBillingChange = (field, value) => {
+    setBilling((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleShippingChange = (field, value) => {
+    setShipping((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSameAsBillingChange = (checked) => {
+    setIsShippingSameAsBilling(checked);
+    if (checked) {
+      setShipping({
+        name: billing.name,
+        email: billing.email,
+        phone: billing.phone,
+        address: billing.address,
+        city: billing.city,
+        state: billing.state,
+        district: billing.district,
+        zip: billing.zip,
+      });
+    } else {
+      setShipping({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        city: "",
+        state: "",
+        district: "",
+        zip: "",
+      });
+    }
+  };
 
   return (
     <div className="space-top space-extra-bottom">
-      <div className=" container">
+      <div className="container">
         <form action="#" className="woocommerce-cart-form">
+          <style>{`
+            .cart_table thead th {
+              background-color: #0068a5;
+              color: white;
+              text-align: center;
+              vertical-align: middle;
+              padding: 15px 10px;
+            }
+            .cart_table tbody td {
+              text-align: center;
+              vertical-align: middle;
+              padding: 15px 10px;
+            }
+            .cart-productimage img {
+              margin: 0 auto;
+              display: block;
+            }
+            .quantity {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+          `}</style>
           <table className="cart_table">
             <thead>
               <tr>
@@ -316,7 +406,6 @@ const handleShippingChange = (field, value) => {
                       <bdi>₹{item.part.sale_price}</bdi>
                     </span>
                   </td>
-
                   <td data-title="Quantity">
                     <div className="quantity">
                       <button
@@ -330,7 +419,6 @@ const handleShippingChange = (field, value) => {
                       >
                         <i className="fas fa-minus" />
                       </button>
-
                       <input
                         type="number"
                         className="qty-input"
@@ -339,7 +427,6 @@ const handleShippingChange = (field, value) => {
                         max={item.part.stock_count}
                         readOnly
                       />
-
                       <button
                         className="quantity-plus qty-btn"
                         onClick={() => {
@@ -353,24 +440,19 @@ const handleShippingChange = (field, value) => {
                       </button>
                     </div>
                   </td>
-
                   <td data-title="Total">
                     <span className="amount">
                       <bdi>₹{item.total_price}</bdi>
                     </span>
                   </td>
                   <td data-title="Remove">
-                    {/* <button onClick={() => handleRemoveItem(item.id)} className="remove">
-                      <i className="fas fa-trash-alt" />
-                    </button> */}
                     <button
-  onClick={(e) => handleRemoveItem(item.id, e)}
-  className="remove"
-  type="button" // <- Add this!
->
-  <i className="fas fa-trash-alt" />
-</button>
-
+                      onClick={(e) => handleRemoveItem(item.id, e)}
+                      className="remove"
+                      type="button"
+                    >
+                      <i className="fas fa-trash-alt" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -378,149 +460,249 @@ const handleShippingChange = (field, value) => {
           </table>
         </form>
 
-        <div className="row cart-page justify-content-end">
-         <div className="col-md-6   ">
-          <div className="shipping-area p-3">
-    <h2 className="h4 summary-title">Shipping Address</h2>
-    <form >
-      <div className="form-group mb-3">
-        <label>Email</label>
-        <input
-          type="email"
-          className="form-control"
-          value={shipping.email}
-          onChange={(e) => handleShippingChange('email', e.target.value)}
-          required
-        />
-      </div>
-      <div className="form-group mb-3">
-        <label>Phone Number</label>
-        <input
-          type="tel"
-          className="form-control"
-          value={shipping.phone}
-          onChange={(e) => handleShippingChange('phone', e.target.value)}
-          required
-        />
-      </div>
-        <div className="form-group mb-3">
-        <label> D.no - Area address</label>
-        <input
-          type="text"
-          className="form-control"
-          value={shipping.address}
-          onChange={(e) => handleShippingChange('address', e.target.value)}
-          required
-        />
-      </div>
-          <div className="form-group mb-3">
-        <label>City</label>
-        <input
-          type="text"
-          className="form-control"
-          value={shipping.city}
-          onChange={(e) => handleShippingChange('city', e.target.value)}
-          required
-        />
-      </div>
-           <div className="form-group mb-3">
-        <label>District</label>
-        <input
-          type="text"
-          className="form-control"
-          value={shipping.district}
-          onChange={(e) => handleShippingChange('district', e.target.value)}
-          required
-        />
-      </div>
-       <div className="form-group mb-3">
-        <label>State</label>
-        <input
-          type="text"
-          className="form-control"
-          value={shipping.state}
-          onChange={(e) => handleShippingChange('state', e.target.value)}
-          required
-        />
-      </div>
-    
-  
-     
-      <div className="form-group mb-3">
-        <label>Zip Code</label>
-        <input
-          type="text"
-          className="form-control"
-          value={shipping.zip}
-          onChange={(e) => handleShippingChange('zip', e.target.value)}
-          required
-        />
-      </div>
-      <div className="form-check my-2">
-      <input
-        type="checkbox"
-        className="form-check-input"
-        id="confirmAddress"
-        checked={isConfirmed}
-        onChange={(e) => setIsConfirmed(e.target.checked)}
-      />
-      <label className="form-check-label" htmlFor="confirmAddress">
-        I confirm that the above address is correct and products will be shipped here.
-      </label>
-    </div>
+        <div className="row cart-page">
+          {/* Billing Address */}
+          <div className="col-md-6">
+            <div className="shipping-area p-3 mb-4">
+              <h2 className="h4 summary-title">Billing Address</h2>
+              <form>
+                <div className="row">
+                  <div className="col-md-12 mb-3">
+                    <label>Full Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={billing.name}
+                      onChange={(e) => handleBillingChange("name", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      value={billing.email}
+                      onChange={(e) => handleBillingChange("email", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>Phone Number</label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      value={billing.phone}
+                      onChange={(e) => handleBillingChange("phone", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-12 mb-3">
+                    <label>D.no - Area address</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={billing.address}
+                      onChange={(e) => handleBillingChange("address", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>City</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={billing.city}
+                      onChange={(e) => handleBillingChange("city", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>District</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={billing.district}
+                      onChange={(e) => handleBillingChange("district", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>State</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={billing.state}
+                      onChange={(e) => handleBillingChange("state", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>Zip Code</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={billing.zip}
+                      onChange={(e) => handleBillingChange("zip", e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div className="shipping-area p-3 mt-3 mb-4">
+              <h2 className="h4 summary-title">Shipping Address</h2>
+              <div className="form-check my-3">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="sameAsBilling"
+                  checked={isShippingSameAsBilling}
+                  onChange={(e) => handleSameAsBillingChange(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="sameAsBilling">
+                  Same as Billing Address
+                </label>
+              </div>
+              <form>
+                <div className="row">
+                  <div className="col-md-12 mb-3">
+                    <label>Full Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={isShippingSameAsBilling ? billing.name : shipping.name}
+                      onChange={(e) => handleShippingChange("name", e.target.value)}
+                      disabled={isShippingSameAsBilling}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      value={isShippingSameAsBilling ? billing.email : shipping.email}
+                      onChange={(e) => handleShippingChange("email", e.target.value)}
+                      disabled={isShippingSameAsBilling}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>Phone Number</label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      value={isShippingSameAsBilling ? billing.phone : shipping.phone}
+                      onChange={(e) => handleShippingChange("phone", e.target.value)}
+                      disabled={isShippingSameAsBilling}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-12 mb-3">
+                    <label>Address</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={isShippingSameAsBilling ? billing.address : shipping.address}
+                      onChange={(e) => handleShippingChange("address", e.target.value)}
+                      disabled={isShippingSameAsBilling}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>City</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={isShippingSameAsBilling ? billing.city : shipping.city}
+                      onChange={(e) => handleShippingChange("city", e.target.value)}
+                      disabled={isShippingSameAsBilling}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>District</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={isShippingSameAsBilling ? billing.district : shipping.district}
+                      onChange={(e) => handleShippingChange("district", e.target.value)}
+                      disabled={isShippingSameAsBilling}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>State</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={isShippingSameAsBilling ? billing.state : shipping.state}
+                      onChange={(e) => handleShippingChange("state", e.target.value)}
+                      disabled={isShippingSameAsBilling}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label>Zip Code</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={isShippingSameAsBilling ? billing.zip : shipping.zip}
+                      onChange={(e) => handleShippingChange("zip", e.target.value)}
+                      disabled={isShippingSameAsBilling}
+                      required
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
 
-    <button
-      onClick={(e) => {
-        e.preventDefault();
-        handleUpdateAddress();
-      }}
-      className="btn btn-secondary mt-2"
-      disabled={!isConfirmed} // ✅ Disable unless checkbox is checked
-    >
-      Update Address
-    </button>
-
-    </form>
-  </div>
-  </div>
-
-  {/* Cart Totals */}
-  <div className="col-md-6  ">
-    <div className="bg-white border-add p-3">
-    <h2 className="h4 summary-title  p-3 mb-0 ">Cart Totals</h2>
-    <table className="cart_totals ">
-      <tbody>
-        <tr>
-          <td>Subtotal</td>
-          <td><bdi>₹{subtotal.toFixed(2)}</bdi></td>
-        </tr>
-        <tr>
-          <td>CGST (9%)</td>
-          <td><bdi>₹{cgst.toFixed(2)}</bdi></td>
-        </tr>
-        <tr>
-          <td>SGST (9%)</td>
-          <td><bdi>₹{sgst.toFixed(2)}</bdi></td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr className="order-total">
-          <td>Order Total</td>
-          <td><strong><bdi className="tot-amount">₹{totalWithGST.toFixed(2)}</bdi></strong></td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <div className="wc-proceed-to-checkout mb-30">
-      <button onClick={handleCheckout} className="btn style2 btn-fw">
-  Proceed to checkout
-</button>
-
-
-    </div>
-    </div>
-  </div>
-</div>
+          {/* Cart Totals */}
+          <div className="col-md-6">
+            <div className="bg-white border-add p-3">
+              <h2 className="h4 summary-title p-3 mb-0">Cart Totals</h2>
+              <table className="cart_totals">
+                <tbody>
+                  <tr>
+                    <td>Subtotal</td>
+                    <td>
+                      <bdi>₹{subtotal.toFixed(2)}</bdi>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>CGST (9%)</td>
+                    <td>
+                      <bdi>₹{cgst.toFixed(2)}</bdi>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>SGST (9%)</td>
+                    <td>
+                      <bdi>₹{sgst.toFixed(2)}</bdi>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr className="order-total">
+                    <td>Order Total</td>
+                    <td>
+                      <strong>
+                        <bdi className="tot-amount">₹{totalWithGST.toFixed(2)}</bdi>
+                      </strong>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+              <div className="wc-proceed-to-checkout mb-30">
+                <button onClick={handleCheckout} className="btn style2 btn-fw">
+                  Proceed to checkout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

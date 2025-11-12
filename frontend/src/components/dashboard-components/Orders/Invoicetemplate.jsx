@@ -3,6 +3,11 @@ import React, { forwardRef } from 'react';
 const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
   const user = order.user || {};
   const items = order.items || [];
+  const shippingAddress = order.shipping_address || {};
+
+  console.log("📄 Invoice - Full Order Data:", JSON.stringify(order, null, 2));
+  console.log("🚚 Invoice - Shipping Address:", JSON.stringify(shippingAddress, null, 2));
+  console.log("👤 Invoice - User Data:", JSON.stringify(user, null, 2));
 
   // ✅ Calculate subtotal, tax, and grand total
   const subtotal = items.reduce(
@@ -12,6 +17,18 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
   const taxPct = 0.18;
   const taxAmount = subtotal * taxPct;
   const grandTotal = subtotal + taxAmount;
+
+  // ✅ Prepare shipping address for display
+  const deliveryAddress = {
+    name: shippingAddress?.name || `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "N/A",
+    email: shippingAddress?.email || user?.email || "",
+    address: shippingAddress?.address || user?.address || "",
+    city: shippingAddress?.city || user?.city || "",
+    district: shippingAddress?.district || user?.district || "",
+    state: shippingAddress?.state || user?.state || "",
+    zip: shippingAddress?.zip || shippingAddress?.pincode || user?.pincode || "",
+    phone: shippingAddress?.phone || user?.phone || "",
+  };
 
   // ✅ Styles
   const styles = {
@@ -36,7 +53,6 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'flex-end',
-      // borderBottom: '1px solid #eaeaea',
       paddingBottom: '25px',
       marginBottom: '20px',
     },
@@ -146,10 +162,11 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
 
         <div style={styles.border}></div>
 
-        {/* Address Section */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '50px' }}>
+        {/* Address Section - Updated to show both billing and shipping */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '50px', gap: '20px' }}>
+          {/* Billing Address (User Info) */}
           <div style={styles.addressBlock}>
-            <b style={styles.strongText}>Invoice To:</b>
+            <b style={styles.strongText}>Bill To:</b>
             <p>
               {user.first_name || ''} {user.last_name || ''}
               <br />
@@ -158,11 +175,50 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
               {user.city || ''}{user.city ? ', ' : ''}{user.state || ''}{' '}
               {user.pincode ? `- ${user.pincode}` : ''}
               <br />
-              {user.country || ''}
+              {user.phone && `Phone: ${user.phone}`}
             </p>
           </div>
 
-          <div style={styles.textRight}>
+          {/* Shipping Address (if different from billing) */}
+          {shippingAddress && Object.keys(shippingAddress).length > 0 && (
+            <div style={styles.addressBlock}>
+              <b style={styles.strongText}>Ship To:</b>
+              <p>
+                {deliveryAddress.name && deliveryAddress.name !== 'N/A' && (
+                  <>
+                    {deliveryAddress.name}
+                    <br />
+                  </>
+                )}
+                {deliveryAddress.address && deliveryAddress.address !== 'N/A' && (
+                  <>
+                    {deliveryAddress.address}
+                    <br />
+                  </>
+                )}
+                {(deliveryAddress.city || deliveryAddress.district) && (
+                  <>
+                    {deliveryAddress.city}
+                    {deliveryAddress.city && deliveryAddress.district && ', '}
+                    {deliveryAddress.district}
+                    <br />
+                  </>
+                )}
+                {(deliveryAddress.state || deliveryAddress.zip) && (
+                  <>
+                    {deliveryAddress.state}
+                    {deliveryAddress.state && deliveryAddress.zip && ' - '}
+                    {deliveryAddress.zip}
+                    <br />
+                  </>
+                )}
+                {deliveryAddress.phone && `Phone: ${deliveryAddress.phone}`}
+              </p>
+            </div>
+          )}
+
+          {/* Company Address */}
+          <div style={{ ...styles.addressBlock, ...styles.textRight }}>
             <b style={styles.strongText}>{company.name || 'GowriSankar Agencies'}:</b>
             <p style={{ marginTop: '5px' }}>
               {company.addressLine1 || 'PLOT NO.381, PHASE 1 & 2, INDIRA AUTONAGAR'}
@@ -193,11 +249,11 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                 items.map((it, i) => {
                   const qty = Number(it.quantity) || 1;
                   const rate = Number(it.price) || 0;
-                  const amount = rate * qty; // ✅ No tax in item amount
+                  const amount = rate * qty;
                   return (
                     <tr key={i} style={i % 2 ? styles.focusBg : {}}>
                       <td style={styles.thtd}>{String(i + 1).padStart(2, '0')}</td>
-                      <td style={styles.thtd}>{it.part_group_name || it.name || 'Service'}</td>
+                      <td style={styles.thtd}>{it.part_group_name || it.part_name || it.name || 'Service'}</td>
                       <td style={styles.thtd}>{rate.toFixed(2)}</td>
                       <td style={styles.thtd}>{qty}</td>
                       <td style={{ ...styles.thtd, textAlign: 'right' }}>{amount.toFixed(2)}</td>
