@@ -57,44 +57,14 @@ const ContactArea = () => {
                 </p>
               </div>
             </div>
-            
           </div>
         </div>
-
       </div>
 
       <div className="space-bottom">
         <div className="container">
-          <div className="map-sec">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3828.9744778971535!2d80.47491364630527!3d16.324248280711437!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f560af1250ff%3A0x34dee9a6503aa770!2sGOWRISANKAR%20AGENCIES!5e0!3m2!1sen!2sin!4v1749801151654!5m2!1sen!2sin"
-              allowFullScreen=""
-              loading="lazy"
-              title="address"
-            />
-          </div>
-        </div>
-      </div>
-      <div className="space-bottom">
-        <div className="container">
-          <div className="row flex-row-reverse">
-            <div className="col-lg-6 text-lg-end">
-              <div className="faq-thumb2 mb-xl-0 mb-50">
-                <div className="about-counter-grid jump">
-                  <img
-                    src="assets/img/icon/faq2-counter-icon-1.svg"
-                    alt="Fixturbo"
-                  />
-                  {/* <div className="media-right">
-                    <h3 className="about-counter">
-                      <span className="counter-number">250</span>+
-                    </h3>
-                    <h4 className="about-counter-text">Hyundai and Toyota </h4>
-                  </div> */}
-                </div>
-                <img src={`${process.env.PUBLIC_URL}assets/img/normal/faq-thumb-2-1.png`} alt="Fixturbo" />
-              </div>
-            </div>
+          <div className="row">
+            {/* Contact Form - Left Side */}
             <div className="col-lg-6">
               <div className="contact-form-wrap p-0">
                 <div className="title-area">
@@ -140,21 +110,6 @@ const ContactArea = () => {
                         />
                       </div>
                     </div>
-                    {/* <div className="col-md-6">
-                      <div className="form-group">
-                        <select
-                          name="subject"
-                          id="subject"
-                          className="form-select"
-                          defaultValue={"Choose"}
-                        >
-                          <option value="Choose">Choose a Option</option>
-                          <option value="Construction">Auto Repair</option>
-                          <option value="Real Estate">Car Repair</option>
-                          <option value="Industry">Automotive</option>
-                        </select>
-                      </div>
-                    </div> */}
                   </div>
                   <div className="form-group col-12">
                     <textarea
@@ -170,6 +125,22 @@ const ContactArea = () => {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+
+            {/* Map - Right Side */}
+            <div className="col-lg-6">
+              <div
+                className="map-sec"
+                style={{ height: "100%", minHeight: "500px" }}
+              >
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3828.9744778971535!2d80.47491364630527!3d16.324248280711437!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f560af1250ff%3A0x34dee9a6503aa770!2sGOWRISANKAR%20AGENCIES!5e0!3m2!1sen!2sin!4v1749801151654!5m2!1sen!2sin"
+                  allowFullScreen=""
+                  loading="lazy"
+                  title="address"
+                  style={{ width: "100%", height: "100%", border: 0 }}
+                />
               </div>
             </div>
           </div>
