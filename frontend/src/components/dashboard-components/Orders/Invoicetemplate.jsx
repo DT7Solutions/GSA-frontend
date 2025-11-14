@@ -250,10 +250,11 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                   const qty = Number(it.quantity) || 1;
                   const rate = Number(it.price) || 0;
                   const amount = rate * qty;
+                   const productName = it.part_name || "N/A";
                   return (
                     <tr key={i} style={i % 2 ? styles.focusBg : {}}>
                       <td style={styles.thtd}>{String(i + 1).padStart(2, '0')}</td>
-                      <td style={styles.thtd}>{it.part_group_name || it.part_name || it.name || 'Service'}</td>
+                     <td style={styles.thtd}>{productName}</td>
                       <td style={styles.thtd}>{rate.toFixed(2)}</td>
                       <td style={styles.thtd}>{qty}</td>
                       <td style={{ ...styles.thtd, textAlign: 'right' }}>{amount.toFixed(2)}</td>

@@ -6,9 +6,11 @@ import { Link } from 'react-router-dom';
 import axios from "axios";
 import API_BASE_URL from "../config";
 import Swal from "sweetalert2";
-
+import Invoicetemplate from "../components/dashboard-components/Orders/Invoicetemplate";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
+import { createRoot } from 'react-dom/client'; // ✅ Modern React 18 API
 
 import { jwtDecode } from "jwt-decode";
 
@@ -78,71 +80,47 @@ const CustomerOrdersList = () => {
   };
 
 //   invoice pdf 
-  const handlePrint = (order) => {
-    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-    const margin = { top: 60, left: 40, right: 40, bottom: 40 };
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    // Company Header
-    doc.setFontSize(20);
-    doc.text('GowriSankar Agencies', margin.left, margin.top - 20);
-    doc.setFontSize(10);
-    doc.text('PLOT NO.381,PHASE 1&2,INDIRA', margin.left, margin.top);
-    doc.text('AUTONAGAR ,Guntur,Andhra Pradesh 522001', margin.left, margin.top + 12);
-    doc.text('Phone:+91 92480 22760', margin.left, margin.top + 24);
-
-    // Invoice Metadata
-    doc.setFontSize(16);
-    doc.text('INVOICE', pageWidth - margin.right - 100, margin.top - 20, { align: 'right' });
-    doc.setFontSize(12);
-    doc.text(`Invoice #: ${order.razorpay_order_id}`, pageWidth - margin.right - 165, margin.top);
-    doc.text(`Date: ${new Date(order.created_at).toLocaleDateString()}`, pageWidth - margin.right - 165, margin.top + 14);
-
-    // Table Rows
-    const rows = order.items.map((item, idx) => {
-      const qty = item.quantity || 1;
-      const unitPrice = item.unit_price ? item.unit_price.toFixed(2) : (order.total_price / order.items.length).toFixed(2);
-      const amount = (qty * parseFloat(unitPrice)).toFixed(2);
-      return [
-        String(idx + 1).padStart(2, '0'),
-        item.part_name || 'N/A',
-        String(qty),
-        `₹${unitPrice}`,
-        `₹${amount}`,
-        order.status.charAt(0).toUpperCase() + order.status.slice(1),
-      ];
-    });
-
-    autoTable(doc, {
-      startY: margin.top + 60,
-      margin: { left: margin.left, right: margin.right },
-      head: [['S.L', 'Name', 'Quantity', 'Unit Price', 'Amount', 'Status']],
-      body: rows,
-      theme: 'striped',
-      styles: { cellPadding: 4, fontSize: 10 },
-      headStyles: { fillColor: [40, 40, 40], textColor: 255 },
-      columnStyles: {
-        0: { cellWidth: 30 },
-        1: { cellWidth: 200 },
-        2: { cellWidth: 50 },
-        3: { cellWidth: 80 },
-        4: { cellWidth: 80 },
-        5: { cellWidth: 100 }
-      },
-      didDrawPage: (data) => {
-        const pageCount = doc.internal.getNumberOfPages();
-        doc.setFontSize(9);
-        doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`, margin.left, doc.internal.pageSize.getHeight() - margin.bottom / 2);
-      }
-    });
-
-    const finalY = doc.lastAutoTable?.finalY || margin.top + 100;
-    doc.setFontSize(14);
-    doc.text(`Grand Total: ₹${order.total_price}`, margin.left, finalY + 30);
-
-    doc.save(`invoice_${order.razorpay_order_id}.pdf`);
-  };
-
+  // ✅ Invoice PDF with modern createRoot API
+   const handlePrint = async (order) => {
+     const container = document.createElement('div');
+     container.style.position = 'absolute';
+     container.style.left = '-9999px';
+     container.style.top = '0';
+     document.body.appendChild(container);
+ 
+     const company = {
+       name: 'GowriSankar Agencies',
+       logo: '/adminAssets/images/gallery/logo-light.png',
+       addressLine1: 'PLOT NO.381, PHASE 1 & 2, INDIRA AUTONAGAR',
+       cityState: 'Guntur, Andhra Pradesh',
+       phone: '+91 92480 22760',
+       signature: '/assets/img/signature.png'
+     };
+ 
+     // ✅ Use createRoot instead of ReactDOM.render
+     const root = createRoot(container);
+     root.render(<Invoicetemplate order={order} company={company} />);
+ 
+     setTimeout(async () => {
+       try {
+         const canvas = await html2canvas(container, { scale: 2, useCORS: true });
+         const imgData = canvas.toDataURL('image/png');
+         const pdf = new jsPDF('p', 'pt', 'a4');
+         const pageWidth = pdf.internal.pageSize.getWidth();
+         const imgProps = pdf.getImageProperties(imgData);
+         const imgHeight = (imgProps.height * pageWidth) / imgProps.width;
+         pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+         pdf.save(`Invoice_${order.razorpay_order_id}.pdf`);
+       } catch (err) {
+         console.error('Error generating invoice PDF:', err);
+       } finally {
+         // ✅ Modern way to unmount
+         root.unmount();
+         container.remove();
+       }
+     }, 100);
+   };
+ 
 
 //   packing slip
   const handlePackingSlipPrint = (order) => {
@@ -247,7 +225,7 @@ const CustomerOrdersList = () => {
         <div className="card basic-data-table">
             <div className="card-header"><h5>Orders List</h5></div>
             <div className="card-body">
-                <table className="table bordered-table mb-0" id="dataTable">
+                <table className="display table table-striped table-bordered mb-0" id="dataTable">
                     <thead>
                         <tr><th>S.L</th><th>Order Id</th><th>Invoice Id</th><th>Order Date</th><th>Order Amount</th><th>Order Status</th><th>Action</th></tr>
                     </thead>

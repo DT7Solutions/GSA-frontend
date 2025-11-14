@@ -145,7 +145,7 @@ const UserProfile = () => {
 
                                     <div className="col-md-6">
                                         <label className="form-label">Phone</label>
-                                        <input type="text" name="phone" className="form-control" value={userData.phone} onChange={handleChange} required />
+                                        <input type="text" name="phone" className="form-control"  value={userData.phone} onChange={handleChange} disabled required />
                                     </div>
 
                                     <div className="col-md-6">

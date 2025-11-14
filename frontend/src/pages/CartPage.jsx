@@ -19,7 +19,7 @@ const CartPage = () => {
       {/* Preloader */}
       {active === true && <Preloader />}
       <HeaderFive />
-      <Breadcrumb title={"Cart"} />
+      <Breadcrumb statictitle={"Cart"} />
 
       <Cart />
       

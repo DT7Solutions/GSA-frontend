@@ -18,7 +18,7 @@ const TermsAndConditionsPage = () => {
       {/* Preloader */}
       {active === true && <Preloader />}
       <HeaderFive />
-      <Breadcrumb title={"Terms And Conditions"} />
+      <Breadcrumb statictitle={"Terms And Conditions"} />
 
       <TermsAndConditionsSection />
       

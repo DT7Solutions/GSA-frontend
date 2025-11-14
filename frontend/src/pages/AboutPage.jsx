@@ -27,7 +27,7 @@ const AboutPage = () => {
       <HeaderFive />
 
       {/* Breadcrumb */}
-      <Breadcrumb title={"About Us"} />
+      <Breadcrumb statictitle={"About Us"} />
 
       {/* About Area */}
       <AboutTwo />

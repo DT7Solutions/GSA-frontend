@@ -18,7 +18,7 @@ const PrivacyPolicyPage = () => {
       {/* Preloader */}
       {active === true && <Preloader />}
       <HeaderFive />
-      <Breadcrumb title={"Privacy Policy"} />
+      <Breadcrumb statictitle={"Privacy Policy"} />
 
       <PrivacyPolicySection />
       

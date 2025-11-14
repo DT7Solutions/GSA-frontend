@@ -23,7 +23,7 @@ const CheckoutPage = () => {
       <HeaderFive />
 
       {/* Breadcrumb */}
-      <Breadcrumb title={"Checkout"} />
+      <Breadcrumb statictitle={"Checkout"} />
 
       {/* Checkout */}
       <Checkout />

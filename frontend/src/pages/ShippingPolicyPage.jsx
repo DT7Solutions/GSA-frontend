@@ -18,7 +18,7 @@ const ShippingPolicyPage = () => {
       {/* Preloader */}
       {active === true && <Preloader />}
       <HeaderFive />
-      <Breadcrumb title={"Shipping Policy"} />
+      <Breadcrumb statictitle={"Shipping Policy"} />
 
       <ShippingPolicy />
       

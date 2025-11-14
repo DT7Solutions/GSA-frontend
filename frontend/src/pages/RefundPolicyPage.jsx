@@ -18,7 +18,7 @@ const RefundPolicyPage = () => {
       {/* Preloader */}
       {active === true && <Preloader />}
       <HeaderFive />
-      <Breadcrumb title={"Refund Policy"} />
+      <Breadcrumb statictitle={"Refund Policy"} />
 
       <RefundPolicy />
       

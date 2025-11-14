@@ -15,6 +15,7 @@ const HeaderFive = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [profile_image, setProfileImage] = useState("");
 
   const [ setCartCount] = useState(0);
 
@@ -74,9 +75,10 @@ const HeaderFive = () => {
             },
           })
           .then((res) => {
-            const { username, role_id } = res.data;
+            const { username,profile_image, role_id } = res.data;
             setIsLoggedIn(true);
             setUserName(username);
+            setProfileImage(profile_image);
             
             let userRole = "";
 
@@ -227,16 +229,35 @@ const HeaderFive = () => {
                               {isLoggedIn ? (
                                 <>
                                   {/* User Info */}
-                                  <div className="py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
-                                    <div>
-                                      <h6 className="text-lg text-primary-light fw-semibold mb-2">
-                                        {userName}
-                                      </h6>
-                                      <span className="text-secondary-light fw-medium text-sm">
-                                      {userRole}
-                                      </span>
-                                    </div>
-                                  </div>
+                                 <div className='py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2'>
+  <div className='d-flex align-items-center gap-3'>
+    {profile_image ? (
+      <img
+        src={profile_image}
+        alt="Profile"
+        className='w-40-px h-40-px object-fit-cover rounded-circle'
+      />
+    ) : (
+      <img
+        src={`${process.env.PUBLIC_URL}/assets/img/default-avatar.png`}
+        alt="Default"
+        className='w-40-px h-40-px object-fit-cover rounded-circle'
+      />
+    )}
+    <div>
+      <h6 className='text-lg text-primary-light fw-semibold mb-2'>
+        {userName}
+      </h6>
+      <span className='text-secondary-light fw-medium text-sm'>
+        {userRole}
+      </span>
+    </div>
+  </div>
+  <button type='button' className='hover-text-danger'>
+    <Icon icon='radix-icons:cross-1' className='icon text-xl' />
+  </button>
+</div>
+
 
                                   {/* Authenticated User Menu */}
                                   <ul className="to-top-list">

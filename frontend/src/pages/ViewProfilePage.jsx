@@ -28,7 +28,7 @@ const ViewProfilePage = () => {
       <HeaderFive />
 
       {/* Breadcrumb */}
-      <Breadcrumb title={"View Profile"} />
+      <Breadcrumb statictitle={"View Profile"} />
 
       <UserProfile />
 
