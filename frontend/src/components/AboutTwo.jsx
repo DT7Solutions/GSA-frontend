@@ -9,10 +9,10 @@ const AboutTwo = () => {
           <div className="col-xxl-7 col-xl-6">
             <div className="about-thumb2 mb-40 mb-xl-0">
               <div className="about-img-1">
-                <img src={`${process.env.PUBLIC_URL}assets/img/normal/about_2-1.png`} alt="GSA" />
+                <img src={`${process.env.PUBLIC_URL}/assets/img/normal/about_2-1.png`} alt="GSA" />
               </div>
               <div className="about-img-2">
-                <img src={`${process.env.PUBLIC_URL}assets/img/normal/about_2-2.png`} alt="GSA" />
+                <img src={`${process.env.PUBLIC_URL}/assets/img/normal/about_2-2.png`} alt="GSA" />
               </div>
               <div className="about-counter-wrap jump-reverse">
                 <img src="assets/img/icon/about_icon2-1.svg" alt="GSA" />
