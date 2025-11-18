@@ -15,6 +15,8 @@ const PartGroupList = ({ id }) => {
   const [selectedVariant, setSelectedVariant] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   // ✅ Fetch default part groups
   useEffect(() => {
@@ -141,6 +143,13 @@ const PartGroupList = ({ id }) => {
     return parts;
   }, [partList, searchKeyword]);
 
+  // ✅ Pagination
+  const totalPages = Math.ceil(partsToDisplay.length / itemsPerPage);
+  const paginatedParts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return partsToDisplay.slice(startIndex, startIndex + itemsPerPage);
+  }, [partsToDisplay, currentPage]);
+
   // ✅ Dynamic counts for displayed parts
   const filteredCategoryCounts = useMemo(() => {
     const counts = {};
@@ -153,6 +162,11 @@ const PartGroupList = ({ id }) => {
 
   const selectedCategoryName =
     categories.find((cat) => String(cat.id) === selectedCategory)?.name || "";
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedBrand, selectedModel, selectedVariant, selectedCategory, searchKeyword]);
 
   return (
     <section className="space-top space-extra-bottom shop-sec">
@@ -169,8 +183,8 @@ const PartGroupList = ({ id }) => {
             </div> */}
 
             <div className="row gy-4">
-              {partsToDisplay.length > 0 ? (
-                partsToDisplay.map((item) => (
+              {paginatedParts.length > 0 ? (
+                paginatedParts.map((item) => (
                   <div className="col-xl-3 col-md-4 col-6" key={item.id}>
                     <div className="product-card style2">
                       <div className="product-img">
@@ -193,6 +207,69 @@ const PartGroupList = ({ id }) => {
                 <p className="text-center">No parts found.</p>
               )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="d-flex justify-content-center mt-4">
+                <nav>
+                  <ul className="pagination">
+                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        Previous
+                      </button>
+                    </li>
+                    
+                    {[...Array(totalPages)].map((_, idx) => {
+                      const pageNum = idx + 1;
+                      // Show first, last, current, and adjacent pages
+                      if (
+                        pageNum === 1 ||
+                        pageNum === totalPages ||
+                        (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                      ) {
+                        return (
+                          <li
+                            key={pageNum}
+                            className={`page-item ${currentPage === pageNum ? 'active' : ''}`}
+                          >
+                            <button
+                              className="page-link"
+                              onClick={() => setCurrentPage(pageNum)}
+                            >
+                              {pageNum}
+                            </button>
+                          </li>
+                        );
+                      } else if (
+                        pageNum === currentPage - 2 ||
+                        pageNum === currentPage + 2
+                      ) {
+                        return (
+                          <li key={pageNum} className="page-item disabled">
+                            <span className="page-link">...</span>
+                          </li>
+                        );
+                      }
+                      return null;
+                    })}
+                    
+                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
           </div>
 
           {/* SIDEBAR */}
@@ -254,28 +331,26 @@ const PartGroupList = ({ id }) => {
               </div>
 
               {/* Part Sections */}
-            {/* Part Sections */}
-{categories.length > 0 && (
-  <div className="widget bg-white widget_categories mt-4 p-0">
-    <h5 className="widget_title bg-theme-sidebar p-3">Part Sections</h5>
-    <ul className="category-list p-3">
-      {categories.map((cat) => (
-        <li key={cat.id}>
-          <Link
-            to="#"
-            onClick={() => setSelectedCategory(String(cat.id))}
-            className={
-              selectedCategory === String(cat.id) ? "active-category" : ""
-            }
-          >
-            {cat.name} ({cat.part_groups_count ?? 0})
-          </Link>
-        </li>
-      ))}
-    </ul>
-  </div>
-)}
-
+              {categories.length > 0 && (
+                <div className="widget bg-white widget_categories mt-4 p-0">
+                  <h5 className="widget_title bg-theme-sidebar p-3">Part Sections</h5>
+                  <ul className="category-list p-3">
+                    {categories.map((cat) => (
+                      <li key={cat.id}>
+                        <Link
+                          to="#"
+                          onClick={() => setSelectedCategory(String(cat.id))}
+                          className={
+                            selectedCategory === String(cat.id) ? "active-category" : ""
+                          }
+                        >
+                          {cat.name} ({cat.part_groups_count ?? 0})
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </aside>
           </div>
         </div>

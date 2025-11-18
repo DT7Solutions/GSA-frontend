@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-// import ThemeToggleButton from "../../helper/ThemeToggleButton";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import API_BASE_URL from "../../config";
@@ -14,8 +13,6 @@ const MasterLayout = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
     const [userRole, setUserRole] = useState("");
-
-
 
     useEffect(() => {
         const handleDropdownClick = (event) => {
@@ -33,7 +30,7 @@ const MasterLayout = ({ children }) => {
                 dropdown.classList.remove("open");
                 const submenu = dropdown.querySelector(".sidebar-submenu");
                 if (submenu) {
-                    submenu.style.maxHeight = "0px"; // Collapse submenu
+                    submenu.style.maxHeight = "0px";
                 }
             });
 
@@ -42,12 +39,11 @@ const MasterLayout = ({ children }) => {
                 clickedDropdown.classList.add("open");
                 const submenu = clickedDropdown.querySelector(".sidebar-submenu");
                 if (submenu) {
-                    submenu.style.maxHeight = `${submenu.scrollHeight}px`; // Expand submenu
+                    submenu.style.maxHeight = `${submenu.scrollHeight}px`;
                 }
             }
         };
 
-        // Attach click event listeners to all dropdown triggers
         const dropdownTriggers = document.querySelectorAll(
             ".sidebar-menu .dropdown > a, .sidebar-menu .dropdown > Link"
         );
@@ -68,17 +64,15 @@ const MasterLayout = ({ children }) => {
                         dropdown.classList.add("open");
                         const submenu = dropdown.querySelector(".sidebar-submenu");
                         if (submenu) {
-                            submenu.style.maxHeight = `${submenu.scrollHeight}px`; // Expand submenu
+                            submenu.style.maxHeight = `${submenu.scrollHeight}px`;
                         }
                     }
                 });
             });
         };
 
-        // Open the submenu that contains the active route
         openActiveDropdown();
 
-        // Cleanup event listeners on unmount
         return () => {
             dropdownTriggers.forEach((trigger) => {
                 trigger.removeEventListener("click", handleDropdownClick);
@@ -93,9 +87,6 @@ const MasterLayout = ({ children }) => {
     let mobileMenuControl = () => {
         setMobileMenu(!mobileMenu);
     };
-
-
-
 
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
@@ -128,11 +119,9 @@ const MasterLayout = ({ children }) => {
                     });
             } catch (error) {
                 console.error("Invalid token", error);
-
             }
         }
     }, []);
-
 
     const handleLogout = () => {
         localStorage.removeItem("accessToken");
@@ -140,8 +129,6 @@ const MasterLayout = ({ children }) => {
         setIsLoggedIn(false);
         navigate("/login");
     };
-
-
 
     return (
         <section className={mobileMenu ? "overlay active" : "overlay "}>
@@ -204,9 +191,9 @@ const MasterLayout = ({ children }) => {
                                         Reports
                                     </NavLink>
                                 </li>
-
                             </ul>
                         </li>
+
                         <li className='dropdown'>
                             <Link to="/orders">
                                 <Icon icon="mdi:clipboard-list-outline" className="menu-icon" />
@@ -224,19 +211,9 @@ const MasterLayout = ({ children }) => {
                                         Orders List
                                     </NavLink>
                                 </li>
-                                {/* <li>
-                                    <NavLink
-                                        to='/Add-products'
-                                        className={(navData) =>
-                                            navData.isActive ? "active-page" : ""
-                                        }
-                                    >
-                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                                        Add Product
-                                    </NavLink>
-                                </li> */}
                             </ul>
                         </li>
+
                         <li className='dropdown'>
                             <Link to='#'>
                                 <Icon icon='hugeicons:invoice-03' className='menu-icon' />
@@ -273,7 +250,7 @@ const MasterLayout = ({ children }) => {
                                         }
                                     >
                                         <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                                       Car Brands
+                                        Car Brands
                                     </NavLink>
                                 </li>
                                 <li>
@@ -284,7 +261,7 @@ const MasterLayout = ({ children }) => {
                                         }
                                     >
                                         <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                                       Car Models
+                                        Car Models
                                     </NavLink>
                                 </li>
                                 <li>
@@ -295,7 +272,7 @@ const MasterLayout = ({ children }) => {
                                         }
                                     >
                                         <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                                       Car Variants
+                                        Car Variants
                                     </NavLink>
                                 </li>
                                 <li>
@@ -306,7 +283,7 @@ const MasterLayout = ({ children }) => {
                                         }
                                     >
                                         <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                                       Part Categorys
+                                        Part Categorys
                                     </NavLink>
                                 </li>
                                 <li>
@@ -317,44 +294,52 @@ const MasterLayout = ({ children }) => {
                                         }
                                     >
                                         <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                                      Part Group
+                                        Part Group
                                     </NavLink>
                                 </li>
-
-
-
                             </ul>
                         </li>
-                       <li className='dropdown'>
-  <Link to='#'>
-    <Icon icon='mdi:form-outline' className='menu-icon' />
-    <span>Enquirys</span>
-  </Link>
-  <ul className='sidebar-submenu'>
-    <li>
-      <NavLink
-        to='/enquiry-queries'
-        className={(navData) =>
-          navData.isActive ? "active-page" : ""
-        }
-      >
-        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-        Queries
-      </NavLink>
-    </li>
-  </ul>
-</li>
 
+                        <li className='dropdown'>
+                            <Link to='#'>
+                                <Icon icon='solar:users-group-rounded-outline' className='menu-icon' />
+                                <span>Users</span>
+                            </Link>
+                            <ul className='sidebar-submenu'>
+                                <li>
+                                    <NavLink
+                                        to='/customers-list'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                        Customers
+                                    </NavLink>
+                                </li>
+                            </ul>
+                        </li>
 
-                        {/* <li>
-                            <NavLink
-                                to='/email'
-                                className={(navData) => (navData.isActive ? "active-page" : "")}
-                            >
-                                <Icon icon='mage:email' className='menu-icon' />
-                                <span>User Login</span>
-                            </NavLink>
-                        </li> */}
+                        <li className='dropdown'>
+                            <Link to='#'>
+                                <Icon icon='mdi:form-outline' className='menu-icon' />
+                                <span>Enquirys</span>
+                            </Link>
+                            <ul className='sidebar-submenu'>
+                                <li>
+                                    <NavLink
+                                        to='/enquiry-queries'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                        Queries
+                                    </NavLink>
+                                </li>
+                            </ul>
+                        </li>
+
                     </ul>
                 </div>
             </aside>
@@ -388,16 +373,10 @@ const MasterLayout = ({ children }) => {
                                 >
                                     <Icon icon='heroicons:bars-3-solid' className='icon' />
                                 </button>
-                                {/* <form className='navbar-search'>
-                                    <input type='text' name='search' placeholder='Search' />
-                                    <Icon icon='ion:search-outline' className='icon' />
-                                </form> */}
                             </div>
                         </div>
                         <div className='col-auto'>
                             <div className='d-flex flex-wrap align-items-center gap-4'>
-                               
-                          
                                 <div className='dropdown'>
                                     <button
                                         className='d-flex justify-content-center align-items-center rounded-circle'
@@ -470,7 +449,6 @@ const MasterLayout = ({ children }) => {
                                         </ul>
                                     </div>
                                 </div>
-                                {/* Profile dropdown end */}
                             </div>
                         </div>
                     </div>

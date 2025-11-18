@@ -297,3 +297,16 @@
 /* .btn {
     position: unset!important;
 } */
+
+
+.product-card.style2{
+  min-height:250px!important;
+}
+.style2 .product-title{
+  font-size: 18px!important;
+}
+
+.badge {
+  position: relative !important;
+  border-radius:5px!important;
+}

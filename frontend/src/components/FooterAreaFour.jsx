@@ -107,7 +107,7 @@ Available in Guntur
                     <div className="contact-grid-details">
                       <p>Email Address</p>
                       <h6>
-                        <Link to="mailto:infoname@mail.com">
+                        <Link to="mailto:rajesh.katakam@gmail.com">
                         rajesh.katakam@gmail.com
                         </Link>
                         <p />

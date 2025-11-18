@@ -56,7 +56,7 @@ import Enquiryformpages from "./pages/dashboard-pages/Enquiryformpages"
 
 import UnauthorizedPage from "./pages/UnauthorizedPage"
 import Commingsoon from "./pages/Commingsoon"
-
+import CustomerListPage from "pages/dashboard-pages/CustomerListPage";
 
 function App() {
   return (
@@ -123,6 +123,7 @@ function App() {
           <Route path="/car-group-part" element={<CarPartGroupPages />} />
 
           <Route path="/enquiry-queries" element={<Enquiryformpages />} />
+          <Route path="/customers-list" element={<CustomerListPage />} />
         </Route>
 
         <Route element={<PrivateRoute requiredRoles={["customer"]} />}>
