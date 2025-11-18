@@ -69,7 +69,9 @@ const ContactArea = () => {
               <div className="contact-form-wrap p-0">
                 <div className="title-area">
                   <span className="sub-title">Contact form</span>
-                  <h2 className="sec-title">Car Repair The Best Services</h2>
+                  <h2 className="sec-title">
+                    Your Trusted Car Service Partner
+                  </h2>
                 </div>
                 <form
                   action="mail.php"
@@ -108,6 +110,23 @@ const ContactArea = () => {
                           id="number"
                           placeholder="Phone Number"
                         />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <select
+                          className="form-control"
+                          name="enquiry"
+                          id="enquiry"
+                          defaultValue=""
+                        >
+                          <option value="">Select Enquiry Type</option>
+                          <option value="spare-parts">Spare Parts</option>
+                          <option value="car-service">Car Service</option>
+                          <option value="repair">Repair</option>
+                          <option value="maintenance">Maintenance</option>
+                          <option value="other">Other</option>
+                        </select>
                       </div>
                     </div>
                   </div>

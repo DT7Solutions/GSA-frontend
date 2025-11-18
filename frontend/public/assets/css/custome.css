@@ -135,24 +135,24 @@ select.form-select option {
     .login-screen .container {
         width: 100% !important;
     }
-    .mobial img{
+    .mobial img {
         height: 80px !important;
     }
-    .header-user-wrap{
+    .header-user-wrap {
         padding-top: 10px !important;
     }
-    .menu-area{
+    .menu-area {
         display: block !important;
     }
-      .breadcumb-wrapper {
+    .breadcumb-wrapper {
         padding: 30px 0 35px !important;
-    }
-    
+    }
 }
 
-.menu-area{
+.menu-area {
     display: none !important;
 }
+
 
 .tr-products .product-title{
     font-size: 20px !important;
@@ -388,8 +388,8 @@ select.form-select option {
 .product-content .product-title{
     font-size: 20px !important;
 }
-.widget_title{}
- .widget_title{
+
+.widget_title{
     font-size: 25px !important;
 }
 
@@ -407,3 +407,13 @@ select.form-select option {
 .btn{
     padding: 18px 30px !important;
 }
+.map-sec {
+    filter: none !important;
+}
+.faq-thumb2-right:after {
+  border-left: solid 40px transparent !important;
+  border-right: solid 40px var(--theme-color) !important;
+  left: auto !important;
+  right: 2px !important;
+}
+
