@@ -10,7 +10,17 @@ const CustomerList = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedRole, setSelectedRole] = useState("all");
-    const [deleteModal, setDeleteModal] = useState({ show: false, customerId: null, customerName: "" });
+    const [toggleModal, setToggleModal] = useState({ 
+        show: false, 
+        customerId: null, 
+        customerName: "", 
+        isActive: false 
+    });
+    const [deleteModal, setDeleteModal] = useState({ 
+        show: false, 
+        customerId: null, 
+        customerName: "" 
+    });
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -37,10 +47,44 @@ const CustomerList = () => {
         }
     };
 
+    const handleToggleStatus = async () => {
+        try {
+            const token = localStorage.getItem("accessToken");
+            const endpoint = toggleModal.isActive 
+                ? `${API_BASE_URL}api/auth/customers/${toggleModal.customerId}/deactivate/`
+                : `${API_BASE_URL}api/auth/customers/${toggleModal.customerId}/activate/`;
+            
+            const response = await axios.patch(
+                endpoint,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            
+            // Update customer status in the list
+            setCustomers(customers.map(c => 
+                c.id === toggleModal.customerId 
+                    ? { ...c, is_active: !toggleModal.isActive }
+                    : c
+            ));
+            
+            setToggleModal({ show: false, customerId: null, customerName: "", isActive: false });
+            
+            // Show success message
+            alert(response.data.message || `Customer ${toggleModal.isActive ? 'deactivated' : 'activated'} successfully`);
+        } catch (err) {
+            console.error("Error toggling customer status:", err);
+            alert(err.response?.data?.error || "Failed to update customer status");
+        }
+    };
+
     const handleDeleteCustomer = async () => {
         try {
             const token = localStorage.getItem("accessToken");
-            await axios.delete(
+            const response = await axios.delete(
                 `${API_BASE_URL}api/auth/customers/${deleteModal.customerId}/delete/`,
                 {
                     headers: {
@@ -54,10 +98,10 @@ const CustomerList = () => {
             setDeleteModal({ show: false, customerId: null, customerName: "" });
             
             // Show success message
-            alert("Customer deleted successfully");
+            alert(response.data.message || "Customer deleted successfully");
         } catch (err) {
             console.error("Error deleting customer:", err);
-            alert("Failed to delete customer");
+            alert(err.response?.data?.error || "Failed to delete customer");
         }
     };
 
@@ -179,6 +223,7 @@ const CustomerList = () => {
                                     <th scope="col">Address</th>
                                     <th scope="col">Role</th>
                                     <th scope="col">Joined Date</th>
+                                    <th scope="col" className="text-center">Status</th>
                                     <th scope="col" className="text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -229,26 +274,70 @@ const CustomerList = () => {
                                                     : "N/A"}
                                             </td>
                                             <td className="text-center">
+                                                <span
+                                                    className={`badge text-sm fw-semibold ${
+                                                        customer.is_active
+                                                            ? "text-success-600 bg-success-100"
+                                                            : "text-danger-600 bg-danger-100"
+                                                    } px-20 py-9 radius-4`}
+                                                >
+                                                    {customer.is_active ? "Active" : "Inactive"}
+                                                </span>
+                                            </td>
+                                            <td className="text-center">
                                                 <div className="d-flex align-items-center justify-content-center gap-2">
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
-                                                        onClick={() => setDeleteModal({
-                                                            show: true,
-                                                            customerId: customer.id,
-                                                            customerName: customer.username
-                                                        })}
-                                                    >
-                                                        <Icon icon="mdi:delete-outline" className="text-lg" />
-                                                        Delete
-                                                    </button>
+                                                    {customer.is_active ? (
+                                                        <button
+                                                            type="button"
+                                                            className="bg-danger-focus text-danger-600 border border-danger-main px-24 py-4 radius-4 fw-medium text-sm d-flex align-items-center gap-1"
+                                                            onClick={() => setToggleModal({
+                                                                show: true,
+                                                                customerId: customer.id,
+                                                                customerName: customer.username,
+                                                                isActive: true
+                                                            })}
+                                                        >
+                                                            <Icon icon="mdi:account-off-outline" className="text-lg" />
+                                                            Deactivate
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            className="badge text-sm fw-semibold bg-primary-600 px-20 py-9 radius-4 text-white d-flex align-items-center gap-1"
+                                                            onClick={() => setToggleModal({
+                                                                show: true,
+                                                                customerId: customer.id,
+                                                                customerName: customer.username,
+                                                                isActive: false
+                                                            })}
+                                                        >
+                                                            <Icon icon="mdi:account-check-outline" className="text-lg" />
+                                                            Activate
+                                                        </button>
+                                                    )}
+                                                    
+                                                    {/* Delete Button - Only show for non-admin users */}
+                                                    {customer.role_name?.toLowerCase() !== 'admin' && (
+                                                        <button
+                                                            type="button"
+                                                            className="badge text-sm fw-semibold bg-danger-600 px-20 py-9 radius-4 text-white d-flex align-items-center gap-1"
+                                                            onClick={() => setDeleteModal({
+                                                                show: true,
+                                                                customerId: customer.id,
+                                                                customerName: customer.username
+                                                            })}
+                                                        >
+                                                            <Icon icon="mdi:delete-outline" className="text-lg" />
+                                                           
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="10" className="text-center py-4">
+                                        <td colSpan="11" className="text-center py-4">
                                             <div className="d-flex flex-column align-items-center gap-2">
                                                 <Icon
                                                     icon="solar:users-group-rounded-outline"
@@ -311,6 +400,66 @@ const CustomerList = () => {
                 </div>
             </div>
 
+            {/* Toggle Status Confirmation Modal */}
+            {toggleModal.show && (
+                <>
+                    <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
+                                        {toggleModal.isActive ? 'Confirm Deactivation' : 'Confirm Activation'}
+                                    </h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        onClick={() => setToggleModal({ show: false, customerId: null, customerName: "", isActive: false })}
+                                    ></button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="text-center py-3">
+                                        <Icon 
+                                            icon={toggleModal.isActive ? "mdi:account-off-outline" : "mdi:account-check-outline"}
+                                            className={toggleModal.isActive ? "text-warning mb-3" : "text-success mb-3"}
+                                            style={{ fontSize: "64px" }}
+                                        />
+                                        <h6 className="mb-3">
+                                            {toggleModal.isActive 
+                                                ? 'Are you sure you want to deactivate this user?' 
+                                                : 'Are you sure you want to activate this user?'}
+                                        </h6>
+                                        <p className="text-secondary-light mb-0">
+                                            User: <strong>{toggleModal.customerName}</strong>
+                                        </p>
+                                        <p className={`text-sm mt-2 ${toggleModal.isActive ? 'text-warning' : 'text-success'}`}>
+                                            {toggleModal.isActive 
+                                                ? 'This user will not be able to login until reactivated.' 
+                                                : 'This user will be able to login again.'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => setToggleModal({ show: false, customerId: null, customerName: "", isActive: false })}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`btn ${toggleModal.isActive ? 'btn-warning' : 'btn-success'}`}
+                                        onClick={handleToggleStatus}
+                                    >
+                                        {toggleModal.isActive ? 'Deactivate User' : 'Activate User'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+
             {/* Delete Confirmation Modal */}
             {deleteModal.show && (
                 <>
@@ -332,11 +481,13 @@ const CustomerList = () => {
                                             className="text-danger mb-3"
                                             style={{ fontSize: "64px" }}
                                         />
-                                        <h6 className="mb-3">Are you sure you want to delete this customer?</h6>
+                                        <h6 className="mb-3">Are you sure you want to delete this user?</h6>
                                         <p className="text-secondary-light mb-0">
-                                            Customer: <strong>{deleteModal.customerName}</strong>
+                                            User: <strong>{deleteModal.customerName}</strong>
                                         </p>
-                                        <p className="text-danger text-sm mt-2">This action cannot be undone.</p>
+                                        <p className="text-danger text-sm mt-2">
+                                            <strong>Warning:</strong> This action cannot be undone. All user data will be permanently deleted.
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="modal-footer">
@@ -352,7 +503,7 @@ const CustomerList = () => {
                                         className="btn btn-danger"
                                         onClick={handleDeleteCustomer}
                                     >
-                                        Delete Customer
+                                        Delete User
                                     </button>
                                 </div>
                             </div>
