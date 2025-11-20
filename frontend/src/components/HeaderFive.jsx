@@ -16,10 +16,61 @@ const HeaderFive = () => {
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
   const [profile_image, setProfileImage] = useState("");
+  // const [setCartCount] = useState(0);
 
-  const [ setCartCount] = useState(0);
+  // Function to fetch user data
+  const fetchUserData = () => {
+    const token = localStorage.getItem("accessToken");
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const userId = decoded.user_id;
 
+        axios
+          .get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res) => {
+            const { username, profile_image, role_id } = res.data;
+            console.log("PROFILE IMAGE FROM API =", profile_image);
+            setIsLoggedIn(true);
+            setUserName(username);
+            setProfileImage(profile_image);
+            
+            let userRole = "";
 
+            if (role_id == 1) {
+              userRole = "Admin";
+            } else if (role_id == 2) {
+              userRole = "Dealer";
+            } else {
+              userRole = "Customer";
+            }
+          
+            setUserRole(userRole);
+          })
+          .catch((err) => {
+            console.error("Error fetching user data:", err);
+            setIsLoggedIn(false);
+            setUserName("Guest");
+            setUserRole("User");
+          });
+  
+      } catch (error) {
+        console.error("Invalid token:", error);
+        setIsLoggedIn(false);
+        setUserName("Guest");
+        setUserRole("User");
+      }
+    } else {
+      setIsLoggedIn(false);
+      setUserName("Guest");
+      setUserRole("User");
+    }
+  };
 
   useEffect(() => {
     var offCanvasNav = document.getElementById("offcanvas-navigation");
@@ -49,6 +100,7 @@ const HeaderFive = () => {
     for (let i = 0; i < numMenuExpand; i++) {
       menuExpand[i].addEventListener("click", sideMenuExpand);
     }
+    
     window.onscroll = () => {
       if (window.pageYOffset < 150) {
         setScroll(false);
@@ -57,69 +109,31 @@ const HeaderFive = () => {
       }
       return () => (window.onscroll = null);
     };
-
   }, []);
 
+  // Initial fetch of user data
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-  
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        const userId = decoded.user_id;
-
-        axios
-          .get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((res) => {
-            const { username,profile_image, role_id } = res.data;
-            setIsLoggedIn(true);
-            setUserName(username);
-            setProfileImage(profile_image);
-            
-            let userRole = "";
-
-            if (role_id == 1) {
-              userRole = "Admin";
-            } else if (role_id == 2) {
-              userRole = "Dealer";
-            } else {
-              userRole = "Customer";
-            }
-          
-            setUserRole(userRole);
-
-          })
-          .catch((err) => {
-            console.error("Error fetching user data:", err);
-            setIsLoggedIn(false);
-            setUserName("Guest");
-            setUserRole("User");
-          });
-  
-      } catch (error) {
-        console.error("Invalid token:", error);
-        setIsLoggedIn(false);
-        setUserName("Guest");
-        setUserRole("User");
-      }
-    } else {
-      setIsLoggedIn(false);
-      setUserName("Guest");
-      setUserRole("User");
-    }
-
-    
+    fetchUserData();
   }, []);
 
+  // Listen for profile update events
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      fetchUserData();
+    };
+
+    // Add event listener for profile updates
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+    };
+  }, []);
 
   const mobileMenu = () => {
     setActive(!active);
   };
-
 
   // cart value increment and decrement 
   useEffect(() => {
@@ -133,20 +147,16 @@ const HeaderFive = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setCartCount(res.data.count);
+        // setCartCount(res.data.count);
       } catch (error) {
         console.error("Error fetching cart count:", error);
       }
     };
   
     if (isLoggedIn) {
-
       fetchCartCount();
-      
     }
   }, [isLoggedIn]);
-  
-
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -154,7 +164,6 @@ const HeaderFive = () => {
     setIsLoggedIn(false);
     navigate("/login"); 
   };
-
 
   return (
     <header className="nav-header header-layout4 header-container" >
@@ -168,42 +177,14 @@ const HeaderFive = () => {
                 </Link>
               </div>
             </div>
-            {/* <div className="col-auto d-none d-md-block">
-              <div className="header-search-wrap">
-                <form className="search-form">
-                  <input
-                    className="form-control"
-                    type="text"
-                    placeholder="Find your product"
-                  />
-                  <select
-                    name="subject"
-                    id="subject"
-                    className="form-select"
-                    defaultValue={"categories"}
-                  >
-                    <option value="categories">All categories</option>
-                    <option value="Construction">Auto Repair</option>
-                    <option value="Real Estate">Car Repair</option>
-                    <option value="Industry">Automotive</option>
-                  </select>
-                  <button className="icon-btn" type="submit">
-                    <i className="fas fa-search" />
-                  </button>
-                </form>
-              </div>
-            </div> */}
+            
             <div className="col-auto">
               <div className="header-user-wrap">
                 <ul>
-
                   <li>
                     <div className="header-grid-wrap">
-                      <div className="simple-icon">
-
-                      </div>
+                      <div className="simple-icon"></div>
                       <div className="header-grid-details">
-
                         <h6 className="header-grid-title">
                           <div className='dropdown'>
                             <button
@@ -229,35 +210,34 @@ const HeaderFive = () => {
                               {isLoggedIn ? (
                                 <>
                                   {/* User Info */}
-                                 <div className='py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2'>
-  <div className='d-flex align-items-center gap-3'>
-    {profile_image ? (
-      <img
-        src={profile_image}
-        alt="Profile"
-        className='w-40-px h-40-px object-fit-cover rounded-circle'
-      />
-    ) : (
-      <img
-        src={`${process.env.PUBLIC_URL}/assets/img/default-avatar.png`}
-        alt="Default"
-        className='w-40-px h-40-px object-fit-cover rounded-circle'
-      />
-    )}
-    <div>
-      <h6 className='text-lg text-primary-light fw-semibold mb-2'>
-        {userName}
-      </h6>
-      <span className='text-secondary-light fw-medium text-sm'>
-        {userRole}
-      </span>
-    </div>
-  </div>
-  <button type='button' className='hover-text-danger'>
-    <Icon icon='radix-icons:cross-1' className='icon text-xl' />
-  </button>
-</div>
+                                  <div className='py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2'>
+                                    <div className='d-flex align-items-center gap-3'>
+                                     {profile_image && profile_image.trim() !== "" ? (
+  <img
+    src={profile_image}
+    onError={(e) => {
+      console.log("IMAGE FAILED TO LOAD:", profile_image);
+      e.target.src = `${process.env.PUBLIC_URL}/assets/img/default-avatar.png`;
+    }}
+  />
+) : (
+  <div>👤</div>
+)}
 
+
+                                      <div>
+                                        <h6 className='text-lg text-primary-light fw-semibold mb-2'>
+                                          {userName}
+                                        </h6>
+                                        <span className='text-secondary-light fw-medium text-sm'>
+                                          {userRole}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <button type='button' className='hover-text-danger'>
+                                      <Icon icon='radix-icons:cross-1' className='icon text-xl' />
+                                    </button>
+                                  </div>
 
                                   {/* Authenticated User Menu */}
                                   <ul className="to-top-list">
@@ -282,8 +262,7 @@ const HeaderFive = () => {
                                         className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
                                         to="/orders"
                                       >
-                                   
-                                        <Icon icon="mdi:package-variant-closed" className="icon text-xl" /> Myorders
+                                        <Icon icon="mdi:package-variant-closed" className="icon text-xl" /> My orders
                                       </Link>
                                     </li>
                                     <li>
@@ -297,7 +276,6 @@ const HeaderFive = () => {
                                   </ul>
                                 </>
                               ) : (
-                                // Show Login Option if User is NOT Logged In
                                 <ul className="to-top-list">
                                   <li>
                                     <Link
@@ -310,75 +288,55 @@ const HeaderFive = () => {
                                 </ul>
                               )}
                             </div>
-
                           </div>
                         </h6>
                       </div>
                     </div>
                   </li>
 
-
-                  <li>
-                    {/* <Link to="/wishlist" className="simple-icon">
-                      <i className="far fa-heart" />
-                      <span className="badge">1</span>
-                    </Link> */}
-                  </li>
+                  <li></li>
                   <li>
                     {isLoggedIn ? (
-<div className="header-grid-wrap">
-                      <div className="simple-icon">
-                        <Link to="/cart">
-                          <svg
-                            width={27} 
-                            height={24}
-                            viewBox="0 0 27 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M26.182 4.64365C25.6274 3.98499 24.9427 3.65565 24.128 3.65565H7.22803L6.13603 1.05565C6.08403 0.847654 5.96703 0.687321 5.78503 0.574654C5.60303 0.461987 5.39936 0.405655 5.17403 0.405655H1.92403C1.5947 0.405655 1.33036 0.505322 1.13103 0.704655C0.931698 0.903988 0.832031 1.16832 0.832031 1.49765C0.832031 1.82699 0.931698 2.08699 1.13103 2.27765C1.33036 2.46832 1.5947 2.56365 1.92403 2.56365H4.42003L5.92803 6.25566L9.93203 16.1097C10.14 16.647 10.4694 17.0543 10.92 17.3317C11.3707 17.609 11.8734 17.7477 12.428 17.7477H12.87L22.49 16.0057C22.9407 15.9017 23.3394 15.6937 23.686 15.3817C24.0327 15.0697 24.284 14.697 24.44 14.2637V14.1597L26.52 6.90565C26.676 6.52432 26.728 6.13432 26.676 5.73565C26.624 5.33699 26.4594 4.97299 26.182 4.64365ZM22.62 13.5097C22.5334 13.6657 22.4207 13.813 22.282 13.9517L12.636 15.6937C12.4627 15.6937 12.3457 15.6763 12.285 15.6417C12.2244 15.607 12.1594 15.5117 12.09 15.3557L8.19003 5.81365H24.128C24.336 5.81365 24.44 5.85699 24.44 5.94366C24.5267 6.01299 24.57 6.15166 24.57 6.35966L22.62 13.5097ZM9.72403 19.4637C9.1867 19.4637 8.71003 19.6717 8.29403 20.0877C7.87803 20.5037 7.67003 20.9847 7.67003 21.5307C7.67003 22.0767 7.87803 22.5577 8.29403 22.9737C8.71003 23.3897 9.1867 23.5977 9.72403 23.5977C10.0707 23.5977 10.4044 23.5023 10.725 23.3117C11.0457 23.121 11.3014 22.8653 11.492 22.5447C11.6827 22.224 11.778 21.886 11.778 21.5307C11.778 21.1753 11.6827 20.8373 11.492 20.5167C11.3014 20.196 11.0457 19.9403 10.725 19.7497C10.4044 19.559 10.0707 19.4637 9.72403 19.4637ZM22.074 19.4637C21.5367 19.4637 21.06 19.6717 20.644 20.0877C20.228 20.5037 20.02 20.9847 20.02 21.5307C20.02 22.0767 20.228 22.5577 20.644 22.9737C21.06 23.3897 21.5367 23.5977 22.074 23.5977C22.4207 23.5977 22.7544 23.5023 23.075 23.3117C23.3957 23.121 23.6514 22.8653 23.842 22.5447C24.0327 22.224 24.128 21.886 24.128 21.5307C24.128 21.1753 24.0327 20.8373 23.842 20.5167C23.6514 20.196 23.3957 19.9403 23.075 19.7497C22.7544 19.559 22.4207 19.4637 22.074 19.4637Z"
-                              fill="#1B1F22"
-                            />
-                          </svg>
-                           <span className="badge">{cartCount}</span> 
-                        </Link>
+                      <div className="header-grid-wrap">
+                        <div className="simple-icon">
+                          <Link to="/cart">
+                            <svg
+                              width={27} 
+                              height={24}
+                              viewBox="0 0 27 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M26.182 4.64365C25.6274 3.98499 24.9427 3.65565 24.128 3.65565H7.22803L6.13603 1.05565C6.08403 0.847654 5.96703 0.687321 5.78503 0.574654C5.60303 0.461987 5.39936 0.405655 5.17403 0.405655H1.92403C1.5947 0.405655 1.33036 0.505322 1.13103 0.704655C0.931698 0.903988 0.832031 1.16832 0.832031 1.49765C0.832031 1.82699 0.931698 2.08699 1.13103 2.27765C1.33036 2.46832 1.5947 2.56365 1.92403 2.56365H4.42003L5.92803 6.25566L9.93203 16.1097C10.14 16.647 10.4694 17.0543 10.92 17.3317C11.3707 17.609 11.8734 17.7477 12.428 17.7477H12.87L22.49 16.0057C22.9407 15.9017 23.3394 15.6937 23.686 15.3817C24.0327 15.0697 24.284 14.697 24.44 14.2637V14.1597L26.52 6.90565C26.676 6.52432 26.728 6.13432 26.676 5.73565C26.624 5.33699 26.4594 4.97299 26.182 4.64365ZM22.62 13.5097C22.5334 13.6657 22.4207 13.813 22.282 13.9517L12.636 15.6937C12.4627 15.6937 12.3457 15.6763 12.285 15.6417C12.2244 15.607 12.1594 15.5117 12.09 15.3557L8.19003 5.81365H24.128C24.336 5.81365 24.44 5.85699 24.44 5.94366C24.5267 6.01299 24.57 6.15166 24.57 6.35966L22.62 13.5097ZM9.72403 19.4637C9.1867 19.4637 8.71003 19.6717 8.29403 20.0877C7.87803 20.5037 7.67003 20.9847 7.67003 21.5307C7.67003 22.0767 7.87803 22.5577 8.29403 22.9737C8.71003 23.3897 9.1867 23.5977 9.72403 23.5977C10.0707 23.5977 10.4044 23.5023 10.725 23.3117C11.0457 23.121 11.3014 22.8653 11.492 22.5447C11.6827 22.224 11.778 21.886 11.778 21.5307C11.778 21.1753 11.6827 20.8373 11.492 20.5167C11.3014 20.196 11.0457 19.9403 10.725 19.7497C10.4044 19.559 10.0707 19.4637 9.72403 19.4637ZM22.074 19.4637C21.5367 19.4637 21.06 19.6717 20.644 20.0877C20.228 20.5037 20.02 20.9847 20.02 21.5307C20.02 22.0767 20.228 22.5577 20.644 22.9737C21.06 23.3897 21.5367 23.5977 22.074 23.5977C22.4207 23.5977 22.7544 23.5023 23.075 23.3117C23.3957 23.121 23.6514 22.8653 23.842 22.5447C24.0327 22.224 24.128 21.886 24.128 21.5307C24.128 21.1753 24.0327 20.8373 23.842 20.5167C23.6514 20.196 23.3957 19.9403 23.075 19.7497C22.7544 19.559 22.4207 19.4637 22.074 19.4637Z"
+                                fill="#1B1F22"
+                              />
+                            </svg>
+                            <span className="badge">{cartCount}</span> 
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                    ):(
-                       <div className="header-grid-wrap">
-                      <div className="simple-icon">
-                        <Link to="/cart">
-                          <svg
-                            width={27} 
-                            height={24}
-                            viewBox="0 0 27 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M26.182 4.64365C25.6274 3.98499 24.9427 3.65565 24.128 3.65565H7.22803L6.13603 1.05565C6.08403 0.847654 5.96703 0.687321 5.78503 0.574654C5.60303 0.461987 5.39936 0.405655 5.17403 0.405655H1.92403C1.5947 0.405655 1.33036 0.505322 1.13103 0.704655C0.931698 0.903988 0.832031 1.16832 0.832031 1.49765C0.832031 1.82699 0.931698 2.08699 1.13103 2.27765C1.33036 2.46832 1.5947 2.56365 1.92403 2.56365H4.42003L5.92803 6.25566L9.93203 16.1097C10.14 16.647 10.4694 17.0543 10.92 17.3317C11.3707 17.609 11.8734 17.7477 12.428 17.7477H12.87L22.49 16.0057C22.9407 15.9017 23.3394 15.6937 23.686 15.3817C24.0327 15.0697 24.284 14.697 24.44 14.2637V14.1597L26.52 6.90565C26.676 6.52432 26.728 6.13432 26.676 5.73565C26.624 5.33699 26.4594 4.97299 26.182 4.64365ZM22.62 13.5097C22.5334 13.6657 22.4207 13.813 22.282 13.9517L12.636 15.6937C12.4627 15.6937 12.3457 15.6763 12.285 15.6417C12.2244 15.607 12.1594 15.5117 12.09 15.3557L8.19003 5.81365H24.128C24.336 5.81365 24.44 5.85699 24.44 5.94366C24.5267 6.01299 24.57 6.15166 24.57 6.35966L22.62 13.5097ZM9.72403 19.4637C9.1867 19.4637 8.71003 19.6717 8.29403 20.0877C7.87803 20.5037 7.67003 20.9847 7.67003 21.5307C7.67003 22.0767 7.87803 22.5577 8.29403 22.9737C8.71003 23.3897 9.1867 23.5977 9.72403 23.5977C10.0707 23.5977 10.4044 23.5023 10.725 23.3117C11.0457 23.121 11.3014 22.8653 11.492 22.5447C11.6827 22.224 11.778 21.886 11.778 21.5307C11.778 21.1753 11.6827 20.8373 11.492 20.5167C11.3014 20.196 11.0457 19.9403 10.725 19.7497C10.4044 19.559 10.0707 19.4637 9.72403 19.4637ZM22.074 19.4637C21.5367 19.4637 21.06 19.6717 20.644 20.0877C20.228 20.5037 20.02 20.9847 20.02 21.5307C20.02 22.0767 20.228 22.5577 20.644 22.9737C21.06 23.3897 21.5367 23.5977 22.074 23.5977C22.4207 23.5977 22.7544 23.5023 23.075 23.3117C23.3957 23.121 23.6514 22.8653 23.842 22.5447C24.0327 22.224 24.128 21.886 24.128 21.5307C24.128 21.1753 24.0327 20.8373 23.842 20.5167C23.6514 20.196 23.3957 19.9403 23.075 19.7497C22.7544 19.559 22.4207 19.4637 22.074 19.4637Z"
-                              fill="#1B1F22"
-                            />
-                          </svg>
-                           {/* <span className="badge">{cartCount}</span>  */}
-                        </Link>
+                    ) : (
+                      <div className="header-grid-wrap">
+                        <div className="simple-icon">
+                          <Link to="/cart">
+                            <svg
+                              width={27} 
+                              height={24}
+                              viewBox="0 0 27 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M26.182 4.64365C25.6274 3.98499 24.9427 3.65565 24.128 3.65565H7.22803L6.13603 1.05565C6.08403 0.847654 5.96703 0.687321 5.78503 0.574654C5.60303 0.461987 5.39936 0.405655 5.17403 0.405655H1.92403C1.5947 0.405655 1.33036 0.505322 1.13103 0.704655C0.931698 0.903988 0.832031 1.16832 0.832031 1.49765C0.832031 1.82699 0.931698 2.08699 1.13103 2.27765C1.33036 2.46832 1.5947 2.56365 1.92403 2.56365H4.42003L5.92803 6.25566L9.93203 16.1097C10.14 16.647 10.4694 17.0543 10.92 17.3317C11.3707 17.609 11.8734 17.7477 12.428 17.7477H12.87L22.49 16.0057C22.9407 15.9017 23.3394 15.6937 23.686 15.3817C24.0327 15.0697 24.284 14.697 24.44 14.2637V14.1597L26.52 6.90565C26.676 6.52432 26.728 6.13432 26.676 5.73565C26.624 5.33699 26.4594 4.97299 26.182 4.64365ZM22.62 13.5097C22.5334 13.6657 22.4207 13.813 22.282 13.9517L12.636 15.6937C12.4627 15.6937 12.3457 15.6763 12.285 15.6417C12.2244 15.607 12.1594 15.5117 12.09 15.3557L8.19003 5.81365H24.128C24.336 5.81365 24.44 5.85699 24.44 5.94366C24.5267 6.01299 24.57 6.15166 24.57 6.35966L22.62 13.5097ZM9.72403 19.4637C9.1867 19.4637 8.71003 19.6717 8.29403 20.0877C7.87803 20.5037 7.67003 20.9847 7.67003 21.5307C7.67003 22.0767 7.87803 22.5577 8.29403 22.9737C8.71003 23.3897 9.1867 23.5977 9.72403 23.5977C10.0707 23.5977 10.4044 23.5023 10.725 23.3117C11.0457 23.121 11.3014 22.8653 11.492 22.5447C11.6827 22.224 11.778 21.886 11.778 21.5307C11.778 21.1753 11.6827 20.8373 11.492 20.5167C11.3014 20.196 11.0457 19.9403 10.725 19.7497C10.4044 19.559 10.0707 19.4637 9.72403 19.4637ZM22.074 19.4637C21.5367 19.4637 21.06 19.6717 20.644 20.0877C20.228 20.5037 20.02 20.9847 20.02 21.5307C20.02 22.0767 20.228 22.5577 20.644 22.9737C21.06 23.3897 21.5367 23.5977 22.074 23.5977C22.4207 23.5977 22.7544 23.5023 23.075 23.3117C23.3957 23.121 23.6514 22.8653 23.842 22.5447C24.0327 22.224 24.128 21.886 24.128 21.5307C24.128 21.1753 24.0327 20.8373 23.842 20.5167C23.6514 20.196 23.3957 19.9403 23.075 19.7497C22.7544 19.559 22.4207 19.4637 22.074 19.4637Z"
+                                fill="#1B1F22"
+                              />
+                            </svg>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
                     )}
-                    
                   </li>
-
-
-                  {/* <div className="header-grid-details ">
-                        <button
-                          type="button"
-                          className="menu-toggle icon-btn"
-                          onClick={mobileMenu}
-                        >
-                          <i className="fas fa-bars" />
-                        </button>
-                      </div> */}
                 </ul>
               </div>
             </div>
@@ -387,9 +345,6 @@ const HeaderFive = () => {
       </div>
 
       <div className={`sticky-wrapper ${scroll && "sticky"}`}>
-        {/* Main Menu Area */}
-       
-        {/* Mobile Menu */}
         <div className={`mobile-menu-wrapper  ${active && "body-visible"}`}>
           <div className="mobile-menu-area">
             <div className="mobile-logo">
@@ -404,20 +359,7 @@ const HeaderFive = () => {
               <ul id="offcanvas-navigation">
                 <li className="menu-item-has-children submenu-item-has-children">
                   <Link to="/About">About</Link>
-                  {/* <ul className="sub-menu submenu-class">
-                    <li>
-                      <NavLink
-                        to="/"
-                        className={(navData) =>
-                          navData.isActive ? "active" : ""
-                        }
-                      >
-                        Home 01
-                      </NavLink>
-                    </li>
-                  </ul> */}
                 </li>
-
                 <li>
                   <NavLink
                     to="/contact"
@@ -431,10 +373,6 @@ const HeaderFive = () => {
           </div>
         </div>
       </div>
-
-
-
-
     </header>
   );
 };
