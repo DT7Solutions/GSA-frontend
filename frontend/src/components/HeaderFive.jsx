@@ -213,7 +213,7 @@ const HeaderFive = () => {
                                   <div className='py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2'>
                                     <div className='d-flex align-items-center gap-3'>
                                      {profile_image && profile_image.trim() !== "" ? (
-  <img
+  <img  style={{width: "50px", height: "50px", borderRadius: "50%", objectFit: "cover"}}
     src={profile_image}
     onError={(e) => {
       console.log("IMAGE FAILED TO LOAD:", profile_image);

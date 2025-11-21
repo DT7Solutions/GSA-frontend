@@ -305,6 +305,12 @@ const Cart = () => {
           console.log("Verify Payload:", JSON.stringify(verifyPayload, null, 2));
           console.log("=".repeat(60) + "\n");
 
+          await fetchCartCount();
+          
+          // ✅ CLEAR LOCAL CART ITEMS
+          setCartItems([]);
+          localStorage.removeItem("cartItems");
+
           const verifyRes = await axios.post(
             `${API_BASE_URL}api/home/payment/verify/`,
             verifyPayload,
