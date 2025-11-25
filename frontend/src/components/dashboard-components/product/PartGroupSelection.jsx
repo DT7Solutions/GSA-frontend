@@ -185,7 +185,7 @@ const PartGroupList = ({ id }) => {
             <div className="row gy-4">
               {paginatedParts.length > 0 ? (
                 paginatedParts.map((item) => (
-                  <div className="col-xl-3 col-md-4 col-6" key={item.id}>
+                  <div className="col-xl-4 col-md-3 col-6" key={item.id}>
                     <div className="product-card style2">
                       <div className="product-img">
                         <Link to={`/shop/${item.id}`}>

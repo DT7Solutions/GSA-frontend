@@ -417,3 +417,11 @@ select.form-select option {
   right: 2px !important;
 }
 
+/* partgroups alignment */
+.product-card .product-title a {
+    color: inherit;
+    min-height: 65px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
