@@ -30,7 +30,7 @@ const Login = () => {
       const response = await axios.post(`${API_BASE_URL}api/auth/mobial_otp_request/`, {
         phone_number: phoneNumber,
       });
-      debugger;
+      
       if (response.data.success) {
         setOtpSent(true);
         Swal.fire({
@@ -42,11 +42,29 @@ const Login = () => {
       }
     } catch (error) {
       console.error("OTP Request Failed:", error.response ? error.response.data : error.message);
+      
+      // Handle specific error cases for OTP
+      const errorData = error.response?.data;
+      let errorMessage = "Failed to send OTP. Please try again.";
+      let errorTitle = "OTP Request Failed";
+      
+      if (errorData?.error === "account_not_found") {
+        errorTitle = "Account Not Found";
+        errorMessage = "You don't have an account. Please sign up.";
+      } else if (errorData?.error === "account_deactivated") {
+        errorTitle = "Account Deactivated";
+        errorMessage = "Your account has been deactivated. Please contact the support team.";
+      }
+      
       Swal.fire({
-        title: "OTP Request Failed",
-        text: "Failed to send OTP. Please try again.",
+        title: errorTitle,
+        text: errorMessage,
         icon: "error",
-        confirmButtonText: "Retry",
+        confirmButtonText: errorTitle === "Account Not Found" ? "Sign Up" : "OK",
+      }).then((result) => {
+        if (result.isConfirmed && errorTitle === "Account Not Found") {
+          navigate("/register");
+        }
       });
     }
   };
@@ -67,72 +85,109 @@ const Login = () => {
       }
     } catch (error) {
       console.error("OTP Verification Failed:", error.response ? error.response.data : error.message);
+      
+      const errorData = error.response?.data;
+      let errorMessage = "Invalid OTP. Please try again.";
+      let errorTitle = "OTP Verification Failed";
+      
+      if (errorData?.error === "account_not_found") {
+        errorTitle = "Account Not Found";
+        errorMessage = "You don't have an account. Please sign up.";
+      } else if (errorData?.error === "account_deactivated") {
+        errorTitle = "Account Deactivated";
+        errorMessage = "Your account has been deactivated. Please contact the support team.";
+      }
+      
       Swal.fire({
-        title: "OTP Verification Failed",
-        text: "Invalid OTP. Please try again.",
+        title: errorTitle,
+        text: errorMessage,
         icon: "error",
-        confirmButtonText: "Retry",
+        confirmButtonText: errorTitle === "Account Not Found" ? "Sign Up" : "OK",
+      }).then((result) => {
+        if (result.isConfirmed && errorTitle === "Account Not Found") {
+          navigate("/register");
+        }
       });
     }
   };
 
   // Function to handle username/password login
-// Function to handle username/password login
-const handleLogin = async (e) => {
-  e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  try {
-    const response = await axios.post(`${API_BASE_URL}api/auth/login/`, {
-      email: email.toLowerCase(),
-      password,
-    });
-
-    if (response.data.access) {
-      // Store tokens and role
-      localStorage.setItem("accessToken", response.data.access);
-      localStorage.setItem("refreshToken", response.data.refresh);
-      localStorage.setItem("role", response.data.role.toLowerCase());
-
-      // Decode user ID from JWT token
-      const decoded = jwtDecode(response.data.access);
-      const userId = decoded.user_id;
-
-      // Get user details using the token
-      const userResponse = await axios.get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
-        headers: {
-          Authorization: `Bearer ${response.data.access}`,
-        },
+    try {
+      const response = await axios.post(`${API_BASE_URL}api/auth/login/`, {
+        email: email.toLowerCase(),
+        password,
       });
 
-      // Check for a saved redirect URL and go there
-      const redirectUrl = localStorage.getItem("redirectAfterLogin");
-      if (redirectUrl) {
-        localStorage.removeItem("redirectAfterLogin");
-        window.location.href = redirectUrl;
-        return;
-      }
+      if (response.data.access) {
+        // Store tokens and role
+        localStorage.setItem("accessToken", response.data.access);
+        localStorage.setItem("refreshToken", response.data.refresh);
+        localStorage.setItem("role", response.data.role.toLowerCase());
 
-      // Role-based default redirection
-      const { role_id } = userResponse.data;
-      if (role_id === 1) {
-        navigate("/Dashboard");
-      } else {
-        navigate("/");
+        // Decode user ID from JWT token
+        const decoded = jwtDecode(response.data.access);
+        const userId = decoded.user_id;
+
+        // Get user details using the token
+        const userResponse = await axios.get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
+          headers: {
+            Authorization: `Bearer ${response.data.access}`,
+          },
+        });
+
+        // Check for a saved redirect URL and go there
+        const redirectUrl = localStorage.getItem("redirectAfterLogin");
+        if (redirectUrl) {
+          localStorage.removeItem("redirectAfterLogin");
+          window.location.href = redirectUrl;
+          return;
+        }
+
+        // Role-based default redirection
+        const { role_id } = userResponse.data;
+        if (role_id === 1) {
+          navigate("/Dashboard");
+        } else {
+          navigate("/");
+        }
       }
+    } catch (error) {
+      console.error("Login Failed:", error.response ? error.response.data : error.message);
+      
+      const errorData = error.response?.data;
+      let errorMessage = "Incorrect email or password.";
+      let errorTitle = "Login Failed";
+      let showSignUpButton = false;
+      
+      // Handle specific error cases
+      if (errorData?.error === "account_not_found") {
+        errorTitle = "Account Not Found";
+        errorMessage = "You don't have an account. Please sign up.";
+        showSignUpButton = true;
+      } else if (errorData?.error === "account_deactivated") {
+        errorTitle = "Account Deactivated";
+        errorMessage = "Your account has been deactivated. Please contact the support team.";
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+      
+      Swal.fire({
+        title: errorTitle,
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: showSignUpButton ? "Sign Up" : "OK",
+        showCancelButton: showSignUpButton,
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed && showSignUpButton) {
+          navigate("/register");
+        }
+      });
     }
-  } catch (error) {
-    console.error("Login Failed:", error.response ? error.response.data : error.message);
-    Swal.fire({
-      title: "Login Failed",
-      text: "Incorrect email or password.",
-      icon: "error",
-      confirmButtonText: "Retry",
-    });
-  }
-};
-
-
-  
+  };
 
   return (
     <div className="login-screen" style={{ height: "111vh" }}>
@@ -148,29 +203,27 @@ const handleLogin = async (e) => {
             
                 {isOtpLogin ? (
                   <>
-                   <div className="mb-3">
-  <label className="form-label">Phone Number</label>
-  <div className="input-group">
-    <span className="input-group-text">+91</span>
-    <input
-      type="tel"
-      className="form-control"
-      value={phoneNumber}
-      onChange={(e) => {
-        const value = e.target.value;
-       
-        if (/^\d{0,10}$/.test(value)) {
-          setPhoneNumber(value);
-        }
-      }}
-      placeholder="Enter phone number"
-      required
-      maxLength={10}
-      disabled={otpSent}
-    />
-  </div>
-</div>
-
+                    <div className="mb-3">
+                      <label className="form-label">Phone Number</label>
+                      <div className="input-group">
+                        <span className="input-group-text">+91</span>
+                        <input
+                          type="tel"
+                          className="form-control"
+                          value={phoneNumber}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (/^\d{0,10}$/.test(value)) {
+                              setPhoneNumber(value);
+                            }
+                          }}
+                          placeholder="Enter phone number"
+                          required
+                          maxLength={10}
+                          disabled={otpSent}
+                        />
+                      </div>
+                    </div>
 
                     {/* OTP Input Field */}
                     {otpSent && (
@@ -213,10 +266,10 @@ const handleLogin = async (e) => {
                         />
                         <button
                           type="button"
-                          className="btn eye-btn  btn-fw"
+                          className="btn eye-btn btn-fw"
                           onClick={() => setShowPassword(!showPassword)}
                         >
-                          {showPassword ? <FaEyeSlash  /> : <FaEye />}
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
                       </div>
                     </div>
@@ -262,7 +315,6 @@ const handleLogin = async (e) => {
               </p>
             </div>
           </div>
-
         </div>
       </div>
     </div>

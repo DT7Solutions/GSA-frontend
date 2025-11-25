@@ -25,7 +25,7 @@ const ViewCustomerOrdersPage = () => {
       {active === true && <Preloader />}
       <HeaderFive />
 
-      <Breadcrumb title={"Orders list"} />
+      <Breadcrumb statictitle={"Orders list"} />
 
       <CustomerOrdersList />
 

@@ -502,11 +502,11 @@ const handlePartGroupClick = async (groupId) => {
 
           <div className="col-xl-3 col-lg-4 sidebar-widget-area">
             <aside className="sidebar-sticky-area sidebar-area sidebar-shop">
-              <div>
-                <h3 className="widget_title">Search by Car Brand</h3>
-
+              <div className="bg-white  rounded shadow-sm">
+                <h3 className="widget_title bg-theme-sidebar p-3 mb-3">Search by Car Brand</h3>
+               <div className="brand p-3">
                 <select
-                  className="mb-3"
+                  className="mb-3 text-center"
                   value={selectedBrand}
                   onChange={(e) => {
                     const selectedId = e.target.value;
@@ -524,7 +524,7 @@ const handlePartGroupClick = async (groupId) => {
 
 
                 <select
-                  className="mb-3"
+                  className="mb-3 text-center"
                   value={selectedModel}
                   onChange={(e) => handleCarModelChange(e.target.value)}
                   disabled={!selectedBrand}
@@ -538,7 +538,7 @@ const handlePartGroupClick = async (groupId) => {
                 </select>
 
                 <select
-                  className="mb-3"
+                  className="mb-3 text-center"
                   value={selectedVariant}
                   onChange={(e) => handleVariantChange(e.target.value)}
                   disabled={!selectedModel}
@@ -557,6 +557,7 @@ const handlePartGroupClick = async (groupId) => {
   ? `${selectedBrandName} > ${selectedModelName} > ${selectedVariantName}`
   : "Please select all options"}
 
+                </div>
                 </div>
               </div>
 
