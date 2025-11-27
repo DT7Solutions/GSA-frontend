@@ -134,7 +134,7 @@ const CustomerList = () => {
         switch (roleName?.toLowerCase()) {
             case 'admin':
                 return 'text-danger-600 bg-danger-100';
-            case 'dealer':
+            case 'staff':
                 return 'text-warning-600 bg-warning-100';
             case 'customer':
                 return 'text-success-600 bg-success-100';
@@ -193,7 +193,7 @@ const CustomerList = () => {
                             >
                                 <option value="all">All Roles</option>
                                 <option value="admin">Admin</option>
-                                <option value="dealer">Dealer</option>
+                                <option value="staff">Staff</option>
                                 <option value="customer">Customer</option>
                             </select>
                         </div>

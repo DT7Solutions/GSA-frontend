@@ -181,32 +181,37 @@ const PartGroupList = ({ id }) => {
                   : `All Parts (${partsToDisplay.length} Items)`}
               </h4>
             </div> */}
-
-            <div className="row gy-4">
-              {paginatedParts.length > 0 ? (
-                paginatedParts.map((item) => (
-                  <div className="col-xl-4 col-md-3 col-6" key={item.id}>
-                    <div className="product-card style2">
-                      <div className="product-img">
-                        <Link to={`/shop/${item.id}`}>
-                          <img
-                            src={item.image || "/assets/img/placeholder.png"}
-                            alt={item.name}
-                          />
-                        </Link>
-                      </div>
-                      <div className="product-content text-center">
-                        <h6 className="product-title">
-                          <Link to={`/shop/${item.id}`}>{item.name}</Link>
-                        </h6>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center">No parts found.</p>
-              )}
+<div className="row gy-4">
+  {paginatedParts.length > 0 ? (
+    paginatedParts.map((item) => {
+      // Check if the selected category is CHASSIS
+      const isChassis = selectedCategoryName?.toUpperCase() === "CHASSIS";
+      const colClass = isChassis ? "col-xl-4" : "col-xl-3";
+      
+      return (
+        <div className={`${colClass} col-md-3 col-6`} key={item.id}>
+          <div className="product-card style2">
+            <div className="product-img">
+              <Link to={`/shop/${item.id}`}>
+                <img
+                  src={item.image || "/assets/img/placeholder.png"}
+                  alt={item.name}
+                />
+              </Link>
             </div>
+            <div className="product-content text-center">
+              <h6 className="product-title">
+                <Link to={`/shop/${item.id}`}>{item.name}</Link>
+              </h6>
+            </div>
+          </div>
+        </div>
+      );
+    })
+  ) : (
+    <p className="text-center">No parts found.</p>
+  )}
+</div>
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -275,10 +280,12 @@ const PartGroupList = ({ id }) => {
           {/* SIDEBAR */}
           <div className="col-xl-3 col-lg-4 sidebar-widget-area">
             <aside className="sidebar-area sidebar-shop">
-              <h4 className="widget_title">Filter by Car</h4>
+              <div className="bg-white border-smooth">
+              <h4 className="widget_title bg-theme-sidebar p-3 mb-2">Filter by Car</h4>
 
               {/* Brand */}
-              <div className="mb-3">
+              <div className="p-3">
+              <div className="mb-3 ">
                 <label className="form-label">Car Brand</label>
                 <select
                   className="form-select"
@@ -329,19 +336,23 @@ const PartGroupList = ({ id }) => {
                   ))}
                 </select>
               </div>
+              </div>
+              </div>
 
               {/* Part Sections */}
-              {categories.length > 0 && (
-                <div className="widget bg-white widget_categories mt-4 p-0">
-                  <h5 className="widget_title bg-theme-sidebar p-3">Part Sections</h5>
+             {categories.length > 0 && (
+                <div className="widget bg-white widget_categories mt-5 p-0">
+                  <h5 className="widget_title bg-theme-sidebar mb-2 p-3">Part Sections</h5>
                   <ul className="category-list p-3">
                     {categories.map((cat) => (
                       <li key={cat.id}>
                         <Link
                           to="#"
                           onClick={() => setSelectedCategory(String(cat.id))}
-                          className={
-                            selectedCategory === String(cat.id) ? "active-category" : ""
+                          style={
+                            selectedCategory === String(cat.id)
+                              ? { backgroundColor: "#0068a5", color: "#fff", padding: "8px 12px", borderRadius: "4px", display: "block" }
+                              : { padding: "8px 12px", display: "block" }
                           }
                         >
                           {cat.name} ({cat.part_groups_count ?? 0})

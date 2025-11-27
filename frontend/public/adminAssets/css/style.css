@@ -286,7 +286,8 @@
   --button-secondary: var(--primary-50);
   --black: var(--dark-2);
   --white: var(--base);
-  --bg-color: var(--neutral-50);
+  /* --bg-color: var(--neutral-50); */
+  --bg-color: #f6f6f6;
   --text-primary-light: var(--neutral-900);
   --text-secondary-light: var(--neutral-600);
   --text-secondary-dark: var(--neutral-300);
@@ -13050,7 +13051,7 @@ select option {
 }
 
 .card .card-body {
-  padding: 0.875rem 1.5rem;
+  padding: 0.875rem 0.9rem;
   color: var(--text-secondary-light);
 }
 
@@ -15798,3 +15799,12 @@ td.fc-header-center {
   text-transform: capitalize;
   display: inline-block;
 }
+
+ .border-smooth{
+  border: 1px solid #E1E1E1!important;
+ }
+
+ .table>:not(:last-child)>:last-child>* {
+  border-bottom: none !important;
+ }
+

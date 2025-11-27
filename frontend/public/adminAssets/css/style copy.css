@@ -11737,7 +11737,7 @@ select option {
 }
 
 .card .card-body {
-  padding: 0.875rem 1.5rem;
+  padding: 0.875rem 0.9rem;
   color: var(--text-secondary-light);
 }
 

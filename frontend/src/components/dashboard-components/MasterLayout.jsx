@@ -110,7 +110,7 @@ const MasterLayout = ({ children }) => {
                         if (role_id == 1) {
                             userRole = "Admin";
                         } else if (role_id == 2) {
-                            userRole = "Dealer";
+                            userRole = "Staff";
                         } else {
                             userRole = "Customer";
                         }

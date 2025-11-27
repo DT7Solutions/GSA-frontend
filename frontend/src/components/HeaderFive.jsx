@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { jwtDecode } from "jwt-decode";
@@ -16,7 +16,13 @@ const HeaderFive = () => {
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
   const [profile_image, setProfileImage] = useState("");
-  // const [setCartCount] = useState(0);
+  
+  // Search states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchRef = useRef(null);
 
   // Function to fetch user data
   const fetchUserData = () => {
@@ -35,17 +41,15 @@ const HeaderFive = () => {
           })
           .then((res) => {
             const { username, profile_image, role_id } = res.data;
-            console.log("PROFILE IMAGE FROM API =", profile_image);
             setIsLoggedIn(true);
             setUserName(username);
             setProfileImage(profile_image);
             
             let userRole = "";
-
             if (role_id == 1) {
               userRole = "Admin";
             } else if (role_id == 2) {
-              userRole = "Dealer";
+              userRole = "Staff";
             } else {
               userRole = "Customer";
             }
@@ -71,6 +75,48 @@ const HeaderFive = () => {
       setUserRole("User");
     }
   };
+
+  // Search functionality
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}api/home/search-parts/?q=${query}`);
+      setSearchResults(response.data);
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error("Error searching parts:", error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handlePartClick = (partId) => {
+    setShowSearchResults(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    navigate(`/shop-details/${partId}`);
+  };
+
+  // Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     var offCanvasNav = document.getElementById("offcanvas-navigation");
@@ -111,21 +157,16 @@ const HeaderFive = () => {
     };
   }, []);
 
-  // Initial fetch of user data
   useEffect(() => {
     fetchUserData();
   }, []);
 
-  // Listen for profile update events
   useEffect(() => {
     const handleProfileUpdate = () => {
       fetchUserData();
     };
 
-    // Add event listener for profile updates
     window.addEventListener('profileUpdated', handleProfileUpdate);
-
-    // Cleanup
     return () => {
       window.removeEventListener('profileUpdated', handleProfileUpdate);
     };
@@ -135,7 +176,6 @@ const HeaderFive = () => {
     setActive(!active);
   };
 
-  // cart value increment and decrement 
   useEffect(() => {
     const fetchCartCount = async () => {
       const token = localStorage.getItem("accessToken");
@@ -147,7 +187,6 @@ const HeaderFive = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        // setCartCount(res.data.count);
       } catch (error) {
         console.error("Error fetching cart count:", error);
       }
@@ -178,6 +217,107 @@ const HeaderFive = () => {
               </div>
             </div>
             
+            {/* Search Box with Results */}
+            <div className="col-auto d-none d-md-block">
+              <div className="header-search-wrap" ref={searchRef} style={{ position: 'relative' }}>
+                <form className="search-form bg-white" onSubmit={(e) => e.preventDefault()}>
+                  <input 
+                    className="form-control" 
+                    type="text" 
+                    placeholder="Find your product"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
+                  />
+                  <button className="icon-btn" type="button">
+                    <i className={isSearching ? "fas fa-spinner fa-spin" : "fas fa-search"}></i>
+                  </button>
+                </form>
+
+                {/* Search Results Dropdown */}
+                {showSearchResults && searchResults.length > 0 && (
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      backgroundColor: 'white',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      marginTop: '5px',
+                      maxHeight: '400px',
+                      overflowY: 'auto',
+                      zIndex: 1000,
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {searchResults.map((part) => (
+                      <div
+                        key={part.id}
+                        onClick={() => handlePartClick(part.id)}
+                        style={{
+                          padding: '12px 16px',
+                          cursor: 'pointer',
+                          borderBottom: '1px solid #f0f0f0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                      >
+                        {part.product_image && (
+                          <img 
+                            src={part.product_image} 
+                            alt={part.product_name}
+                            style={{
+                              width: '50px',
+                              height: '50px',
+                              objectFit: 'cover',
+                              borderRadius: '4px'
+                            }}
+                          />
+                        )}
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: '500', color: '#333', marginBottom: '4px' }}>
+                            {part.product_name}
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#666' }}>
+                            {part.part_group?.name} • ₹{part.sale_price || part.price}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* No Results Message */}
+                {showSearchResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      backgroundColor: 'white',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      marginTop: '5px',
+                      padding: '20px',
+                      textAlign: 'center',
+                      color: '#666',
+                      zIndex: 1000,
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    No parts found for "{searchQuery}"
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="col-auto">
               <div className="header-user-wrap">
                 <ul>
@@ -209,21 +349,18 @@ const HeaderFive = () => {
                             <div className="dropdown-menu to-top dropdown-menu-sm">
                               {isLoggedIn ? (
                                 <>
-                                  {/* User Info */}
                                   <div className='py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2'>
                                     <div className='d-flex align-items-center gap-3'>
                                      {profile_image && profile_image.trim() !== "" ? (
-  <img  style={{width: "50px", height: "50px", borderRadius: "50%", objectFit: "cover"}}
-    src={profile_image}
-    onError={(e) => {
-      console.log("IMAGE FAILED TO LOAD:", profile_image);
-      e.target.src = `${process.env.PUBLIC_URL}/assets/img/default-avatar.png`;
-    }}
-  />
-) : (
-  <div>👤</div>
-)}
-
+                                      <img  style={{width: "50px", height: "50px", borderRadius: "50%", objectFit: "cover"}}
+                                        src={profile_image}
+                                        onError={(e) => {
+                                          e.target.src = `${process.env.PUBLIC_URL}/assets/img/default-avatar.png`;
+                                        }}
+                                      />
+                                    ) : (
+                                      <div>👤</div>
+                                    )}
 
                                       <div>
                                         <h6 className='text-lg text-primary-light fw-semibold mb-2'>
@@ -239,7 +376,6 @@ const HeaderFive = () => {
                                     </button>
                                   </div>
 
-                                  {/* Authenticated User Menu */}
                                   <ul className="to-top-list">
                                     <li>
                                       <Link
@@ -344,36 +480,36 @@ const HeaderFive = () => {
         </div>
       </div>
 
-      <div className={`sticky-wrapper ${scroll && "sticky"}`}>
-        <div className={`mobile-menu-wrapper  ${active && "body-visible"}`}>
-          <div className="mobile-menu-area">
-            <div className="mobile-logo">
-              <Link to="/">
-                <img src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`} alt="Fixturbo" />
-              </Link>
-              <button className="menu-toggle" onClick={mobileMenu}>
-                <i className="fa fa-times" />
-              </button>
-            </div>
-            <div className="mobile-menu">
-              <ul id="offcanvas-navigation">
-                <li className="menu-item-has-children submenu-item-has-children">
-                  <Link to="/About">About</Link>
-                </li>
-                <li>
-                  <NavLink
-                    to="/contact"
-                    className={(navData) => (navData.isActive ? "active" : "")}
-                  >
-                    Contact
-                  </NavLink>
-                </li>
-              </ul>
-            </div>
-          </div>
+     <div className={`sticky-wrapper ${scroll && "sticky"}`}>
+    <div className={`mobile-menu-wrapper  ${active && "body-visible"}`}>
+      <div className="mobile-menu-area">
+        <div className="mobile-logo">
+          <Link to="/">
+            <img src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`} alt="Fixturbo" />
+          </Link>
+          <button className="menu-toggle" onClick={mobileMenu}>
+            <i className="fa fa-times" />
+          </button>
+        </div>
+        <div className="mobile-menu">
+          <ul id="offcanvas-navigation">
+            <li className="menu-item-has-children submenu-item-has-children">
+              <Link to="/About">About</Link>
+            </li>
+            <li>
+              <NavLink
+                to="/contact"
+                className={(navData) => (navData.isActive ? "active" : "")}
+              >
+                Contact
+              </NavLink>
+            </li>
+          </ul>
         </div>
       </div>
-    </header>
+    </div>
+  </div>
+</header>
   );
 };
 

@@ -12,9 +12,9 @@ const TestimonialOne = () => {
           <div className="col-lg-12">
             <div className="space1">
               <div className="title-area">
-                <h2 className="sec-title  text-center mt-5 gsa-title" style={{ color: "white" }}>
+                <h4 className="sec-title  text-center mt-5 " style={{ color: "white" }}>
                   Clients  Says
-                </h2>
+                </h4>
               </div>
               <div className="row global-carousel testmonial-slider">
                 <Swiper

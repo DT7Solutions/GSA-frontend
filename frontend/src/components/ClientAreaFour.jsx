@@ -5,12 +5,16 @@ import { Link } from "react-router-dom";
 const ClientAreaFour = () => {
   return (
     <div className="client-area-3">
+      {/* <div className="about1-shape-img shape-mockup">
+            <img className="about1-shape-img-1 spin" src={`${process.env.PUBLIC_URL}/assets/img/normal/about_shape1-2.svg`} alt="img" />
+            <img className="about1-shape-img-2 spin2" src={`${process.env.PUBLIC_URL}/assets/img/normal/about_shape1-1.svg`} alt="img" />
+        </div> */}
       <div className="container">
         <div className="row gx-80">
           <div className="col-lg-12">
             <div className="client-slider3">
               <div className="title-area">
-                <h2 className="sec-title text-dark text-center  gsa-title">Brands we Trust</h2>
+                <h4 className="sec-title text-dark text-center">Brands we Trust</h4>
               </div>
               <Swiper
                 navigation={{

@@ -144,12 +144,12 @@ const ModelVariantsList = () => {
     return (
         <div className="category-area-1 pb-100 brand-logo-display mt-5">
       <div className="container-fluid">
-        <h4 className="text-center fw-extrabold mb-20">
+        <h5 className="text-center fw-extrabold mb-20">
           Select Your {carModelItem.name} {carModelItem.generation} Variants
-        </h4>
-        <div className="row mt-5 brands-sec">
+        </h5>
+        <div className="row mt-5 brands-sec d-flex justify-content-center align-items-center">
         
-          <div className="col-sm-12 col-md-4 col-lg-4 mb-3">
+          <div className="col-sm-12 col-md-4 col-lg-3 mb-3">
             <div className="brand-models">
               <img src={carModelItem.image} alt={carModelItem.name} />
               <div className="text-center">
@@ -161,11 +161,12 @@ const ModelVariantsList = () => {
 
          
           {modelvariant.length > 0 ? (
-            <div className="col-sm-12 col-md-12 col-lg-12 mb-3">
+            <div className="col-sm-12 col-md-12 col-lg-9 mb-3">
               <div className="brand-models">
                 <div className="card">
-                  <div className="card-body">
-                    <table className="table bordered-table mb-0">
+                  
+                  <div className="card-body table-responsive">
+                    <table className="table basic-border-table mb-0">
                       <thead>
                         <tr>
                           <th scope="col">Name</th>
