@@ -212,9 +212,9 @@ const CustomerList = () => {
                 <div className="card-body p-24">
                     <div className="table-responsive scroll-sm">
                         <table className="table bordered-table sm-table mb-0">
-                            <thead>
+                            <thead >
                                 <tr>
-                                    <th scope="col">S.No</th>
+                                    <th scope="col" >S.No</th>
                                     <th scope="col">Username</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Phone</th>

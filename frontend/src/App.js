@@ -57,6 +57,7 @@ import Enquiryformpages from "./pages/dashboard-pages/Enquiryformpages"
 import UnauthorizedPage from "./pages/UnauthorizedPage"
 import Commingsoon from "./pages/Commingsoon"
 import CustomerListPage from "pages/dashboard-pages/CustomerListPage";
+import StaffList from "components/dashboard-components/Users/StaffList";
 
 function App() {
   return (
@@ -107,7 +108,7 @@ function App() {
 
 
          {/* Private Route for Dashboard2 */}
-        <Route element={<PrivateRoute requiredRoles={["admin"]} />}>
+        <Route element={<PrivateRoute requiredRoles={["admin","staff"]} />}>
           <Route path="/Dashboard" element={<AdminPage />} />
           <Route path="/Tables" element={<TableDataPage />} />
           <Route path="/OrderList" element={<OrdersListPage />} />
@@ -124,13 +125,14 @@ function App() {
 
           <Route path="/enquiry-queries" element={<Enquiryformpages />} />
           <Route path="/customers-list" element={<CustomerListPage />} />
+          <Route path="/staff-list" element={<StaffList />} />
         </Route>
 
         <Route element={<PrivateRoute requiredRoles={["customer"]} />}>
           <Route path="/orders" element={<ViewCustomerOrdersPage />} />
         </Route>
 
-         <Route element={<PrivateRoute requiredRoles={["admin","customer","Dealer"]} />}>
+         <Route element={<PrivateRoute requiredRoles={["admin","customer","staff"]} />}>
           <Route path="/view-profile" element={<ViewProfilePage />} />
           <Route path="/change-password" element={<ChnagePassword />} />
         </Route>

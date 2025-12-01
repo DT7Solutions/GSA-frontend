@@ -49,7 +49,7 @@ const HomePageSix = () => {
       <CategoryAreaOne />
 
       {/* Product Area One */}
-      {/* <ProductAreaTwo />   -------------------------------------- */}
+      <ProductAreaTwo />   
       {/* <ProductAreaOne /> */}
 
       {/* CTA Area Two */}

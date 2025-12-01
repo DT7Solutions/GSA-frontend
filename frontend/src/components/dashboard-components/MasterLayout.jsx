@@ -317,6 +317,17 @@ const MasterLayout = ({ children }) => {
                                         Customers
                                     </NavLink>
                                 </li>
+                                <li>
+            <NavLink
+                to='/staff-list'
+                className={(navData) =>
+                    navData.isActive ? "active-page" : ""
+                }
+            >
+                <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                Staff
+            </NavLink>
+        </li>
                             </ul>
                         </li>
 
