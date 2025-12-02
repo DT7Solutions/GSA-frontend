@@ -730,7 +730,7 @@ const ShopArea = ({ id }) => {
                 </div>
               </div>
 
-              <div className="widget widget_categories mt-5 bg-white rounded shadow-sm border p-0">
+              <div className="widget widget_categories hyperlink mt-5 bg-white rounded shadow-sm border p-0">
                 <h3 className="widget_title mb-3 border-bottom fw-bold text-dar p-3 bg-theme-sidebar">
                   Product Categories
                 </h3>
@@ -739,7 +739,7 @@ const ShopArea = ({ id }) => {
                     categories.map((category) => (
                       <li key={category.id} className="mb-3">
                         <div
-                          className="category-card d-flex justify-content-between align-items-center p-3 rounded border hover-shadow"
+                          className="category-card sidebar-point d-flex justify-content-between align-items-center  rounded border hover-shadow"
                           onClick={() => handleCategoryClick(category.id)}
                           style={{ cursor: "pointer" }}
                         >
@@ -767,11 +767,11 @@ const ShopArea = ({ id }) => {
                                   >
                                     <Link
                                       to={`/shop/${group.id}`}
-                                      className="text-decoration-none text-secondary fw-medium p-3 mb-0"
+                                      className="text-decoration-none text-secondary fw-medium sidebar-point mb-0"
                                     >
                                       {group.name}
                                     </Link>
-                                    <span className="toggle-square p-3">
+                                    <span className="toggle-square sidebar-point">
                                       {expandedPartGroupId === group.id
                                         ? "⊟"
                                         : "⊞"}
@@ -781,12 +781,12 @@ const ShopArea = ({ id }) => {
                                   {expandedPartGroupId === group.id &&
                                     partItemsByGroup[group.id] &&
                                     partItemsByGroup[group.id].length > 0 && (
-                                      <ul className="part-item-list list-unstyled ps-4 mt-2">
+                                      <ul className="part-item-list list-unstyled ps-4 mt-3">
                                         {partItemsByGroup[group.id].map((item) => (
-                                          <li key={item.id} className="py-1">
+                                          <li key={item.id} className="pb-1">
                                             <Link
                                               to={`/shop-details/${item.id}`}
-                                              className="text-decoration-none text-muted hover-text-dark"
+                                              className="text-decoration-none text-muted hover-text-dark mb-2 pb-3 px-3"
                                             >
                                               {item.product_name || item.name}
                                             </Link>

@@ -321,5 +321,18 @@
 }
 
 
+/*  */
+.dropdown-menu[style] {
+  right:0!important;
+}
+.btn-theme{
+  background-color: #0068A5!important;
+}
 
+ .sidebar-point{
+  padding:0.8rem!important;
+}
 
+.widget_categories a{
+  font-size:12px!important;
+}

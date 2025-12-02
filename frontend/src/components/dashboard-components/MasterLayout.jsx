@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import API_BASE_URL from "../../config";
 import notificationService from '../dashboard-components/NotificationService';
+import NotificationDropdown from '../dashboard-components/NotificationDropdown';
 
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,6 +19,7 @@ const MasterLayout = ({ children }) => {
     const [userName, setUserName] = useState("");
     const [userRole, setUserRole] = useState("");
     const [notificationCount, setNotificationCount] = useState(0);
+    const [hasShownNotifications, setHasShownNotifications] = useState(new Set());
 
     // Dropdown menu effect
     useEffect(() => {
@@ -447,43 +449,16 @@ const MasterLayout = ({ children }) => {
                         
                         <div className='col-auto'>
                             <div className='d-flex flex-wrap align-items-center gap-3'>
-                                {/* Notification Bell */}
+                                {/* Notification Bell with Dropdown */}
                                 {(userRole === "Admin" || userRole === "Staff") && (
-                                    <div className='dropdown'>
-                                        <button
-                                            className='position-relative d-flex justify-content-center align-items-center rounded-circle'
-                                            type='button'
-                                            style={{ width: '40px', height: '40px', border: '1px solid #ddd' }}
-                                            onClick={() => {
-                                                setNotificationCount(0);
-                                                navigate('/OrderList');
-                                            }}
-                                        >
-                                            <Icon icon='mdi:bell-outline' className='text-xl' />
-                                            {notificationCount > 0 && (
-                                                <span className='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>
-                                                    {notificationCount > 9 ? '9+' : notificationCount}
-                                                </span>
-                                            )}
-                                        </button>
-                                    </div>
+                                    <NotificationDropdown 
+                                        notificationCount={notificationCount}
+                                        setNotificationCount={setNotificationCount}
+                                    />
                                 )}
 
                                 {/* User Profile Dropdown */}
                                 <div className='dropdown'>
-                                     {/* Toast Container */}
-            <ToastContainer
-                position="top-right"
-                autoClose={8000}
-                hideProgressBar={false}
-                newestOnTop={true}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
                                     <button
                                         className='d-flex justify-content-center align-items-center rounded-circle'
                                         type='button'
@@ -560,6 +535,20 @@ const MasterLayout = ({ children }) => {
                     </div>
                 </div>
 
+                {/* Toast Container */}
+                <ToastContainer
+                    position="top-right"
+                    autoClose={8000}
+                    hideProgressBar={false}
+                    newestOnTop={true}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
+
                 {/* dashboard-main-body */}
                 <div className='dashboard-main-body'>{children}</div>
 
@@ -577,8 +566,6 @@ const MasterLayout = ({ children }) => {
                     </div>
                 </footer>
             </main>
-
-           
         </section>
     );
 };
