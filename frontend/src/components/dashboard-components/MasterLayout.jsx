@@ -4,6 +4,10 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import API_BASE_URL from "../../config";
+import notificationService from '../dashboard-components/NotificationService';
+
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MasterLayout = ({ children }) => {
     let [sidebarActive, seSidebarActive] = useState(false);
@@ -13,7 +17,9 @@ const MasterLayout = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState("");
     const [userRole, setUserRole] = useState("");
+    const [notificationCount, setNotificationCount] = useState(0);
 
+    // Dropdown menu effect
     useEffect(() => {
         const handleDropdownClick = (event) => {
             event.preventDefault();
@@ -78,7 +84,7 @@ const MasterLayout = ({ children }) => {
                 trigger.removeEventListener("click", handleDropdownClick);
             });
         };
-    }, [location.pathname]);
+    }, [location.pathname, userRole]);
 
     let sidebarControl = () => {
         seSidebarActive(!sidebarActive);
@@ -88,6 +94,7 @@ const MasterLayout = ({ children }) => {
         setMobileMenu(!mobileMenu);
     };
 
+    // Get user data
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
 
@@ -123,10 +130,59 @@ const MasterLayout = ({ children }) => {
         }
     }, []);
 
+    // Notification polling effect
+    useEffect(() => {
+        // Only start polling if user is admin or staff
+        if (userRole === "Admin" || userRole === "Staff") {
+            console.log(`👤 ${userRole} logged in - starting notification service`);
+            
+            // Handle incoming notifications
+            const handleNotification = (notifications) => {
+                notifications.forEach(notification => {
+                    // Play notification sound
+                    const audio = new Audio('/notification-sound.mp3');
+                    audio.play().catch(e => console.log('Audio play failed:', e));
+                    
+                    // Show toast notification
+                    toast.success(
+                        <div>
+                            <strong>🛒 New Order!</strong>
+                            <div style={{ fontSize: '0.9em', marginTop: '5px' }}>
+                                Order #{notification.order_id} from {notification.customer_name}
+                                <br />
+                                Amount: ₹{notification.total_amount.toFixed(2)}
+                            </div>
+                        </div>,
+                        {
+                            position: "top-right",
+                            autoClose: 8000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                        }
+                    );
+                    
+                    // Update notification count
+                    setNotificationCount(prev => prev + 1);
+                });
+            };
+            
+            notificationService.addListener(handleNotification);
+            notificationService.startPolling(10000); // Poll every 10 seconds
+            
+            return () => {
+                notificationService.removeListener(handleNotification);
+                notificationService.stopPolling();
+            };
+        }
+    }, [userRole]);
+
     const handleLogout = () => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         setIsLoggedIn(false);
+        notificationService.stopPolling();
         navigate("/login");
     };
 
@@ -300,37 +356,39 @@ const MasterLayout = ({ children }) => {
                             </ul>
                         </li>
 
-                        <li className='dropdown'>
-                            <Link to='#'>
-                                <Icon icon='solar:users-group-rounded-outline' className='menu-icon' />
-                                <span>Users</span>
-                            </Link>
-                            <ul className='sidebar-submenu'>
-                                <li>
-                                    <NavLink
-                                        to='/customers-list'
-                                        className={(navData) =>
-                                            navData.isActive ? "active-page" : ""
-                                        }
-                                    >
-                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                                        Customers
-                                    </NavLink>
-                                </li>
-                                <li>
-            <NavLink
-                to='/staff-list'
-                className={(navData) =>
-                    navData.isActive ? "active-page" : ""
-                }
-            >
-                <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                Staff
-            </NavLink>
-        </li>
-                            </ul>
-                        </li>
-
+                        {userRole === "Admin" && (
+                            <li className='dropdown'>
+                                <Link to='#'>
+                                    <Icon icon='solar:users-group-rounded-outline' className='menu-icon' />
+                                    <span>Users</span>
+                                </Link>
+                                <ul className='sidebar-submenu'>
+                                    <li>
+                                        <NavLink
+                                            to='/customers-list'
+                                            className={(navData) =>
+                                                navData.isActive ? "active-page" : ""
+                                            }
+                                        >
+                                            <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                            Customers
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            to='/staff-list'
+                                            className={(navData) =>
+                                                navData.isActive ? "active-page" : ""
+                                            }
+                                        >
+                                            <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                            Staff
+                                        </NavLink>
+                                    </li>
+                                </ul>
+                            </li>
+                        )}
+                        
                         <li className='dropdown'>
                             <Link to='#'>
                                 <Icon icon='mdi:form-outline' className='menu-icon' />
@@ -354,8 +412,8 @@ const MasterLayout = ({ children }) => {
                     </ul>
                 </div>
             </aside>
-            <main
-                className={sidebarActive ? "dashboard-main active" : "dashboard-main"}>
+            
+            <main className={sidebarActive ? "dashboard-main active" : "dashboard-main"}>
                 <div className='navbar-header'>
                     <div className='row align-items-center justify-content-between'>
                         <div className='col-auto'>
@@ -386,9 +444,46 @@ const MasterLayout = ({ children }) => {
                                 </button>
                             </div>
                         </div>
+                        
                         <div className='col-auto'>
-                            <div className='d-flex flex-wrap align-items-center gap-4'>
+                            <div className='d-flex flex-wrap align-items-center gap-3'>
+                                {/* Notification Bell */}
+                                {(userRole === "Admin" || userRole === "Staff") && (
+                                    <div className='dropdown'>
+                                        <button
+                                            className='position-relative d-flex justify-content-center align-items-center rounded-circle'
+                                            type='button'
+                                            style={{ width: '40px', height: '40px', border: '1px solid #ddd' }}
+                                            onClick={() => {
+                                                setNotificationCount(0);
+                                                navigate('/OrderList');
+                                            }}
+                                        >
+                                            <Icon icon='mdi:bell-outline' className='text-xl' />
+                                            {notificationCount > 0 && (
+                                                <span className='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>
+                                                    {notificationCount > 9 ? '9+' : notificationCount}
+                                                </span>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* User Profile Dropdown */}
                                 <div className='dropdown'>
+                                     {/* Toast Container */}
+            <ToastContainer
+                position="top-right"
+                autoClose={8000}
+                hideProgressBar={false}
+                newestOnTop={true}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
                                     <button
                                         className='d-flex justify-content-center align-items-center rounded-circle'
                                         type='button'
@@ -483,6 +578,7 @@ const MasterLayout = ({ children }) => {
                 </footer>
             </main>
 
+           
         </section>
     );
 };

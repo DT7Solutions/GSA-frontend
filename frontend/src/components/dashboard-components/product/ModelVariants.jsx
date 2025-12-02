@@ -153,7 +153,7 @@ const ModelVariantsList = () => {
             <div className="brand-models">
               <img src={carModelItem.image} alt={carModelItem.name} />
               <div className="text-center">
-                {carModelItem.car_make} {carModelItem.name}{" "}
+                {carModelItem.car_make_name} {carModelItem.name}{" "}
                 {carModelItem.generation}
               </div>
             </div>

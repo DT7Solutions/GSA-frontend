@@ -172,7 +172,7 @@ const CustomerList = () => {
                         <select 
                             className="form-select form-select-sm w-auto ps-12 py-6 radius-12 h-40-px"
                             value={itemsPerPage}
-                            disabled
+                            disabled  style={{lineHeight:"28px"}}
                         >
                             <option>10</option>
                             <option>20</option>
@@ -183,8 +183,8 @@ const CustomerList = () => {
                         {/* Role Filter */}
                         <div className="d-flex align-items-center gap-2 ms-3">
                             <span className="text-md fw-medium text-secondary-light mb-0">Role:</span>
-                            <select 
-                                className="form-select form-select-sm w-auto ps-12 py-6 radius-12 h-40-px"
+                            <select style={{lineHeight:"28px"}} 
+                                className="form-select form-select-sm w-auto ps-12 py-6 radius-12 h-40-px" 
                                 value={selectedRole}
                                 onChange={(e) => {
                                     setSelectedRole(e.target.value);

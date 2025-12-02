@@ -555,9 +555,9 @@ const ShopArea = ({ id }) => {
                   </>
                 ) : (
                   // Enquiry Form when no products found
-                  <div className="card shadow-sm">
+                  <div className="">
                     <div className="card-body p-4">
-                      <div className="text-center mb-4">
+                      <div className="text-center mb-5">
                         <i
                           className="fas fa-search"
                           style={{ fontSize: "3rem", color: "#6c757d" }}
@@ -571,11 +571,11 @@ const ShopArea = ({ id }) => {
                       </div>
 
                       <form
-                        className="comment-form bg-light p-4 rounded"
+                        className="comment-form bg-light p-4 rounded card shadow-sm"
                         onSubmit={handleEnquirySubmit}
                       >
-                        <h5 className="mb-4">Submit Product Enquiry</h5>
-                        <div className="row">
+                        <h5 className="mb-4 text-center">Submit Product Enquiry</h5>
+                        <div className="row p-lg-5 p-3">
                           <div className="col-md-6 form-group mb-3">
                             <input
                               type="text"
