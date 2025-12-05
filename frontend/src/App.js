@@ -126,6 +126,7 @@ function App() {
           <Route path="/enquiry-queries" element={<Enquiryformpages />} />
           <Route path="/customers-list" element={<CustomerListPage />} />
           <Route path="/staff-list" element={<StaffList />} />
+       
         </Route>
 
         <Route element={<PrivateRoute requiredRoles={["customer"]} />}>

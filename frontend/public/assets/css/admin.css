@@ -333,6 +333,35 @@
   padding:0.8rem!important;
 }
 
-.widget_categories a{
+.hyperlink a{
   font-size:12px!important;
+}
+.copyright-wrap{
+  background-color:#1b1b1b!important;
+}
+.heading-banner-section{
+  font-size: xx-large!important;
+}
+/* .sidebar-shop{
+  background-color: #fff;
+  box-shadow: #E5E5E5;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+} */
+
+.show-num .single-select,.show-num .form-select,.show-num select {
+  line-height: 50px!important;
+}
+/* white background + custom arrow color (#0068a5) */
+.single-select,
+.form-select,
+.show-num select {
+  background-color: #ffffff !important;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath fill=%27none%27 stroke=%27%230068a5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%272%27 d=%27M2 5l6 6 6-6%27/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 1em 1em !important;
+  padding-right: 2.25rem !important; /* space for arrow */
+  height:40px!important;
+  line-height:40px!important
 }

@@ -11,13 +11,14 @@ const ShopArea = ({ id }) => {
   const [range, setRange] = useState([0, 100]);
   const [productData, setProductData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 9;
+  const [productsPerPage, setProductsPerPage] = useState(9);
 
   const [carMakes, setCarMakes] = useState([]);
   const [carModels, setCarModels] = useState([]);
   const [modelVariant, setModelVariant] = useState([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [sortBy, setSortBy] = useState("latest");
 
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
@@ -88,7 +89,6 @@ const ShopArea = ({ id }) => {
 
       Swal.fire("Success!", "Your enquiry has been submitted successfully.", "success");
       
-      // Reset form but keep car details
       setEnquiryFormData({
         name: "",
         phone: "",
@@ -114,34 +114,53 @@ const ShopArea = ({ id }) => {
     setCurrentPage(1);
   };
 
-  useEffect(() => {
-  const fetchProductData = async () => {
-    try {
-      setIsLoadingProducts(true);
-      // Clear previous data before fetching
-      setProductData([]);
-      setFilteredProducts([]);
-      
-      const response = await axios.get(`${API_BASE_URL}api/home/car_part_items/${id}/`);
-      setProductData(response.data);
-      setFilteredProducts(response.data);
-      
-      // Reset to first page when new data loads
-      setCurrentPage(1);
-    } catch (error) {
-      console.error("Error fetching car parts:", error);
-      // Clear data on error too
-      setProductData([]);
-      setFilteredProducts([]);
-    } finally {
-      setIsLoadingProducts(false);
+  // Sort products based on selected option
+  const sortProducts = (products, sortType) => {
+    const sorted = [...products];
+    
+    switch (sortType) {
+      case "price-low-high":
+        return sorted.sort((a, b) => a.sale_price - b.sale_price);
+      case "price-high-low":
+        return sorted.sort((a, b) => b.sale_price - a.sale_price);
+      case "latest":
+      default:
+        return sorted.sort((a, b) => b.id - a.id);
     }
   };
 
-  if (id) {
-    fetchProductData();
-  }
-}, [id]);
+  useEffect(() => {
+    const fetchProductData = async () => {
+      try {
+        setIsLoadingProducts(true);
+        setProductData([]);
+        setFilteredProducts([]);
+        
+        const response = await axios.get(`${API_BASE_URL}api/home/car_part_items/${id}/`);
+        setProductData(response.data);
+        setFilteredProducts(response.data);
+        
+        setCurrentPage(1);
+      } catch (error) {
+        console.error("Error fetching car parts:", error);
+        setProductData([]);
+        setFilteredProducts([]);
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    };
+
+    if (id) {
+      fetchProductData();
+    }
+  }, [id]);
+
+  // Apply sorting when sortBy changes
+  useEffect(() => {
+    const sorted = sortProducts(filteredProducts, sortBy);
+    setFilteredProducts(sorted);
+    setCurrentPage(1);
+  }, [sortBy]);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -155,6 +174,15 @@ const ShopArea = ({ id }) => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const handleProductsPerPageChange = (e) => {
+    setProductsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (e) => {
+    setSortBy(e.target.value);
   };
 
   const isTokenValid = (token) => {
@@ -319,31 +347,29 @@ const ShopArea = ({ id }) => {
   };
 
   const handlePartGroupClick = async (groupId) => {
-  if (expandedPartGroupId === groupId) {
-    setExpandedPartGroupId(null);
-    return;
-  }
+    if (expandedPartGroupId === groupId) {
+      setExpandedPartGroupId(null);
+      return;
+    }
 
-  setExpandedPartGroupId(groupId);
+    setExpandedPartGroupId(groupId);
 
-  // Skip fetch if already loaded
-  if (partItemsByGroup[groupId]) return;
+    if (partItemsByGroup[groupId]) return;
 
-  try {
-    const response = await axios.get(`${API_BASE_URL}api/home/car_part_items/${groupId}/`);
-    setPartItemsByGroup((prev) => ({
-      ...prev,
-      [groupId]: response.data,
-    }));
-  } catch (error) {
-    console.error("Error fetching part items:", error);
-    // Set empty array on error
-    setPartItemsByGroup((prev) => ({
-      ...prev,
-      [groupId]: [],
-    }));
-  }
-};
+    try {
+      const response = await axios.get(`${API_BASE_URL}api/home/car_part_items/${groupId}/`);
+      setPartItemsByGroup((prev) => ({
+        ...prev,
+        [groupId]: response.data,
+      }));
+    } catch (error) {
+      console.error("Error fetching part items:", error);
+      setPartItemsByGroup((prev) => ({
+        ...prev,
+        [groupId]: [],
+      }));
+    }
+  };
 
   return (
     <section className="space-top space-extra-bottom shop-sec">
@@ -372,6 +398,58 @@ const ShopArea = ({ id }) => {
               <>
                 {currentProducts.length > 0 ? (
                   <>
+                    {/* Product Count and Sort Options Bar */}
+                    <div className="d-flex justify-content-between align-items-center mb-5 p-3 bg-light rounded">
+                      <div className="product-count">
+                        <p className="mb-0">
+                          Showing <strong>{indexOfFirstProduct + 1}</strong> to{" "}
+                          <strong>
+                            {Math.min(indexOfLastProduct, filteredProducts.length)}
+                          </strong>{" "}
+                          of <strong>{filteredProducts.length}</strong> products
+                        </p>
+                      </div>
+
+                      <div className="d-flex gap-3 align-items-center show-num">
+                        {/* Products Per Page */}
+                        <div className="d-flex align-items-center gap-2">
+                          <label htmlFor="perPage" className="mb-0 text-nowrap">
+                            Show:
+                          </label>
+                          <select
+                            id="perPage"
+                            className=""
+                            style={{ width: "80px" }}
+                            value={productsPerPage}
+                            onChange={handleProductsPerPageChange}
+                          >
+                            <option value={9}>9</option>
+                            <option value={12}>12</option>
+                            <option value={18}>18</option>
+                            <option value={24}>24</option>
+                          </select>
+                        </div>
+
+                        {/* Sort By */}
+                        <div className="d-flex align-items-center gap-2 show-num">
+                          <label htmlFor="sortBy" className="mb-0 text-nowrap">
+                            Sort by:
+                          </label>
+                          <select
+                            id="sortBy"
+                            className=""
+                            style={{ width: "150px" }}
+                            value={sortBy}
+                            onChange={handleSortChange}
+                          >
+                            <option value="latest">Latest</option>
+                            <option value="price-low-high">Price: Low to High</option>
+                            <option value="price-high-low">Price: High to Low</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="row gy-4">
                       {currentProducts.map((product, index) => (
                         <div className="col-xl-4 col-md-6 col-6" key={index}>

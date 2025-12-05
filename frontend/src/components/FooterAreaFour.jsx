@@ -125,7 +125,7 @@ Available in Guntur
           <div className="row gy-3 justify-content-md-between justify-content-center">
             <div className="col-auto align-self-center">
               <p className="copyright-text text-center">
-                © <Link to="#" className="highlight-text">GOWRISANKAR AGENCIES</Link> 2025 | All Rights Reserved
+             Copyright ©  2025 <Link to="#" className="highlight-text">GOWRISANKAR AGENCIES</Link> | All Rights Reserved
               </p>
             </div>
             <div className="col-auto">
