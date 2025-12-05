@@ -245,7 +245,7 @@ select.form-select option {
 
 }
 .brands-sec .category-card-item img{
-    height: 250px !important;
+    height: 120px !important;
     /* border-radius: 50%; */
     cursor: pointer !important;
     

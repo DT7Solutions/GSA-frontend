@@ -20,7 +20,8 @@ import TestimonialOne from "../components/TestimonialOne";
 import CategoriesSection from "../components/CategoriesSection";
 import CurrentOffers from "../components/CurrentOffersSection";
 
-import SearchVehicleArea from "../components/SearchVehicleArea"
+import SearchVehicleArea from "../components/SearchVehicleArea";
+import TwoBannerSection from "components/Bannersection";
 
 const HomePageSix = () => {
   let [active, setActive] = useState(true);
@@ -44,12 +45,12 @@ const HomePageSix = () => {
 
       {/* search filters  */}
       {/* <SearchVehicleArea /> */}
-
+  <TwoBannerSection/>
       {/* Category Area One */}
       <CategoryAreaOne />
 
       {/* Product Area One */}
-      <ProductAreaTwo />   
+      {/* <ProductAreaTwo />    */}
       {/* <ProductAreaOne /> */}
 
       {/* CTA Area Two */}
@@ -69,9 +70,10 @@ const HomePageSix = () => {
       {/* <FaqAreaThree />  -------------------------------- */}
 
       {/* Client Area Four */}
+      <TestimonialOne />
       <ClientAreaFour />
 
-      <TestimonialOne />
+      
 
       {/* Blog Area Two */}
       {/* <div className="space-top">

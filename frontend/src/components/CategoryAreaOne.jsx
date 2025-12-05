@@ -31,7 +31,7 @@ const CategoryAreaOne = () => {
 
         {carMakes.map((make) => (
         <div key={make.id} className="col-sm-12 col-md-3 col-lg-3 mb-3">
-          <div className="category-card-item aligen-items-center">
+          <div className="category-card-item brand-design aligen-items-center">
               <Link
                 to={`/brand-models/${make.id}`}
                 onClick={() => {
