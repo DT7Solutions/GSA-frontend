@@ -122,16 +122,14 @@ const CarCategoryList = () => {
 
   return (
     <div className="card basic-data-table">
-      <div className="card-header d-flex justify-content-between align-items-center">
+      {/* <div className="card-header d-flex justify-content-between align-items-center">
         <h5 className="card-title mb-0">Car Part Category List</h5>
-        {/* <button className="btn btn-primary btn-sm" onClick={handleAddClick}>
-          Add Category
-        </button> */}
-      </div>
+      
+      </div> */}
       <div className="card-body">
         <div className="table-responsive">
           <table
-            className="table bordered-table mb-0"
+            className="table bordered-table mb-0 sm-table"
             id="dataTable"
             data-page-length={10}
           >

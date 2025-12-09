@@ -154,12 +154,10 @@ const CarModelsDisplay = () => {
 
     return (
         <div className="card basic-data-table">
-            <div className="card-header">
-                <h5 className="card-title mb-0">Car Brands List</h5>
-            </div>
+           
             <div className="card-body">
                 <div className="table-responsive">
-                    <table className="table bordered-table mb-0">
+                    <table className="table bordered-table mb-0 sm-table">
                         <thead>
                             <tr>
                                 <th>S.L</th>

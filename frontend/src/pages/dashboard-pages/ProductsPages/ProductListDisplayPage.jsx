@@ -12,7 +12,7 @@ const ProductListDisplayPage = () => {
       <MasterLayout>
 
         {/* Breadcrumb */}
-        <Breadcrumb title="Basic Table" />
+        <Breadcrumb title="Product List" />
 
         {/* TableDataLayer */}
         <ProductListDisplay />

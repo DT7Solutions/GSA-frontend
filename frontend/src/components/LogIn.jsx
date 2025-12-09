@@ -198,7 +198,7 @@ const Login = () => {
           </div>
           <div className="col-md-5">
             <div className="">
-              <h2 className="text-center mb-4 my-5">Sign In</h2>
+              <h4 className="text-center mb-4 my-5">Sign In</h4>
               <form onSubmit={isOtpLogin ? (otpSent ? verifyOtp : requestOtp) : handleLogin} className="input-style">
             
                 {isOtpLogin ? (
@@ -253,26 +253,17 @@ const Login = () => {
                         required
                       />
                     </div>
-                    <div className="mb-3 position-relative input-g">
-                      <label className="form-label">Password</label>
-                      <div className="input-group password-input">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          className="form-control"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                          style={{height:"47.5px"}}
-                        />
-                        <button
-                          type="button"
-                          className="btn eye-btn btn-fw"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <FaEyeSlash /> : <FaEye />}
-                        </button>
-                      </div>
-                    </div>
+                   <div className="mb-3 position-relative input-g">
+  <label className="form-label">Password</label>
+  <input
+    type="password"
+    className="form-control"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    required
+    style={{ height: "47.5px" }}
+  />
+</div>
 
                     {/* Remember Me & Forgot Password */}
                     <div className="d-flex justify-content-between mb-3">

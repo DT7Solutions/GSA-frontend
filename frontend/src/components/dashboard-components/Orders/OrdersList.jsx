@@ -185,9 +185,10 @@ const OrdersList = () => {
 
   return (
     <div className="card basic-data-table">
-      <div className="card-header"><h5>Orders List</h5></div>
+      {/* <div className="card-header"><h5>Orders List</h5></div> */}
       <div className="card-body">
-        <table className="table bordered-table mb-0" id="dataTable">
+        <div className="table-responsive">
+        <table className="table bordered-table mb-0 sm-table" id="dataTable">
           <thead>
             <tr>
               <th>S.L</th>
@@ -245,6 +246,7 @@ const OrdersList = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {showModal && selectedOrder && (

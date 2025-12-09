@@ -12,7 +12,7 @@ const CarBrandListPage = () => {
       <MasterLayout>
 
         {/* Breadcrumb */}
-        <Breadcrumb title="Car Barnds" />
+        <Breadcrumb title="Car Brands" />
 
         {/* TableDataLayer */}
         <CarBrandDisplay />

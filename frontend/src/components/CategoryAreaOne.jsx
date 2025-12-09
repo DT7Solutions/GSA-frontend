@@ -21,6 +21,13 @@ const CategoryAreaOne = () => {
     fetchCarMakes();
   }, []);
 
+  // Fixed: Store consistent brand data
+  const handleBrandClick = (make) => {
+    localStorage.setItem("selected_brand", JSON.stringify({ 
+      brand: make.id,           // Use 'brand' instead of 'brand_id'
+      brand_name: make.name 
+    }));
+  };
 
   return (
     <div className="category-area-1 pb-100 brand-logo-display">
@@ -34,13 +41,8 @@ const CategoryAreaOne = () => {
           <div className="category-card-item brand-design aligen-items-center">
               <Link
                 to={`/brand-models/${make.id}`}
-                onClick={() => {
-                   
-               
-                  localStorage.setItem("selected_brand", JSON.stringify({ brand_id: make.id, brand_name: make.name }));
-                }}
+                onClick={() => handleBrandClick(make)}
               >
-
                 <img
                   src={make.image}
                   alt={make.name}
@@ -48,9 +50,11 @@ const CategoryAreaOne = () => {
                 />
               </Link>
             <div className="text-center">
-                <Link to={`/brand-models/${make.id}`} onClick={() => {
-                  localStorage.setItem("selected_brand", JSON.stringify({ brand_name: make.id }));
-                }} className="text-center brand-name car-brand-name">
+                <Link 
+                  to={`/brand-models/${make.id}`} 
+                  onClick={() => handleBrandClick(make)} 
+                  className="text-center brand-name car-brand-name"
+                >
                   {make.name}
                 </Link>
             </div>

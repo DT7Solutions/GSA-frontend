@@ -22,6 +22,8 @@ import CurrentOffers from "../components/CurrentOffersSection";
 
 import SearchVehicleArea from "../components/SearchVehicleArea";
 import TwoBannerSection from "components/Bannersection";
+import MarqueeOne from "components/MarqueeOne";
+
 
 const HomePageSix = () => {
   let [active, setActive] = useState(true);
@@ -34,14 +36,14 @@ const HomePageSix = () => {
     <>
       {/* Preloader */}
       {active === true && <Preloader />}
-
+  <MarqueeOne/>
       {/* Header Five */}
       <HeaderFive />
 
       {/* Hero Six */}
       <HeroFive />
       {/* featur section  */}
-      {/* <FeatureArea /> */}
+      <FeatureArea />
 
       {/* search filters  */}
       {/* <SearchVehicleArea /> */}
@@ -70,7 +72,7 @@ const HomePageSix = () => {
       {/* <FaqAreaThree />  -------------------------------- */}
 
       {/* Client Area Four */}
-      <TestimonialOne />
+      {/* <TestimonialOne /> */}
       <ClientAreaFour />
 
       
@@ -83,7 +85,7 @@ const HomePageSix = () => {
       {/* Subscribe Two */}
       {/* <SubscribeTwo /> */}
 
-      {/* Footer Area Four */}
+     
       <FooterAreaFour />
     </>
   );

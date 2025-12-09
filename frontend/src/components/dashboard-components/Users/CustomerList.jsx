@@ -170,7 +170,7 @@ const CustomerList = () => {
                             Show
                         </span>
                         <select 
-                            className="form-select form-select-sm w-auto ps-12 py-6 radius-12 h-40-px"
+                            className="form-select form-select-sm w-auto ps-12  radius-12 h-40-px"
                             value={itemsPerPage}
                             disabled  style={{lineHeight:"28px"}}
                         >
@@ -184,7 +184,7 @@ const CustomerList = () => {
                         <div className="d-flex align-items-center gap-2 ms-3">
                             <span className="text-md fw-medium text-secondary-light mb-0">Role:</span>
                             <select style={{lineHeight:"28px"}} 
-                                className="form-select form-select-sm w-auto ps-12 py-6 radius-12 h-40-px" 
+                                className="form-select form-select-sm w-auto ps-12  radius-12 h-40-px" 
                                 value={selectedRole}
                                 onChange={(e) => {
                                     setSelectedRole(e.target.value);
@@ -263,7 +263,7 @@ const CustomerList = () => {
                                             </td>
                                             <td>
                                                 <span
-                                                    className={`badge text-sm fw-semibold ${getRoleBadgeColor(customer.role_name)} px-20 py-9 radius-4`}
+                                                    className={`badge text-sm fw-semibold ${getRoleBadgeColor(customer.role_name)}  px-20 py-9 radius-4`}
                                                 >
                                                     {customer.role_name || "N/A"}
                                                 </span>
@@ -277,8 +277,8 @@ const CustomerList = () => {
                                                 <span
                                                     className={`badge text-sm fw-semibold ${
                                                         customer.is_active
-                                                            ? "text-success-600 bg-success-100"
-                                                            : "text-danger-600 bg-danger-100"
+                                                            ? "text-success-600 bg-success-100 border border-success-main"
+                                                            : "text-danger-600 bg-danger-100 border border-danger-main"
                                                     } px-20 py-9 radius-4`}
                                                 >
                                                     {customer.is_active ? "Active" : "Inactive"}
@@ -303,7 +303,7 @@ const CustomerList = () => {
                                                     ) : (
                                                         <button
                                                             type="button"
-                                                            className="badge text-sm fw-semibold bg-primary-600 px-20 py-9 radius-4 text-white d-flex align-items-center gap-1"
+                                                            className="badge text-sm fw-semibold bg-primary-600 px-20 py-9 radius-4 text-white border-success-main d-flex align-items-center gap-1"
                                                             onClick={() => setToggleModal({
                                                                 show: true,
                                                                 customerId: customer.id,

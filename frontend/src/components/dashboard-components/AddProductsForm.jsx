@@ -559,7 +559,7 @@ const AddProductsForm = () => {
         <div className="col-lg-12">
             <div className="card">
                 <div className="card-header">
-                    <h5 className="card-title mb-0">Add Products</h5>
+                    {/* <h5 className="card-title mb-0">Add Products</h5> */}
                     <BulkProductUpload />
                 </div>
                 <div className="card-body">
@@ -568,7 +568,7 @@ const AddProductsForm = () => {
                         <div className="col-md-4">
                             <label className="form-label">Select Car</label>
                             <div className="input-group has-validation">
-                                <div className='search-select'>
+                                <div className='addproduct-select search-select'>
                                 <Select
                                     className="basic-single input-g"
                                     classNamePrefix="select"
@@ -596,7 +596,7 @@ const AddProductsForm = () => {
                         {/* Car Model Selection */}
                         <div className="col-md-4">
                             <label className="form-label">Select Car Model</label>
-                            <div className="input-group has-validation">
+                            <div className="addproduct-select input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarModelChange}>
                                     
                                     <option >-- select car model --</option>
@@ -617,7 +617,7 @@ const AddProductsForm = () => {
                         {/* Car Variant Selection */}
                         <div className="col-md-4">
                             <label className="form-label">Select Car Variant</label>
-                            <div className="input-group has-validation">
+                            <div className="addproduct-select input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarVariantChange}>
                                     <option >-- select Car Variant --</option>
                                     {carVariant.map((varient) => (
@@ -637,7 +637,7 @@ const AddProductsForm = () => {
                         {/* Part Selection */}
                         <div className="col-md-4">
                             <label className="form-label">Select Part category</label>
-                            <div className="input-group has-validation">
+                            <div className="addproduct-select input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarcategorytChange}>
                                     <option >-- select car  part category --  </option>
                                     {carPartCat.map((item) => (
@@ -658,7 +658,7 @@ const AddProductsForm = () => {
                         {/* Part */}
                         <div className="col-md-4">
                             <label className="form-label">Select Part </label>
-                            <div className="input-group has-validation">
+                            <div className="addproduct-select input-group has-validation">
                                 <select className="form-select form-select input-g" onChange={handleCarpartitemChange}>
                                     <option >-- select car  part  --  </option>
                                     {carcatGroup.map((item) => (
@@ -845,7 +845,7 @@ const AddProductsForm = () => {
 
 
                         <div className="col-12">
-                            <button className="btn btn-primary-600 style2" style={{ position: "unset" }} type="submit">
+                            <button className="btn-theme-admin btn-primary-600 style2" style={{ position: "unset" }} type="submit">
                             Add Car Part
                             </button>
                         </div>

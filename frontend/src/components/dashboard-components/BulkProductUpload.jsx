@@ -341,7 +341,7 @@ const BulkProductUpload = () => {
             {/* Bulk Upload Button */}
             <button
                 type="button"
-                className="btn btn-success"
+                className="btn-theme-admin btn-success justify-content-center d-flex align-items-center gap-2"
                 onClick={() => setShowBulkModal(true)}
                 style={{ marginLeft: '10px' }}
             >

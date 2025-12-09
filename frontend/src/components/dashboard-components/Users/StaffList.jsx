@@ -193,14 +193,14 @@ const StaffList = () => {
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
                 <h6 className="fw-semibold mb-0">Staff Management</h6>
                 <ul className="d-flex align-items-center gap-2">
-                    <li className="fw-medium">
+                    <li className="fw-medium list-none">
                         <a href="/Dashboard" className="d-flex align-items-center gap-1 hover-text-primary">
                             <Icon icon="solar:home-smile-angle-outline" className="icon text-lg" />
                             Dashboard
                         </a>
                     </li>
-                    <li>-</li>
-                    <li className="fw-medium">Staff</li>
+                    <li className="list-none">-</li>
+                    <li className="fw-medium list-none">Staff</li>
                 </ul>
             </div>
 
@@ -222,7 +222,7 @@ const StaffList = () => {
                     </div>
                     <button
                         type="button"
-                        className="btn btn-primary-600 btn-sm"
+                        className="btn-theme-admin  btn-primary-600 btn-sm justify-content-center d-flex align-items-center "
                         onClick={() => setShowAddModal(true)}
                     >
                         <Icon icon="ic:baseline-plus" className="me-1" />

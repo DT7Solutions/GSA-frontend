@@ -54,29 +54,29 @@ const ProductListDisplay = () => {
 
     return (
         <div className="card basic-data-table">
-            <div className="card-header">
+            {/* <div className="card-header">
                 <h5 className="card-title mb-0">Product List</h5>
-            </div>
+            </div> */}
             <div className="card-body">
                 <div className="table-responsive">
-                    <table className="display table table-striped table-bordered" id="dataTable" style={{ width: "100%" }}>
-                        <thead>
+                    <table className="display table table-striped table-bordered sm-table" id="dataTable" style={{ width: "100%" }}>
+                        <thead className="bg-theme-table">
                             <tr>
-                                <th>S.L</th>
-                                <th>Car Details</th>
-                                <th>Part Name</th>
-                                <th>Figure No</th>
-                                <th>Part No</th>
-                                <th>Price</th>
-                                <th>Sale Price</th>
-                                <th>Discount</th>
-                                <th>Qty</th>
-                                <th>SKU</th>
-                                <th>Stock</th>
-                                <th>Remarks</th>
-                                <th>Description</th>
-                                <th>Compatibility</th>
-                                <th>Actions</th>
+                                <th className="bg-theme-color" >S.L</th>
+                                <th className="bg-theme-color">Car Details</th>
+                                <th className="bg-theme-color">Part Name</th>
+                                <th className="bg-theme-color">Figure No</th>
+                                <th className="bg-theme-color">Part No</th>
+                                <th className="bg-theme-color">Price</th>
+                                <th className="bg-theme-color">Sale Price</th>
+                                <th className="bg-theme-color">Discount</th>
+                                <th className="bg-theme-color">Qty</th>
+                                <th className="bg-theme-color">SKU</th>
+                                <th className="bg-theme-color">Stock</th>
+                                <th className="bg-theme-color">Remarks</th>
+                                <th className="bg-theme-color">Description</th>
+                                <th className="bg-theme-color">Compatibility</th>
+                                <th className="bg-theme-color">Actions</th>
                             </tr>
                         </thead>
                         <tbody>

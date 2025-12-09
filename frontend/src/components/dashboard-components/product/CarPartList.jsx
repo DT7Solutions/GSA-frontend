@@ -97,12 +97,12 @@ const CarPartList = () => {
 
   return (
     <div className="card basic-data-table">
-      <div className="card-header">
+      {/* <div className="card-header">
         <h5 className="card-title mb-0">Car Part Group</h5>
-      </div>
+      </div> */}
       <div className="card-body">
         <div className="table-responsive">
-          <table className="table bordered-table mb-0" id="dataTable" data-page-length={10}>
+          <table className="table bordered-table mb-0 sm-table" id="dataTable" data-page-length={10}>
             <thead>
               <tr>
                 <th>S.L</th>

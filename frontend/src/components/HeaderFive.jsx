@@ -321,115 +321,135 @@ const HeaderFive = () => {
             <div className="col-auto">
               <div className="header-user-wrap">
                 <ul>
-                  <li>
-                    <div className="header-grid-wrap">
-                      <div className="simple-icon"></div>
-                      <div className="header-grid-details">
-                        <h6 className="header-grid-title">
-                          <div className='dropdown'>
-                            <button
-                              className='d-flex justify-content-center align-items-center rounded-circle'
-                              type='button'
-                              data-bs-toggle='dropdown'
-                            >
-                              <svg
-                                width={23}
-                                height={22}
-                                viewBox="0 0 23 22"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M11.4642 0.48653C10.3922 0.48653 9.39616 0.758532 8.47616 1.30253C7.55616 1.84653 6.82416 2.57853 6.28016 3.49853C5.73616 4.41853 5.46416 5.41453 5.46416 6.48653C5.46416 7.55853 5.73616 8.55453 6.28016 9.47453C6.82416 10.3945 7.55616 11.1265 8.47616 11.6705C9.39616 12.2145 10.3922 12.4865 11.4642 12.4865C12.5362 12.4865 13.5322 12.2185 14.4522 11.6825C15.3722 11.1465 16.1042 10.4185 16.6482 9.49853C17.1922 8.57853 17.4642 7.57453 17.4642 6.48653C17.4642 5.39853 17.1962 4.39453 16.6602 3.47453C16.1242 2.55453 15.3962 1.82653 14.4762 1.29053C13.5562 0.754532 12.5522 0.48653 11.4642 0.48653ZM11.4642 10.4945C10.7442 10.4945 10.0762 10.3145 9.46016 9.95453C8.84416 9.59453 8.35616 9.10653 7.99616 8.49053C7.63616 7.87453 7.45616 7.20653 7.45616 6.48653C7.45616 5.76653 7.63616 5.10253 7.99616 4.49453C8.35616 3.88653 8.84416 3.40253 9.46016 3.04253C10.0762 2.68253 10.7442 2.50253 11.4642 2.50253C12.1842 2.50253 12.8522 2.68253 13.4682 3.04253C14.0842 3.40253 14.5722 3.88653 14.9322 4.49453C15.2922 5.10253 15.4722 5.76653 15.4722 6.48653C15.4722 7.20653 15.2922 7.87453 14.9322 8.49053C14.5722 9.10653 14.0842 9.59453 13.4682 9.95453C12.8522 10.3145 12.1842 10.4945 11.4642 10.4945ZM0.976156 21.5105C1.28016 21.6385 1.57616 21.7665 1.86416 21.8945L1.88816 21.8225C1.90416 21.7745 1.93216 21.7305 1.97216 21.6905C2.01216 21.6505 2.08816 21.5425 2.20016 21.3665L2.36816 21.1025C2.65616 20.5905 3.19216 19.9585 3.97616 19.2065C4.82416 18.4065 5.80816 17.7745 6.92816 17.3105C8.28816 16.7665 9.79216 16.4945 11.4402 16.4945C13.0882 16.4945 14.6082 16.7825 16.0002 17.3585C17.0882 17.8065 18.0802 18.4225 18.9762 19.2065C19.6482 19.7985 20.1762 20.4305 20.5602 21.1025C20.6402 21.1985 20.7202 21.3265 20.8002 21.4865C20.8802 21.5985 20.9282 21.6705 20.9442 21.7025C20.9602 21.7345 20.9842 21.7665 21.0162 21.7985C21.0482 21.8305 21.0642 21.8545 21.0642 21.8705C21.0642 21.8865 21.0642 21.8945 21.0642 21.8945L21.9762 21.5105L22.8642 21.1025V21.0065C22.8642 20.9745 22.8482 20.9425 22.8162 20.9105C22.7842 20.8785 22.7602 20.8385 22.7442 20.7905C22.7282 20.7425 22.6802 20.6625 22.6002 20.5505C22.4562 20.3425 22.3442 20.1585 22.2642 19.9985C21.7042 19.1665 21.0722 18.4305 20.3682 17.7905C19.2962 16.8465 18.1202 16.1025 16.8402 15.5585C15.1922 14.8545 13.4322 14.5025 11.5602 14.5025C9.62416 14.5025 7.86416 14.8385 6.28016 15.5105C4.96816 16.0545 3.80016 16.8145 2.77616 17.7905C2.05616 18.4305 1.41616 19.1665 0.856156 19.9985L0.688156 20.2625C0.528156 20.5185 0.424156 20.6945 0.376156 20.7905C0.328156 20.8385 0.296156 20.8865 0.280156 20.9345L0.256156 21.0065V21.1025C0.192156 21.1025 0.160156 21.1105 0.160156 21.1265C0.160156 21.1425 0.224156 21.1745 0.352156 21.2225L0.976156 21.5105Z"
-                                  fill="#1B1F22"
-                                />
-                              </svg>
-                            </button>
+              
 
-                            <div className="dropdown-menu to-top dropdown-menu-sm">
-                              {isLoggedIn ? (
-                                <>
-                                  <div className='py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2'>
-                                    <div className='d-flex align-items-center gap-3'>
-                                     {profile_image && profile_image.trim() !== "" ? (
-                                      <img  style={{width: "50px", height: "50px", borderRadius: "50%", objectFit: "cover"}}
-                                        src={profile_image}
-                                        onError={(e) => {
-                                          e.target.src = `${process.env.PUBLIC_URL}/assets/img/default-avatar.png`;
-                                        }}
-                                      />
-                                    ) : (
-                                      <div>👤</div>
-                                    )}
+<li>
+  <div className="header-grid-wrap">
+    <div className="simple-icon"></div>
+     
+    <div className="header-grid-details">
+      
+      <h6 className="header-grid-title">
+        
+        <div className='dropdown  header-icon-text'>
+          <button
+            className='d-flex justify-content-center align-items-center rounded-circle'
+            type='button'
+            data-bs-toggle='dropdown'
+            onClick={() => !isLoggedIn && navigate('/login')}
+            style={{ cursor: 'pointer' }}
+          >
+            <svg
+              width={23}
+              height={22}
+              viewBox="0 0 23 22"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M11.4642 0.48653C10.3922 0.48653 9.39616 0.758532 8.47616 1.30253C7.55616 1.84653 6.82416 2.57853 6.28016 3.49853C5.73616 4.41853 5.46416 5.41453 5.46416 6.48653C5.46416 7.55853 5.73616 8.55453 6.28016 9.47453C6.82416 10.3945 7.55616 11.1265 8.47616 11.6705C9.39616 12.2145 10.3922 12.4865 11.4642 12.4865C12.5362 12.4865 13.5322 12.2185 14.4522 11.6825C15.3722 11.1465 16.1042 10.4185 16.6482 9.49853C17.1922 8.57853 17.4642 7.57453 17.4642 6.48653C17.4642 5.39853 17.1962 4.39453 16.6602 3.47453C16.1242 2.55453 15.3962 1.82653 14.4762 1.29053C13.5562 0.754532 12.5522 0.48653 11.4642 0.48653ZM11.4642 10.4945C10.7442 10.4945 10.0762 10.3145 9.46016 9.95453C8.84416 9.59453 8.35616 9.10653 7.99616 8.49053C7.63616 7.87453 7.45616 7.20653 7.45616 6.48653C7.45616 5.76653 7.63616 5.10253 7.99616 4.49453C8.35616 3.88653 8.84416 3.40253 9.46016 3.04253C10.0762 2.68253 10.7442 2.50253 11.4642 2.50253C12.1842 2.50253 12.8522 2.68253 13.4682 3.04253C14.0842 3.40253 14.5722 3.88653 14.9322 4.49453C15.2922 5.10253 15.4722 5.76653 15.4722 6.48653C15.4722 7.20653 15.2922 7.87453 14.9322 8.49053C14.5722 9.10653 14.0842 9.59453 13.4682 9.95453C12.8522 10.3145 12.1842 10.4945 11.4642 10.4945ZM0.976156 21.5105C1.28016 21.6385 1.57616 21.7665 1.86416 21.8945L1.88816 21.8225C1.90416 21.7745 1.93216 21.7305 1.97216 21.6905C2.01216 21.6505 2.08816 21.5425 2.20016 21.3665L2.36816 21.1025C2.65616 20.5905 3.19216 19.9585 3.97616 19.2065C4.82416 18.4065 5.80816 17.7745 6.92816 17.3105C8.28816 16.7665 9.79216 16.4945 11.4402 16.4945C13.0882 16.4945 14.6082 16.7825 16.0002 17.3585C17.0882 17.8065 18.0802 18.4225 18.9762 19.2065C19.6482 19.7985 20.1762 20.4305 20.5602 21.1025C20.6402 21.1985 20.7202 21.3265 20.8002 21.4865C20.8802 21.5985 20.9282 21.6705 20.9442 21.7025C20.9602 21.7345 20.9842 21.7665 21.0162 21.7985C21.0482 21.8305 21.0642 21.8545 21.0642 21.8705C21.0642 21.8865 21.0642 21.8945 21.0642 21.8945L21.9762 21.5105L22.8642 21.1025V21.0065C22.8642 20.9745 22.8482 20.9425 22.8162 20.9105C22.7842 20.8785 22.7602 20.8385 22.7442 20.7905C22.7282 20.7425 22.6802 20.6625 22.6002 20.5505C22.4562 20.3425 22.3442 20.1585 22.2642 19.9985C21.7042 19.1665 21.0722 18.4305 20.3682 17.7905C19.2962 16.8465 18.1202 16.1025 16.8402 15.5585C15.1922 14.8545 13.4322 14.5025 11.5602 14.5025C9.62416 14.5025 7.86416 14.8385 6.28016 15.5105C4.96816 16.0545 3.80016 16.8145 2.77616 17.7905C2.05616 18.4305 1.41616 19.1665 0.856156 19.9985L0.688156 20.2625C0.528156 20.5185 0.424156 20.6945 0.376156 20.7905C0.328156 20.8385 0.296156 20.8865 0.280156 20.9345L0.256156 21.0065V21.1025C0.192156 21.1025 0.160156 21.1105 0.160156 21.1265C0.160156 21.1425 0.224156 21.1745 0.352156 21.2225L0.976156 21.5105Z"
+                fill="#1B1F22"
+              />
+            </svg>
+          </button>
+      
+          {isLoggedIn && (
+            <div className="dropdown-menu to-top dropdown-menu-sm">
+              <div className='py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2'>
+                <div className='d-flex align-items-center gap-3'>
+                  {profile_image && profile_image.trim() !== "" ? (
+                    <img 
+                      style={{width: "50px", height: "50px", borderRadius: "50%", objectFit: "cover"}}
+                      src={profile_image}
+                      onError={(e) => {
+                        e.target.src = `${process.env.PUBLIC_URL}/assets/img/default-avatar.png`;
+                      }}
+                      alt="Profile"
+                    />
+                  ) : (
+                    <div>👤</div>
+                  )}
 
-                                      <div>
-                                        <h6 className='text-lg text-primary-light fw-semibold mb-2'>
-                                          {userName}
-                                        </h6>
-                                        <span className='text-secondary-light fw-medium text-sm'>
-                                          {userRole}
-                                        </span>
-                                      </div>
-                                    </div>
-                                    <button type='button' className='hover-text-danger'>
-                                      <Icon icon='radix-icons:cross-1' className='icon text-xl' />
-                                    </button>
-                                  </div>
+                  <div>
+                    <h6 className='text-lg text-primary-light fw-semibold mb-2'>
+                      {userName}
+                    </h6>
+                    <span className='text-secondary-light fw-medium text-sm'>
+                      {userRole}
+                    </span>
+                  </div>
+                </div>
+                <button type='button' className='hover-text-danger'>
+                  <Icon icon='radix-icons:cross-1' className='icon text-xl' />
+                </button>
+              </div>
 
-                                  <ul className="to-top-list">
-                                    <li>
-                                      <Link
-                                        className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                                        to="/view-profile"
-                                      >
-                                        <Icon icon="solar:user-linear" className="icon text-xl" /> My Profile
-                                      </Link>
-                                    </li>
-                                    <li>
-                                      <Link
-                                        className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                                        to="/change-password"
-                                      >
-                                        <Icon icon="tabler:lock" className="icon text-xl" /> Change Password
-                                      </Link>
-                                    </li>
-                                    <li>
-                                      <Link
-                                        className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                                        to="/orders"
-                                      >
-                                        <Icon icon="mdi:package-variant-closed" className="icon text-xl" /> My orders
-                                      </Link>
-                                    </li>
-                                    <li>
-                                      <button
-                                        className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 border-0 bg-transparent"
-                                        onClick={handleLogout}
-                                      >
-                                        <Icon icon="lucide:power" className="icon text-xl" /> Log Out
-                                      </button>
-                                    </li>
-                                  </ul>
-                                </>
-                              ) : (
-                                <ul className="to-top-list">
-                                  <li>
-                                    <Link
-                                      className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                                      to="/login"
-                                    >
-                                      <Icon icon="solar:user-linear" className="icon text-xl" /> Login
-                                    </Link>
-                                  </li>
-                                </ul>
-                              )}
-                            </div>
-                          </div>
-                        </h6>
-                      </div>
-                    </div>
-                  </li>
-
+              <ul className="to-top-list">
+                <li>
+                  <Link
+                    className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
+                    to="/view-profile"
+                  >
+                    <Icon icon="solar:user-linear" className="icon text-xl" /> My Profile
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
+                    to="/change-password"
+                  >
+                    <Icon icon="tabler:lock" className="icon text-xl" /> Change Password
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
+                    to="/orders"
+                  >
+                    <Icon icon="mdi:package-variant-closed" className="icon text-xl" /> My orders
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 border-0 bg-transparent"
+                    onClick={handleLogout}
+                  >
+                    <Icon icon="lucide:power" className="icon text-xl" /> Log Out
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
+          <div className="">
+          {isLoggedIn ? (
+        <>
+          
+          <h6 className="header-grid-title">{userName}</h6>
+        </>
+      ) : (
+        <>
+          <span 
+            className="header-grid-text" 
+            style={{ cursor: 'pointer' }}
+            onClick={() => navigate('/login')}
+          >
+            Sign In
+          </span>
+          <h6 
+            className="header-grid-title"
+            style={{ cursor: 'pointer' }}
+            onClick={() => navigate('/login')}
+          >
+            Account
+          </h6>
+        </>
+      )}
+      </div>
+        </div>
+      </h6>
+    </div>
+  </div>
+</li>
                   <li></li>
                   <li>
                     {isLoggedIn ? (
