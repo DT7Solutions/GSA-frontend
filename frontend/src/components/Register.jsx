@@ -55,22 +55,22 @@ const Register =  () => {
     };
     
     return (
-        <div className="mt-3 space-extra-bottom login-screen" style={{ height: "125vh" }}>
+        <div className="space-extra-bottom login-screen" style={{  height: "110vh" ,background: "#edf0f2" }}>
             <div className="container">
-                <div className="row d-flex justify-content-center align-items-center py-4 shadow ">
+                <div className="row d-flex justify-content-center align-items-center py-4  "  style={{ gap: "2rem" }}>
                     <div className="col-md-5">
-                        <img src={`${process.env.PUBLIC_URL}/assets/img/update-img/hero6-1.png`} alt="Login" className="img-fluid" />
+                        <img src={`${process.env.PUBLIC_URL}/assets/img/normal/register-page-form.png`} alt="Login" className="img-fluid" />
                     </div>
-                    <div className="col-md-5">
-                        <div className="">
-                            <h2 className="text-center mb-4 my-5">Sign Up</h2>
+                    <div className="col-md-6">
+                        <div className="create-account-inform">
+                            <h4 className="text-center mb-4">Create Your Account</h4>
                             <form onSubmit={handleSubmit} className="input-style">
 
                                 <div className="mb-3">
                                     <label className="form-label">Username</label>
                                     <input
-                                        type="text"
-                                        className="form-control"
+                                        type="text" 
+                                        className="form-control ring-offset-background"
                                         placeholder="please enter your username"
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
@@ -117,13 +117,7 @@ const Register =  () => {
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
                                         />
-                                        <button
-                                            type="button"
-                                            className="btn eye-btn  btn-fw"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                        >
-                                            {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                        </button>
+                                       
                                     </div>
                                 </div>
                                 <div className="mb-3 position-relative">
@@ -137,14 +131,7 @@ const Register =  () => {
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             required
                                         />
-                                        <button
-                                            type="button"
-                                          
-                                            className="btn eye-btn  btn-fw"
-                                            onClick={() => setShowPassword2(!showPassword2)}
-                                        >
-                                            {showPassword2 ? <FaEyeSlash /> : <FaEye />}
-                                        </button>
+                                       
                                     </div>
                                 </div>
 

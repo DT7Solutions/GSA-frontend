@@ -122,7 +122,7 @@ const TwoBannerSection = () => {
   };
 
   return (
-    <div  className='col-12 mt-5'>
+    <div  className='col-12' style={{background:"#f0f2f5"}}>
       <div className='container' style={styles.bannerRow}>
         {banners.map((banner) => (
           <div key={banner.id} style={styles.bannerCol}>

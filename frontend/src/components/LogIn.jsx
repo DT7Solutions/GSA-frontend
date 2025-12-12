@@ -43,7 +43,6 @@ const Login = () => {
     } catch (error) {
       console.error("OTP Request Failed:", error.response ? error.response.data : error.message);
       
-      // Handle specific error cases for OTP
       const errorData = error.response?.data;
       let errorMessage = "Failed to send OTP. Please try again.";
       let errorTitle = "OTP Request Failed";
@@ -122,23 +121,19 @@ const Login = () => {
       });
 
       if (response.data.access) {
-        // Store tokens and role
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
         localStorage.setItem("role", response.data.role.toLowerCase());
 
-        // Decode user ID from JWT token
         const decoded = jwtDecode(response.data.access);
         const userId = decoded.user_id;
 
-        // Get user details using the token
         const userResponse = await axios.get(`${API_BASE_URL}api/auth/user/get_user_data/${userId}/`, {
           headers: {
             Authorization: `Bearer ${response.data.access}`,
           },
         });
 
-        // Check for a saved redirect URL and go there
         const redirectUrl = localStorage.getItem("redirectAfterLogin");
         if (redirectUrl) {
           localStorage.removeItem("redirectAfterLogin");
@@ -146,7 +141,6 @@ const Login = () => {
           return;
         }
 
-        // Role-based default redirection
         const { role_id } = userResponse.data;
         if (role_id === 1) {
           navigate("/Dashboard");
@@ -162,7 +156,6 @@ const Login = () => {
       let errorTitle = "Login Failed";
       let showSignUpButton = false;
       
-      // Handle specific error cases
       if (errorData?.error === "account_not_found") {
         errorTitle = "Account Not Found";
         errorMessage = "You don't have an account. Please sign up.";
@@ -190,15 +183,21 @@ const Login = () => {
   };
 
   return (
-    <div className="login-screen" style={{ height: "111vh" }}>
-      <div className="container ">
-        <div className="row d-flex justify-content-center align-items-center py-4 shadow">
-          <div className="col-md-5">
-            <img src={`${process.env.PUBLIC_URL}/assets/img/update-img/hero6-1.png`} alt="Login" className="img-fluid" />
+    <div className="login-screen" style={{ height: "111vh",background: "#edf0f2" }}>
+      <div className="container">
+        <div className="row d-flex justify-content-between align-items-center py-4" style={{ gap: "2rem" }}>
+          <div className="col-md-5 mb-4 mb-md-0 ">
+            <img 
+              src={`${process.env.PUBLIC_URL}/assets/img/normal/gowrisankaragencies.jpg`} 
+              alt="Login" 
+              className="img-fluid shadow-elevated"
+              style={{ maxWidth: "100%" }}
+            />
           </div>
-          <div className="col-md-5">
-            <div className="">
-              <h4 className="text-center mb-4 my-5">Sign In</h4>
+          <div className="col-md-6">
+            <div className="signn-in-inform">
+              <h4 className="text-center mb-4">Welcome Back</h4>
+              <p className="text-center muted-color">Login to access your account</p>
               <form onSubmit={isOtpLogin ? (otpSent ? verifyOtp : requestOtp) : handleLogin} className="input-style">
             
                 {isOtpLogin ? (
@@ -225,7 +224,6 @@ const Login = () => {
                       </div>
                     </div>
 
-                    {/* OTP Input Field */}
                     {otpSent && (
                       <div className="mb-3">
                         <label className="form-label">Enter OTP</label>
@@ -253,19 +251,18 @@ const Login = () => {
                         required
                       />
                     </div>
-                   <div className="mb-3 position-relative input-g">
-  <label className="form-label">Password</label>
-  <input
-    type="password"
-    className="form-control"
-    value={password}
-    onChange={(e) => setPassword(e.target.value)}
-    required
-    style={{ height: "47.5px" }}
-  />
-</div>
+                    <div className="mb-3 position-relative input-g">
+                      <label className="form-label">Password</label>
+                      <input
+                        type="password"
+                        className="form-control"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        style={{ height: "47.5px" }}
+                      />
+                    </div>
 
-                    {/* Remember Me & Forgot Password */}
                     <div className="d-flex justify-content-between mb-3">
                       <div className="form-check">
                         <input
@@ -286,10 +283,9 @@ const Login = () => {
                 </button>
               </form>
 
-              {/* Toggle Login Methods */}
               <div className="text-center mt-3">
                 <button
-                  className="w-100 btn style2 btn-fw w-100 mb-2"
+                  className="w-100 btn style2 btn-fw mb-2"
                   onClick={() => {
                     setIsOtpLogin(!isOtpLogin);
                     setOtpSent(false);
@@ -300,7 +296,6 @@ const Login = () => {
                 </button>
               </div>
 
-              {/* Sign Up Link */}
               <p className="text-center mt-3">
                 Not a member? <Link to="/register">Sign Up</Link>
               </p>

@@ -23,6 +23,7 @@ import CurrentOffers from "../components/CurrentOffersSection";
 import SearchVehicleArea from "../components/SearchVehicleArea";
 import TwoBannerSection from "components/Bannersection";
 import MarqueeOne from "components/MarqueeOne";
+import Shopbycategory from "components/Shopbycategory";
 
 
 const HomePageSix = () => {
@@ -49,14 +50,16 @@ const HomePageSix = () => {
       {/* <SearchVehicleArea /> */}
   <TwoBannerSection/>
       {/* Category Area One */}
+       <Shopbycategory />
       <CategoryAreaOne />
+     
 
       {/* Product Area One */}
       {/* <ProductAreaTwo />    */}
       {/* <ProductAreaOne /> */}
 
       {/* CTA Area Two */}
-      {/* <CTAAreaTwo /> */}
+      <CTAAreaTwo />
 
       {/* <CategoriesSection /> */}
 
@@ -72,8 +75,8 @@ const HomePageSix = () => {
       {/* <FaqAreaThree />  -------------------------------- */}
 
       {/* Client Area Four */}
-      {/* <TestimonialOne /> */}
-      <ClientAreaFour />
+      <TestimonialOne />
+      {/* <ClientAreaFour /> */}
 
       
 

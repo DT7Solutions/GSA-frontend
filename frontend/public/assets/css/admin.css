@@ -123,6 +123,7 @@
 .brandslider .category-card-item{
   background-color: #fff!important;
   border: 1px solid #E5E5E5;
+  border-radius: .75rem;
 }
  
 .woocommerce-cart-form {
@@ -225,6 +226,7 @@
 
 
 
+
 .page-item.active .page-link{
   background-color: #0068A5!important;
   color: #fff!important;
@@ -234,7 +236,7 @@
   color: #0068A5!important;
 }
 .footer-wrapper {
-  background-color: #0E0E0E!important;
+  background-color: #364049!important;
 }
 .footer-logo-img{
   height: 100px!important;
@@ -261,6 +263,12 @@
   border-radius: 4px!important;
   transition: background-color 0.3s ease!important;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
+}
+
+@media screen and (max-width: 576px) {
+  .product-card .link-btn {
+  padding:12.5px 10px!important;
+  }
 }
 
 .product-card .link-btn:hover {
@@ -337,7 +345,9 @@
   font-size:12px!important;
 }
 .copyright-wrap{
-  background-color:#1b1b1b!important;
+  background-color:#364049!important;
+  border-top:1px solid  hsl(0 0% 100% / 0.1)!important;
+
 }
 .heading-banner-section{
   font-size: xx-large!important;
@@ -369,7 +379,10 @@
 
 .brand-design{
   background-color: #fff!important;
-  border: 1px solid #E5E5E5!important;
+  border: 1px solid hsl(210 20% 88%)!important;
+  /* border-color: hsl(210 20% 88%);
+  border-width: 1px; */
+  border-radius: .75rem; 
 }
 
 
@@ -477,3 +490,81 @@
   height:50px!important;
   line-height:50px!important;
 }
+
+.signn-in-inform{
+  background-color: hsl(0 0% 100%);
+  box-shadow: 0 4px 24px -4px hsl(201 100% 32% / .12), 0 2px 8px -2px hsl(215 25% 15% / .08);
+  border-radius: 0.75rem;
+  padding: 2rem;
+
+}
+
+.muted-color{
+  color:hsl(215 15% 45%);
+}
+
+.shadow-elevated {
+  --tw-shadow: 0 12px 40px -8px hsl(201 100% 32% / .2),
+               0 4px 16px -4px hsl(215 25% 15% / .12);
+
+  --tw-shadow-colored: 0 12px 40px -8px hsl(201 100% 32% / .2),
+                        0 4px 16px -4px hsl(215 25% 15% / .12);
+
+  box-shadow: 0 0 #0000, 0 0 #0000, var(--tw-shadow);
+}
+.create-account-inform{
+  background-color: hsl(0 0% 100%);
+  box-shadow: 0 4px 24px -4px hsl(201 100% 32% / .12), 0 2px 8px -2px hsl(215 25% 15% / .08);
+  border-radius: 0.75rem;
+  padding: 2rem;
+
+}
+
+.password-page{
+  background-color: hsl(0 0% 100%);
+  box-shadow: 0 4px 24px -4px hsl(201 100% 32% / .12), 0 2px 8px -2px hsl(215 25% 15% / .08);
+  border-radius: 0.75rem;
+  padding: 2rem;
+
+}
+
+
+.bg-color-list{
+  background-color: #edf0f2!important;
+}
+
+
+.shop-by-category{
+  padding: 10px 10px 20px;
+
+}
+
+.category-f-size{
+  font-size: 14px!important;
+}
+
+.rounded-full {
+  border-radius: 9999px!important;
+
+}
+
+.highlight-text{
+  color:#0068A5;
+}
+
+/*  */
+.gsa-cta-section {
+      position: relative;
+      padding: 80px 20px;
+      background-image: url(../img/service/cta-bg-homepage.jpg);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      overflow: hidden;
+    }
+
+
+  .header-logo{
+    padding-top:0px!important;
+    padding-bottom: 0px!important;
+  }

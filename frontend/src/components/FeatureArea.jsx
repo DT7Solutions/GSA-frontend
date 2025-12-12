@@ -1,66 +1,165 @@
 import React from 'react';
-import { CheckCircle, Award, Truck, Headphones } from 'lucide-react';
+import { CheckCircle, Award, Truck, Headphones, BadgeCheck } from 'lucide-react';
 
 const WhyChooseUs = () => {
   const features = [
     {
       icon: <CheckCircle className="w-10 h-10" />,
-      title: "100% Customer Satisfaction",
-      description:
-        "Your happiness is our priority.",
+      title: "100% Genuine Parts",
+      description: "Only authentic parts from trusted manufacturers.",
+    },
+    {
+      icon: <Truck className="w-10 h-10" />,
+      title: "Fast Delivery",
+      description: "Quick delivery when you need it most.",
     },
     {
       icon: <Award className="w-10 h-10" />,
-      title: "100% Quality Car Accessories",
-      description:
-        "Only premium, tested products.",
+      title: "Best Prices",
+      description: "Competitive pricing without compromising quality.",
     },
-    // {
-    //   icon: <Truck className="w-10 h-10" />,
-    //   title: "Free Shipping",
-    //   description:
-    //     "Fast and reliable delivery.",
-    // },
     {
       icon: <Headphones className="w-10 h-10" />,
-      title: "24/7 Support For Clients",
-      description:
-        "We're always here to help.",
+      title: "Expert Support",
+      description: "Knowledgeable team ready to assist you.",
+    },
+    {
+      icon: <BadgeCheck className="w-10 h-10" />,
+      title: "Trusted Since 1995",
+      description: "Three decades of excellence and integrity.",
     },
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section style={{ padding: '80px 0', background: '#f0f2f5' }}>
+      <style>{`
+        .why-choose-card {
+          background: white;
+          border-radius: 16px;
+          padding: 32px 24px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          height: 100%;
+          position: relative;
+          overflow: hidden;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .why-choose-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-bg-circle {
+          position: absolute;
+          width: 120px;
+          height: 120px;
+          background: linear-gradient(135deg, #ecf5fa 0%, #d4e9f7 100%);
+          border-radius: 50%;
+          top: -30px;
+          right: -30px;
+          opacity: 0.5;
+        }
+        
+        .icon-box {
+          background: linear-gradient(135deg, #0068a5 0%, #004d7a 100%);
+          color: white;
+          width: 60px;
+          height: 60px;
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 104, 165, 0.3);
+        }
+        
+        .feature-title {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #1f2937;
+          margin-bottom: 12px;
+          line-height: 1.4;
+        }
+        
+        .feature-description {
+          font-size: 14px;
+          color: #6b7280;
+          line-height: 1.6;
+          margin: 0;
+        }
+      `}
+      
+      </style>
+      {/* Responsive CSS */}
+<style>{`
+  @media (max-width: 768px) {
+    .why-choose-wrapper {
+      flex-wrap: wrap !important;
+    }
+
+    .why-choose-item {
+      flex: 0 0 100% !important;
+      max-width: 100% !important;
+    }
+  }
+`}</style>
+
+      
       <div className="container">
         
         {/* Header */}
-        {/* <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Why Choose Us
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <h5 style={{  fontWeight: 'bold', color: '#1f2937', marginBottom: '16px' }}>
+            Why Choose <span className='highlight-text'> Gowrisankar Agencies</span>
+          </h5>
+          <p style={{ fontSize: '1.125rem', color: '#6b7280', maxWidth: '700px', margin: '0 auto' }}>
             Experience excellence in every aspect of our service. We're committed
-            to providing you with the best car accessories and support.
+            to providing you with the best auto parts and support.
           </p>
-        </div> */}
+        </div>
 
-        {/* Feature Cards */}
-        <div className="row g-4 justify-content-center">
-          {features.map((feature, index) => (
-            <div key={index} className="col-lg-4 col-md-6 col-sm-12">
-              <div className="bg-white rounded-2xl p-20  shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 h-100 d-flex align-items-center gap-3">
-                <div className="flex-shrink-0">
-                  <div className="d-flex align-items-center justify-content-center" style={{ backgroundColor: '#ecf5fa', color: '#0068a5', width: '50px', height: '50px', borderRadius: '50%' }}>
-                    {feature.icon}
+        {/* Feature Cards - All in One Row */}
+        <div
+  className="why-choose-wrapper"
+  style={{
+    display: "flex",
+    gap: "24px",
+    justifyContent: "center",
+    flexWrap: "nowrap",
+    alignItems: "stretch",
+  }}
+>
+  {features.map((feature, index) => (
+    <div
+      key={index}
+      className="why-choose-item"
+      style={{ flex: "1", minWidth: "0", maxWidth: "280px" }}
+    >
+              <div className="why-choose-card">
+                {/* Decorative Background */}
+                <div className="card-bg-circle" />
+                
+                {/* Content */}
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'flex-start',
+                  position: 'relative',
+                  zIndex: 1,
+                }}>
+                  {/* Icon */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <div className="icon-box">
+                      {feature.icon}
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex-grow-1">
-                  <h6 className="text-lg font-semibold text-gray-900 mb-2">
+                  {/* Title */}
+                  <h6 className="feature-title">
                     {feature.title}
                   </h6>
 
-                  <p className="text-gray-600 leading-relaxed mb-0" style={{ fontSize: '14px' }}>
+                  {/* Description */}
+                  <p className="feature-description">
                     {feature.description}
                   </p>
                 </div>

@@ -30,9 +30,9 @@ const CategoryAreaOne = () => {
   };
 
   return (
-    <div className="category-area-1 pb-100 brand-logo-display">
-      <div className="container-fluid">
-        <h4 className="text-center fw-extrabold mb-20  mt-5 pt-5">Search By Brand</h4>
+    <div className="category-area-1 pb-100 brand-logo-display" style={{ backgroundColor: '#F0F2F5' }}>
+      <div className="container">
+        <h4 className="text-center fw-extrabold mb-20  pt-5">Search By <span className='highlight-text'>Brand</span></h4>
 
         <div className="row mt-5 brands-sec">
 

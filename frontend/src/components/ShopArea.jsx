@@ -375,7 +375,7 @@ const ShopArea = ({ id }) => {
     <section className="space-top space-extra-bottom shop-sec">
       <div className="container">
         <div className="row flex-row-reverse">
-          <div className="col-xl-9 col-lg-8">
+          <div className="col-xl-9 col-lg-8 order-lg-1 order-2 mb-5">
             {isLoadingProducts ? (
               <div
                 className="text-center my-5"
@@ -742,7 +742,7 @@ const ShopArea = ({ id }) => {
             )}
           </div>
 
-          <div className="col-xl-3 col-lg-4 sidebar-widget-area">
+          <div className="col-xl-3 col-lg-4 sidebar-widget-area order-lg-2 order-1 mb-5">
             <aside className="sidebar-sticky-area sidebar-area sidebar-shop">
               <div className="bg-white rounded shadow-sm">
                 <h3 className="widget_title bg-theme-sidebar p-3 mb-3">
@@ -859,7 +859,7 @@ const ShopArea = ({ id }) => {
                                   {expandedPartGroupId === group.id &&
                                     partItemsByGroup[group.id] &&
                                     partItemsByGroup[group.id].length > 0 && (
-                                      <ul className="part-item-list list-unstyled ps-4 mt-3">
+                                      <ul className="part-item-list bg-color-list list-unstyled ps-4 py-3">
                                         {partItemsByGroup[group.id].map((item) => (
                                           <li key={item.id} className="pb-1">
                                             <Link
