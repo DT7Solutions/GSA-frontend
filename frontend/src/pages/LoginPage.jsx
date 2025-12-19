@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
-// import HeaderFive from "../components/HeaderFive";
-
-// import FooterAreaFour from "../components/FooterAreaFour";
-// import Breadcrumb from "../components/Breadcrumb";
-// import SubscribeOne from "../components/SubscribeOne";
 import LogIn from "../components/LogIn";
-import Preloader from "../helper/Preloader";
+// import Preloader from "../helper/Preloader";
 
 const LoginPage = () => {
   let [active, setActive] = useState(true);
@@ -17,22 +12,8 @@ const LoginPage = () => {
   return (
     <>
       {/* Preloader */}
-      {active === true && <Preloader />}
-
-      {/* Header one */}
-      {/* <HeaderFive /> */}
-
-      {/* Breadcrumb */}
-      {/* <Breadcrumb title={"Cart"} /> */}
-
-      {/* Cart */}
+      {/* {active === true && <Preloader />} */}
       <LogIn />
-
-      {/* Subscribe One */}
-      {/* <SubscribeOne /> */}
-
-      {/* Footer Area One */}
-      {/* <FooterAreaFour /> */}
     </>
   );
 };

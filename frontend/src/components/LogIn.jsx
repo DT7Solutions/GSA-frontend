@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
 import axios from "axios";
 import API_BASE_URL from "../config";
+import "../assets/css/Auth.css";
 
 const Login = () => {
   const [isOtpLogin, setIsOtpLogin] = useState(false);
@@ -24,7 +25,6 @@ const Login = () => {
     }
   }, [navigate]);
 
-  // Function to handle OTP request
   const requestOtp = async () => {
     try {
       const response = await axios.post(`${API_BASE_URL}api/auth/mobial_otp_request/`, {
@@ -68,7 +68,6 @@ const Login = () => {
     }
   };
 
-  // Function to handle OTP verification
   const verifyOtp = async () => {
     try {
       const response = await axios.post(`${API_BASE_URL}api/auth/verify_mobial_otp/`, {
@@ -79,7 +78,6 @@ const Login = () => {
       if (response.data.access) {
         localStorage.setItem("accessToken", response.data.access);
         localStorage.setItem("refreshToken", response.data.refresh);
-
         navigate("/Dashboard");
       }
     } catch (error) {
@@ -110,7 +108,6 @@ const Login = () => {
     }
   };
 
-  // Function to handle username/password login
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -183,123 +180,144 @@ const Login = () => {
   };
 
   return (
-    <div className="login-screen" style={{ height: "111vh",background: "#edf0f2" }}>
-      <div className="container">
-        <div className="row d-flex justify-content-between align-items-center py-4" style={{ gap: "2rem" }}>
-          <div className="col-md-5 mb-4 mb-md-0 ">
-            <img 
-              src={`${process.env.PUBLIC_URL}/assets/img/normal/gowrisankaragencies.jpg`} 
-              alt="Login" 
-              className="img-fluid shadow-elevated"
-              style={{ maxWidth: "100%" }}
-            />
+    <div className="modern-auth-container">
+      {/* Left Side - Image */}
+      <div className="modern-auth-left">
+        <img 
+          src={`${process.env.PUBLIC_URL}/assets/img/normal/gowrisankaragencies.jpg`}
+          alt="Login Illustration" 
+          className="auth-side-image"
+        />
+      </div>
+      {/* Right Side - Login Form */}
+      <div className="modern-auth-right">
+        <div className="modern-auth-form-wrapper">
+          {/* Logo */}
+          {/* <div className="modern-auth-logo">
+            <span className="logo-text">TheCubeFactory</span>
+          </div> */}
+
+          {/* Welcome text */}
+          <div className="modern-auth-header">
+            <h1>Welcome back</h1>
+            <p>Please enter your details</p>
           </div>
-          <div className="col-md-6">
-            <div className="signn-in-inform">
-              <h4 className="text-center mb-4">Welcome Back</h4>
-              <p className="text-center muted-color">Login to access your account</p>
-              <form onSubmit={isOtpLogin ? (otpSent ? verifyOtp : requestOtp) : handleLogin} className="input-style">
-            
-                {isOtpLogin ? (
-                  <>
-                    <div className="mb-3">
-                      <label className="form-label">Phone Number</label>
-                      <div className="input-group">
-                        <span className="input-group-text">+91</span>
-                        <input
-                          type="tel"
-                          className="form-control"
-                          value={phoneNumber}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^\d{0,10}$/.test(value)) {
-                              setPhoneNumber(value);
-                            }
-                          }}
-                          placeholder="Enter phone number"
-                          required
-                          maxLength={10}
-                          disabled={otpSent}
-                        />
-                      </div>
-                    </div>
 
-                    {otpSent && (
-                      <div className="mb-3">
-                        <label className="form-label">Enter OTP</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
-                          placeholder="Enter OTP"
-                          required
-                        />
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="mb-3">
-                      <label className="form-label">Email</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="mb-3 position-relative input-g">
-                      <label className="form-label">Password</label>
-                      <input
-                        type="password"
-                        className="form-control"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        style={{ height: "47.5px" }}
-                      />
-                    </div>
+          {/* Form Fields */}
+          <div className="modern-auth-form">
+            {isOtpLogin ? (
+              <>
+                <div className="form-group-modern">
+                  <label>Phone Number</label>
+                  <div className="phone-input-group">
+                    <span className="phone-prefix">+91</span>
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^\d{0,10}$/.test(value)) {
+                          setPhoneNumber(value);
+                        }
+                      }}
+                      placeholder="Enter phone number"
+                      required
+                      maxLength={10}
+                      disabled={otpSent}
+                      className="modern-input"
+                    />
+                  </div>
+                </div>
 
-                    <div className="d-flex justify-content-between mb-3">
-                      <div className="form-check">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          checked={rememberMe}
-                          onChange={() => setRememberMe(!rememberMe)}
-                        />
-                        <label className="form-check-label">Remember Me</label>
-                      </div>
-                      <Link to="/forgot-password">Forgot Password?</Link>
-                    </div>
-                  </>
+                {otpSent && (
+                  <div className="form-group-modern">
+                    <label>Enter OTP</label>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="Enter OTP"
+                      required
+                      className="modern-input"
+                    />
+                  </div>
                 )}
+              </>
+            ) : (
+              <>
+                <div className="form-group-modern">
+                  <label>Email address</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    className="modern-input"
+                  />
+                </div>
 
-                <button type="submit" className="w-100 btn style2 btn-fw">
-                  {isOtpLogin ? (otpSent ? "Verify OTP" : "Request OTP") : "Sign In"}
-                </button>
-              </form>
+                <div className="form-group-modern">
+                  <label>Password</label>
+                  <div className="password-input-wrapper">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      required
+                      className="modern-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="password-toggle-btn"
+                    >
+                      {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                    </button>
+                  </div>
+                </div>
 
-              <div className="text-center mt-3">
-                <button
-                  className="w-100 btn style2 btn-fw mb-2"
-                  onClick={() => {
-                    setIsOtpLogin(!isOtpLogin);
-                    setOtpSent(false);
-                    setOtp("");
-                  }}
-                >
-                  {isOtpLogin ? "Login with Email & Password" : "Login with OTP"}
-                </button>
-              </div>
+                <div className="form-options">
+                  <label className="remember-me-label">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                    />
+                    <span>Remember for 30 days</span>
+                  </label>
+                  <Link to="/forgot-password" className="forgot-password-link">
+                    Forgot password
+                  </Link>
+                </div>
+              </>
+            )}
 
-              <p className="text-center mt-3">
-                Not a member? <Link to="/register">Sign Up</Link>
-              </p>
-            </div>
+            <button
+              onClick={isOtpLogin ? (otpSent ? verifyOtp : requestOtp) : handleLogin}
+              className="modern-btn-primary"
+            >
+              {isOtpLogin ? (otpSent ? "Verify OTP" : "Request OTP") : "Sign in"}
+            </button>
+
+            <button
+              onClick={() => {
+                setIsOtpLogin(!isOtpLogin);
+                setOtpSent(false);
+                setOtp("");
+              }}
+              className="modern-btn-secondary"
+            >
+              {isOtpLogin ? "Login with Email & Password" : "Login with OTP"}
+            </button>
+
+            <p className="signup-text">
+              Don't have an account?{' '}
+              <Link to="/register" className="signup-link">
+                Sign up
+              </Link>
+            </p>
           </div>
         </div>
       </div>

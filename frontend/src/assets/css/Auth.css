@@ -1,0 +1,397 @@
+/* Auth Container - Full Height (Used by Login, Register, Forgot Password, Change Password) */
+.modern-auth-container {
+  min-height: 111vh !important;
+  height: 100vh !important;
+  display: flex !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Left Side - Image */
+.modern-auth-left {
+  width: 50% !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: none !important;
+  background: linear-gradient(135deg, #a78bfa 0%, #0068a5 50%, #7c3aed 100%) !important;
+}
+
+@media (min-width: 992px) {
+  .modern-auth-left {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+.auth-side-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Right Side - Form */
+.modern-auth-right {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 32px !important;
+  background: #f9fafb !important;
+  overflow-y: auto !important;
+  min-height: 100vh !important;
+}
+
+.modern-auth-form-wrapper {
+  width: 100% !important;
+  max-width: 448px !important;
+  padding: 20px 0 !important;
+}
+
+/* Logo */
+.modern-auth-logo {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 48px !important;
+}
+
+.logo-text {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+}
+
+/* Header */
+.modern-auth-header {
+  margin-bottom: 32px !important;
+}
+
+.modern-auth-header h1 {
+  font-size: 36px !important;
+  font-weight: bold !important;
+  color: #111827 !important;
+  margin-bottom: 8px !important;
+  line-height: 1.2 !important;
+}
+
+.modern-auth-header p {
+  color: #6b7280 !important;
+  font-size: 16px !important;
+  margin: 0 !important;
+}
+
+/* Form */
+.modern-auth-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px !important;
+}
+
+/* For register form with more fields */
+.modern-auth-form.compact {
+  gap: 20px !important;
+}
+
+.form-group-modern {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+.form-group-modern label {
+  display: block !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+  margin: 0 !important;
+}
+
+
+.modern-auth-form input {
+    height: 55px;
+    padding: 0 20px;
+    border: 1px solid transparent;
+    color: var(--body-color);
+    background-color: var(--smoke-color);
+    font-size: 16px;
+    width: 100%;
+    font-family: var(--body-font);
+    transition: 0.4s ease-in-out;
+}
+
+
+
+.modern-input {
+  width: 100% !important;
+  padding: 10px 16px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+  outline: none !important;
+  transition: all 0.2s !important;
+  font-size: 14px !important;
+  background: white !important;
+}
+
+.modern-input:focus {
+  border-color: #0068a5 !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+}
+
+.modern-input:disabled {
+  background-color: #f3f4f6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Phone Input */
+.phone-input-group {
+  display: flex !important;
+  gap: 0 !important;
+}
+
+.phone-prefix {
+  padding: 12px 16px !important;
+  background: #f3f4f6 !important;
+  border: 1px solid #d1d5db !important;
+  border-right: none !important;
+  border-radius: 8px 0 0 8px !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.phone-input-group .modern-input {
+  border-radius: 0 8px 8px 0 !important;
+}
+
+/* Password Input */
+.password-input-wrapper {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.password-input-wrapper .modern-input {
+  padding-right: 48px !important;
+}
+
+.password-toggle-btn {
+  position: absolute !important;
+  right: 12px !important;
+  background: none !important;
+  border: none !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+  padding: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: color 0.2s !important;
+}
+
+.password-toggle-btn:hover {
+  color: #6b7280 !important;
+}
+
+/* Form Options */
+.form-options {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+.remember-me-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+}
+
+.remember-me-label input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer !important;
+  accent-color: #0068a5 !important;
+}
+
+.remember-me-label span {
+  font-size: 14px !important;
+  color: #374151 !important;
+}
+
+.forgot-password-link,
+.back-to-login-link {
+  font-size: 14px !important;
+  color: #0068a5 !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  transition: color 0.2s !important;
+}
+
+.forgot-password-link:hover,
+.back-to-login-link:hover {
+  color: #37a0dd !important;
+}
+
+/* Buttons */
+.modern-btn-primary {
+  width: 100% !important;
+  background: #1e8dce !important;
+  color: white !important;
+  font-weight: 500 !important;
+  padding: 12px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  font-size: 16px !important;
+}
+
+.modern-btn-primary:hover {
+  background: #0068a5 !important;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+}
+
+.modern-btn-primary:disabled {
+  background: #d1d5db !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+.modern-btn-secondary {
+  width: 100% !important;
+  background: white !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+  padding: 12px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  font-size: 16px !important;
+}
+
+.modern-btn-secondary:hover {
+  background: #f9fafb !important;
+  border-color: #9ca3af !important;
+}
+
+/* Link Texts */
+.signup-text,
+.signin-text {
+  text-align: center !important;
+  font-size: 14px !important;
+  color: #6b7280 !important;
+  margin: 0 !important;
+}
+
+.signup-link,
+.signin-link {
+  color: #0068a5 !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  transition: color 0.2s !important;
+}
+
+.signup-link:hover,
+.signin-link:hover {
+  color: #7c3aed !important;
+}
+
+/* Back Button */
+.back-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: #6b7280 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  transition: color 0.2s !important;
+  margin-bottom: 24px !important;
+  cursor: pointer !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.back-button:hover {
+  color: #374151 !important;
+}
+
+.back-button svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Success/Info Messages */
+.auth-message {
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  margin-bottom: 20px !important;
+}
+
+.auth-message.success {
+  background: #ecfdf5 !important;
+  border: 1px solid #10b981 !important;
+  color: #065f46 !important;
+}
+
+.auth-message.info {
+  background: #eff6ff !important;
+  border: 1px solid #3b82f6 !important;
+  color: #1e40af !important;
+}
+
+.auth-message.error {
+  background: #fef2f2 !important;
+  border: 1px solid #ef4444 !important;
+  color: #991b1b !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 991px) {
+  .modern-auth-right {
+    width: 100% !important;
+    padding: 24px 16px !important;
+  }
+  
+  .modern-auth-header h1 {
+    font-size: 28px !important;
+  }
+  
+  .logo-text {
+    font-size: 20px !important;
+  }
+  
+  .modern-auth-logo {
+    margin-bottom: 32px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .modern-auth-header h1 {
+    font-size: 24px !important;
+  }
+  
+  .modern-auth-form {
+    gap: 20px !important;
+  }
+  
+  .modern-auth-form.compact {
+    gap: 16px !important;
+  }
+  
+  .form-options {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}

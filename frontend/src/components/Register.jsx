@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Link,useNavigate  } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
 import API_BASE_URL from "../config";
+import "../assets/css/Auth.css";
 
-const Register =  () => {
+const Register = () => {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
@@ -29,7 +30,6 @@ const Register =  () => {
         }
 
         try {
-            debugger;
             const response = await axios.post(`${API_BASE_URL}api/auth/register/`, {
                 username,
                 email: email.toLowerCase(),
@@ -40,7 +40,6 @@ const Register =  () => {
 
             console.log("Registration Successful:", response.data);
             navigate("/Dashboard");
-
 
         } catch (error) {
             console.error("Registration Failed:", error.response ? error.response.data : error.message);
@@ -53,101 +52,148 @@ const Register =  () => {
             });
         }
     };
-    
+
     return (
-        <div className="space-extra-bottom login-screen" style={{  height: "110vh" ,background: "#edf0f2" }}>
-            <div className="container">
-                <div className="row d-flex justify-content-center align-items-center py-4  "  style={{ gap: "2rem" }}>
-                    <div className="col-md-5">
-                        <img src={`${process.env.PUBLIC_URL}/assets/img/normal/register-page-form.png`} alt="Login" className="img-fluid" />
-                    </div>
-                    <div className="col-md-6">
-                        <div className="create-account-inform">
-                            <h4 className="text-center mb-4">Create Your Account</h4>
-                            <form onSubmit={handleSubmit} className="input-style">
+        <div className="modern-auth-container">
+            {/* Left Side - Image */}
+            <div className="modern-auth-left">
+                <img 
+                    src={`${process.env.PUBLIC_URL}/assets/img/normal/register-page-form.png`}
+                    alt="Register Illustration" 
+                    className="auth-side-image"
+                />
+            </div>
 
-                                <div className="mb-3">
-                                    <label className="form-label">Username</label>
-                                    <input
-                                        type="text" 
-                                        className="form-control ring-offset-background"
-                                        placeholder="please enter your username"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Email</label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                        placeholder="please enter your email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Phone Number</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        placeholder="please enter your phone number"
-                                        value={phoneNumber}
-                                        onChange={(e) => {
-                                            const value = e.target.value.replace(/\D/g, '');
-                                            if (value.length <= 10) {
-                                                setPhoneNumber(value);
-                                            }
-                                        }}
-                                        maxLength={10}
-                                        minLength={10}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3 position-relative">
-                                    <label className="form-label">Password</label>
-                                    <div className="input-group password-input">
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            className="form-control"
-                                            placeholder="please enter you password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            required
-                                        />
-                                       
-                                    </div>
-                                </div>
-                                <div className="mb-3 position-relative">
-                                    <label className="form-label">Confirm Password</label>
-                                    <div className="input-group password-input">
-                                        <input
-                                            type={showPassword2 ? "text" : "password"}
-                                            className="form-control"
-                                            placeholder="please enter confirm password"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            required
-                                        />
-                                       
-                                    </div>
-                                </div>
-
-
-                                <button type="submit" className="w-100 btn style2 btn-fw">
-                                    Sign Up
-                                </button>
-                            </form>
-
-                            {/* Sign Up Link */}
-                            <p className="text-center mt-3">
-                                You are a member? <Link to="/login">Sign in</Link>
-                            </p>
+            {/* Right Side - Registration Form */}
+            <div className="modern-auth-right">
+                <div className="modern-auth-form-wrapper">
+                    {/* Logo */}
+                    <div className="modern-auth-logo">
+                        <div className="logo-cubes">
+                            <div className="logo-cube" />
+                            <div className="logo-cube" />
+                            <div className="logo-cube logo-cube-bottom" />
+                            <div className="logo-cube logo-cube-bottom" />
                         </div>
+                        <span className="logo-text">TheCubeFactory</span>
                     </div>
 
+                    {/* Welcome text */}
+                    <div className="modern-auth-header">
+                        <h1>Create Account</h1>
+                        <p>Sign up to get started</p>
+                    </div>
+
+                    {/* Form */}
+                    <div className="modern-auth-form compact">
+                        {/* Username */}
+                        <div className="form-group-modern">
+                            <label>Username</label>
+                            <input
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Enter your username"
+                                required
+                                className="modern-input"
+                            />
+                        </div>
+
+                        {/* Email */}
+                        <div className="form-group-modern">
+                            <label>Email address</label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter your email"
+                                required
+                                className="modern-input"
+                            />
+                        </div>
+
+                        {/* Phone Number */}
+                        <div className="form-group-modern">
+                            <label>Phone Number</label>
+                            <div className="phone-input-group">
+                                <span className="phone-prefix">+91</span>
+                                <input
+                                    type="tel"
+                                    value={phoneNumber}
+                                    onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, '');
+                                        if (value.length <= 10) {
+                                            setPhoneNumber(value);
+                                        }
+                                    }}
+                                    placeholder="Enter phone number"
+                                    maxLength={10}
+                                    required
+                                    className="modern-input"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password */}
+                        <div className="form-group-modern">
+                            <label>Password</label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter your password"
+                                    required
+                                    className="modern-input"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="password-toggle-btn"
+                                >
+                                    {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div className="form-group-modern">
+                            <label>Confirm Password</label>
+                            <div className="password-input-wrapper">
+                                <input
+                                    type={showPassword2 ? "text" : "password"}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Confirm your password"
+                                    required
+                                    className="modern-input"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword2(!showPassword2)}
+                                    className="password-toggle-btn"
+                                >
+                                    {showPassword2 ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Sign Up Button */}
+                        <button
+                            onClick={handleSubmit}
+                            className="modern-btn-primary"
+                        >
+                            Sign Up
+                        </button>
+
+                        {/* Sign In Link */}
+                        <p className="signin-text">
+                            Already have an account?{' '}
+                            <Link to="/login" className="signin-link">
+                                Sign in
+                            </Link>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
