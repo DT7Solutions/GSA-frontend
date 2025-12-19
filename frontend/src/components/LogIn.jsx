@@ -181,22 +181,84 @@ const Login = () => {
 
   return (
     <div className="modern-auth-container">
-      {/* Left Side - Image */}
-      <div className="modern-auth-left">
-        <img 
-          src={`${process.env.PUBLIC_URL}/assets/img/normal/gowrisankaragencies.jpg`}
-          alt="Login Illustration" 
-          className="auth-side-image"
-        />
+      {/* Left Side - Enhanced Content */}
+      <div className="modern-auth-left login-left-content">
+        {/* Background Blobs */}
+        <div className="login-background-blobs">
+          <div className="blob blob-1"></div>
+          <div className="blob blob-2"></div>
+          <div className="blob blob-3"></div>
+        </div>
+
+        <div className="login-left-inner">
+          
+          {/* Logo */}
+          <div className="login-left-logo ">
+            <img className="bg-white p-2 rounded-md"
+              src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
+              alt="Gowrisankar Auto Express"
+            />
+          </div>
+
+          {/* Main Heading */}
+          <div className="login-left-hero">
+            <h1 className="text-center">Welcome Back!</h1>
+            <p className="login-left-tagline text-center">
+              Your trusted partner for genuine automotive parts & accessories
+            </p>
+          </div>
+
+          {/* Features Grid */}
+          <div className="login-features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
+                  <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
+                </svg>
+              </div>
+              <h4>1000+</h4>
+              <span>Products</span>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
+                  <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
+                </svg>
+              </div>
+              <h4>50+</h4>
+              <span>Brands</span>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
+                  <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
+                </svg>
+              </div>
+              <h4>10K+</h4>
+              <span>Customers</span>
+            </div>
+          </div>
+
+       
+
+          {/* Bottom CTA */}
+          <div className="login-bottom-cta">
+            <p>New to Gowrisankar Auto Express?</p>
+            <Link to="/register" className="explore-link">
+              Explore our catalog →
+            </Link>
+          </div>
+        </div>
       </div>
-      {/* Right Side - Login Form */}
+
+      {/* Right Side - Login Form (UNCHANGED) */}
       <div className="modern-auth-right">
         <div className="modern-auth-form-wrapper">
-          {/* Logo */}
-          {/* <div className="modern-auth-logo">
-            <span className="logo-text">TheCubeFactory</span>
-          </div> */}
-
           {/* Welcome text */}
           <div className="modern-auth-header">
             <h1>Welcome back</h1>
@@ -268,13 +330,6 @@ const Login = () => {
                       required
                       className="modern-input"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="password-toggle-btn"
-                    >
-                      {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-                    </button>
                   </div>
                 </div>
 
@@ -321,6 +376,251 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Additional Styles */}
+      <style>{`
+        .login-background-blobs {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          opacity: 0.15;
+          top: 0;
+          left: 0;
+        }
+
+        .blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          animation: float 8s ease-in-out infinite;
+        }
+
+        .blob-1 {
+          width: 300px;
+          height: 300px;
+          background: #667eea;
+          top: -50px;
+          left: 50px;
+        }
+
+        .blob-2 {
+          width: 250px;
+          height: 250px;
+          background: #764ba2;
+          bottom: 100px;
+          right: -30px;
+          animation-delay: 2s;
+        }
+
+        .blob-3 {
+          width: 200px;
+          height: 200px;
+          background: #667eea;
+          bottom: 50px;
+          left: 20%;
+          animation-delay: 4s;
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) translateX(0px);
+          }
+          25% {
+            transform: translateY(-30px) translateX(20px);
+          }
+          50% {
+            transform: translateY(-60px) translateX(-20px);
+          }
+          75% {
+            transform: translateY(-30px) translateX(20px);
+          }
+        }
+
+        .login-left-inner {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          justify-content:center;
+          padding: 60px 40px;
+        }
+
+        .login-left-logo {
+          margin-bottom: 30px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .login-left-logo img {
+          height: 100px;
+          width: auto;
+          object-fit: contain;
+        }
+
+        .login-left-hero {
+          margin-bottom: 50px;
+        }
+
+        .login-left-hero h1 {
+          font-size: 48px;
+          font-weight: 800;
+          color: white;
+          margin: 0 0 16px 0;
+          letter-spacing: -1px;
+          line-height: 1.1;
+        }
+
+        .login-left-tagline {
+          font-size: 18px;
+          color: rgba(255, 255, 255, 0.85);
+          margin: 0;
+          line-height: 1.6;
+        }
+
+        .login-features-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          margin-bottom: 50px;
+        }
+
+        .feature-card {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          padding: 24px 16px;
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+          background: rgba(255, 255, 255, 0.15);
+          border-color: rgba(255, 255, 255, 0.3);
+          transform: translateY(-4px);
+        }
+
+        .feature-icon {
+          margin-bottom: 12px;
+          color: #0068a5;
+          display: flex;
+          justify-content: center;
+        }
+
+        .feature-card h4 {
+          font-size: 24px;
+          font-weight: 700;
+          color: white;
+          margin: 8px 0 4px 0;
+        }
+
+        .feature-card span {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.7);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .login-benefits {
+          margin-bottom: 40px;
+        }
+
+        .login-benefits h5 {
+          font-size: 16px;
+          font-weight: 700;
+          color: white;
+          margin: 0 0 16px 0;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .benefits-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .benefits-list li {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 12px;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        .benefit-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          background: rgba(0, 212, 255, 0.3);
+          border-radius: 50%;
+          color: #0068a5;
+          font-size: 12px;
+          font-weight: 700;
+          flex-shrink: 0;
+        }
+
+        .login-bottom-cta {
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-bottom-cta p {
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0 0 12px 0;
+        }
+
+        .explore-link {
+          display: inline-block;
+          color: #0068a5;
+          text-decoration: none;
+          font-weight: 700;
+          font-size: 14px;
+          transition: all 0.3s ease;
+          position: relative;
+        }
+
+        .explore-link:after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background: #0068a5;
+          transition: width 0.3s ease;
+        }
+
+        .explore-link:hover:after {
+          width: 100%;
+        }
+
+        @media (max-width: 768px) {
+          .login-left-inner {
+            padding: 40px 24px;
+          }
+
+          .login-left-hero h1 {
+            font-size: 36px;
+          }
+
+          .login-features-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+
+          .login-benefits {
+            margin-bottom: 30px;
+          }
+        }
+      `}</style>
     </div>
   );
 };

@@ -75,7 +75,7 @@ const Register = () => {
                             <div className="logo-cube logo-cube-bottom" />
                             <div className="logo-cube logo-cube-bottom" />
                         </div>
-                        <span className="logo-text">TheCubeFactory</span>
+                       
                     </div>
 
                     {/* Welcome text */}
@@ -146,13 +146,7 @@ const Register = () => {
                                     required
                                     className="modern-input"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="password-toggle-btn"
-                                >
-                                    {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-                                </button>
+                                
                             </div>
                         </div>
 
@@ -168,13 +162,7 @@ const Register = () => {
                                     required
                                     className="modern-input"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword2(!showPassword2)}
-                                    className="password-toggle-btn"
-                                >
-                                    {showPassword2 ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-                                </button>
+                                
                             </div>
                         </div>
 

@@ -58,6 +58,7 @@ import UnauthorizedPage from "./pages/UnauthorizedPage"
 import Commingsoon from "./pages/Commingsoon"
 import CustomerListPage from "pages/dashboard-pages/CustomerListPage";
 import StaffList from "components/dashboard-components/Users/StaffList";
+import NotFoundPage from "pages/NotFoundPage";
 
 function App() {
   return (
@@ -141,7 +142,7 @@ function App() {
 
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
 

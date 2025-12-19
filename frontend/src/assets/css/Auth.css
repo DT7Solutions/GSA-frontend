@@ -14,7 +14,7 @@
   position: relative !important;
   overflow: hidden !important;
   display: none !important;
-  background: linear-gradient(135deg, #a78bfa 0%, #0068a5 50%, #7c3aed 100%) !important;
+  background: linear-gradient(180deg, hsl(210 15% 25%) 0%, hsl(210 20% 15%) 100%)!important;
 }
 
 @media (min-width: 992px) {
@@ -236,13 +236,13 @@
 
 .forgot-password-link:hover,
 .back-to-login-link:hover {
-  color: #37a0dd !important;
+  color: #013e61 !important;
 }
 
 /* Buttons */
 .modern-btn-primary {
   width: 100% !important;
-  background: #1e8dce !important;
+  background: #0068a5 !important;
   color: white !important;
   font-weight: 500 !important;
   padding: 12px !important;
@@ -255,7 +255,7 @@
 }
 
 .modern-btn-primary:hover {
-  background: #0068a5 !important;
+  background: #1996df !important;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
 }
 
@@ -395,3 +395,4 @@
     align-items: flex-start !important;
   }
 }
+

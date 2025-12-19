@@ -568,3 +568,13 @@
     padding-top:0px!important;
     padding-bottom: 0px!important;
   }
+
+  .bg-blur-btn{
+    background-color: hsl((0 0% 100%) / .1);
+    --tw-backdrop-blur: blur(4px);
+    backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  }
+
+  .gradient-steel {
+    background: linear-gradient(180deg, hsl(210 15% 25%) 0%, hsl(210 20% 15%) 100%);
+}

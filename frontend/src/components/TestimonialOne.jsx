@@ -120,7 +120,7 @@ const TestimonialsSection = () => {
     }
 
     .gsa-testimonial-nav-btn:hover {
-      background: #3b82f6;
+      background: #0068a4;
       color: white;
       transform: scale(1.1);
     }
@@ -244,7 +244,7 @@ const TestimonialsSection = () => {
 
     .gsa-testimonial-dot-active {
       width: 32px;
-      background: #3b82f6;
+      background: #0068a4;
     }
 
     .gsa-testimonial-dot-inactive {

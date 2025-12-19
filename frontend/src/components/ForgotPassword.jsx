@@ -83,16 +83,61 @@ const ForgotPassword = () => {
 
   return (
     <div className="modern-auth-container">
-      {/* Left Image */}
+      {/* Left Side - Image with Overlay */}
       <div className="modern-auth-left">
         <img
           src={`${process.env.PUBLIC_URL}/assets/img/normal/gowrisankaragencies.jpg`}
           alt="Forgot Password"
           className="auth-side-image"
         />
+        <div className="auth-overlay">
+          <div className="overlay-content">
+            <div className="overlay-logo-section">
+              <div className="overlay-logo-container">
+                <img
+                  src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
+                  alt="Logo"
+                  className="overlay-logo"
+                />
+              </div>
+              <h5 className="overlay-title">Gowrisankar Agencies</h5>
+              <p className="overlay-subtitle">Trusted Car Spare Parts Provider</p>
+            </div>
+
+            {/* <div className="overlay-features">
+              <div className="overlay-feature">
+                <div className="feature-icon-overlay">🔒</div>
+                <div>
+                  <h6>Secure Reset</h6>
+                  <p>Your account security is our priority</p>
+                </div>
+              </div>
+              <div className="overlay-feature">
+                <div className="feature-icon-overlay">⚡</div>
+                <div>
+                  <h6>Quick Process</h6>
+                  <p>Reset password in 3 simple steps</p>
+                </div>
+              </div>
+              <div className="overlay-feature">
+                <div className="feature-icon-overlay">✉️</div>
+                <div>
+                  <h6>Email Verification</h6>
+                  <p>OTP sent to your registered email</p>
+                </div>
+              </div>
+            </div> */}
+
+            {/* <div className="overlay-footer">
+              <div className="footer-divider"></div>
+              <p className="footer-tagline">Driven By Quality</p>
+              <div className="footer-divider"></div>
+            </div> */}
+          </div>
+        </div>
       </div>
 
-      {/* Right Form */}
+      {/* Right Form - UNCHANGED */}
       <div className="modern-auth-right">
         <div className="modern-auth-form-wrapper">
           <button className="back-button" onClick={() => navigate("/login")}>
@@ -153,7 +198,7 @@ const ForgotPassword = () => {
               </button>
 
               <p className="signin-text">
-                Didn’t receive OTP?{" "}
+                Didn't receive OTP?{" "}
                 <span
                   className="signup-link"
                   style={{ cursor: "pointer" }}
@@ -226,6 +271,201 @@ const ForgotPassword = () => {
           </p>
         </div>
       </div>
+      <style>
+        {`
+        /* Left Side with Image and Overlay */
+.modern-auth-left {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-side-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Overlay Styling */
+.auth-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+  135deg,
+  hsl(202 100% 32% / 0.9),
+  hsl(202 100% 15% / 0.95)
+);
+
+  backdrop-filter: blur(2px);
+  z-index: 2;
+}
+
+.overlay-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 50px;
+  color: white;
+}
+
+/* Logo Section */
+.overlay-logo-section {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.overlay-logo-container {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  display: inline-block;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+  margin-bottom: 25px;
+  transition: transform 0.3s ease;
+}
+
+.overlay-logo-container:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.overlay-logo {
+  width: 160px;
+  height: auto;
+  display: block;
+}
+
+.overlay-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: white;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.overlay-subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Features Section */
+.overlay-features {
+  width: 100%;
+  max-width: 450px;
+  margin-bottom: 50px;
+}
+
+.overlay-feature {
+  display: flex;
+  align-items:center;
+  gap: 18px;
+  padding: 22px 25px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  margin-bottom: 18px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.overlay-feature:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(12px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.feature-icon-overlay {
+  font-size: 36px;
+  flex-shrink: 0;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.overlay-feature h6 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: white;
+}
+
+.overlay-feature p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Footer Section */
+.overlay-footer {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  width: 100%;
+  max-width: 450px;
+}
+
+.footer-divider {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+}
+
+.footer-tagline {
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  white-space: nowrap;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .modern-auth-left {
+    display: none;
+  }
+}
+
+@media (min-width: 993px) and (max-width: 1200px) {
+  .overlay-content {
+    padding: 40px 30px;
+  }
+
+  .overlay-logo {
+    width: 130px;
+  }
+
+  .overlay-title {
+    font-size: 30px;
+  }
+
+  .overlay-subtitle {
+    font-size: 16px;
+  }
+
+  .overlay-features {
+    max-width: 380px;
+  }
+
+  .overlay-feature {
+    padding: 18px 20px;
+  }
+}`}
+      </style>
     </div>
   );
 };
