@@ -30,6 +30,12 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
     phone: shippingAddress?.phone || user?.phone || "",
   };
 
+  // ✅ Company Tax Details (use from company prop or defaults)
+  const companyDetails = {
+    panNo: company.panNo || 'ABCDE1234F',
+    gstNo: company.gstNo || '29ABCDE1234F1Z5',
+  };
+
   // ✅ Styles
   const styles = {
     container: {
@@ -130,6 +136,11 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       fontWeight: 'bold',
       color: '#0068A5',
     },
+    taxDetails: {
+      marginTop: '8px',
+      fontSize: '13px',
+      color: '#555',
+    },
   };
 
   return (
@@ -229,6 +240,10 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
               <br />
               {company.phone || '+91 92480 22760'}
             </p>
+            <div style={styles.taxDetails}>
+              <div><b>PAN:</b> {companyDetails.panNo}</div>
+              <div><b>GST:</b> {companyDetails.gstNo}</div>
+            </div>
           </div>
         </div>
 
@@ -237,11 +252,13 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
           <table style={styles.table}>
             <thead>
               <tr style={styles.focusBg}>
-                <th style={styles.thtd}>SL</th>
-                <th style={styles.thtd}>Product</th>
-                <th style={styles.thtd}>Rate (₹)</th>
-                <th style={styles.thtd}>Qty</th>
-                <th style={{ ...styles.thtd, textAlign: 'right' }}>Amount (₹)</th>
+                <th style={{ ...styles.thtd, width: '5%' }}>SL</th>
+                <th style={{ ...styles.thtd, width: '25%' }}>Product</th>
+                <th style={{ ...styles.thtd, width: '12%' }}>SKU</th>
+                <th style={{ ...styles.thtd, width: '12%' }}>HSN</th>
+                <th style={{ ...styles.thtd, width: '12%' }}>Rate (₹)</th>
+                <th style={{ ...styles.thtd, width: '8%' }}>Qty</th>
+                <th style={{ ...styles.thtd, width: '15%', textAlign: 'right' }}>Amount (₹)</th>
               </tr>
             </thead>
             <tbody>
@@ -250,11 +267,16 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                   const qty = Number(it.quantity) || 1;
                   const rate = Number(it.price) || 0;
                   const amount = rate * qty;
-                   const productName = it.part_name || "N/A";
+                  const productName = it.part_name || "N/A";
+                  const sku = it.sku || it.part_no || "N/A";
+                  const hsn = it.remarks || it.hsn_code || "8708";
+                  
                   return (
                     <tr key={i} style={i % 2 ? styles.focusBg : {}}>
                       <td style={styles.thtd}>{String(i + 1).padStart(2, '0')}</td>
-                     <td style={styles.thtd}>{productName}</td>
+                      <td style={styles.thtd}>{productName}</td>
+                      <td style={styles.thtd}>{sku}</td>
+                      <td style={styles.thtd}>{hsn}</td>
                       <td style={styles.thtd}>{rate.toFixed(2)}</td>
                       <td style={styles.thtd}>{qty}</td>
                       <td style={{ ...styles.thtd, textAlign: 'right' }}>{amount.toFixed(2)}</td>
@@ -263,7 +285,7 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                 })
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ ...styles.thtd, ...styles.textCenter }}>
+                  <td colSpan="7" style={{ ...styles.thtd, ...styles.textCenter }}>
                     No items
                   </td>
                 </tr>

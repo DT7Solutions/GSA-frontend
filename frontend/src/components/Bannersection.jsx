@@ -139,7 +139,7 @@ const TwoBannerSection = () => {
               <div style={styles.bannerContent}>
                 <h2 className="text-white  heading-banner-section" style={styles.bannerHeading}>{banner.heading}</h2>
                 <p  className="text-white" style={styles.bannerParagraph}>{banner.paragraph}</p>
-                <a
+                {/* <a
                   href={banner.buttonLink}
                   style={styles.bannerButton}
                   onMouseEnter={(e) => handleButtonHover(e, true, banner.buttonHoverColor)}
@@ -150,7 +150,7 @@ const TwoBannerSection = () => {
                   }}
                 >
                   {banner.buttonText}
-                </a>
+                </a> */}
               </div>
             </div>
           </div>

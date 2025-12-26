@@ -28,7 +28,12 @@ const PartCategorySelection = ({id, modelvariant}) => {
 
         <div className="category-area-1 pb-100 brand-logo-display mt-5">
             <div className="container-fluid">
-                <h4 className="text-center fw-extrabold mb-20">Filter by Selected Model Part</h4>
+                <h5 className="text-center search-heading mb-0">
+    <span className="heading-muted">Filter by</span>
+    <span className="heading-brand"> Selected Model</span>
+    <span className="heading-muted"> Part</span>
+  </h5>
+                
                 <div className="row mt-5 brands-sec">
                 {variantCategory.map((variant) => (
                     <div className="col-sm-12 col-md-2 col-lg-2 mb-3">

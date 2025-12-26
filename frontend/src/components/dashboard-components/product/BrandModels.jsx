@@ -131,9 +131,11 @@ const BrandModels = ({ id, carMakes }) => {
                 <div className="row align-items-center mb-4">
                     <div className="col-md-3"></div>
                     <div className="col-md-6 text-center">
-                        <h4 className="fw-extrabold mb-0">
-                            Search By {carMakes.name} Car Model
-                        </h4>
+                        <h5 className="search-heading mb-0">
+    <span className="heading-muted">Search By</span>
+    <span className="heading-brand"> {carMakes.name}</span>
+    <span className="heading-muted"> Car Model</span>
+  </h5>
                     </div>
                     <div className="col-md-3">
                         <div className="d-flex justify-content-end align-items-center gap-2">

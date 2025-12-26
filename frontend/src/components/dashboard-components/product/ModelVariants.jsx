@@ -144,9 +144,12 @@ const ModelVariantsList = () => {
     return (
         <div className="category-area-1 pb-100 brand-logo-display mt-5">
       <div className="container-fluid">
-        <h5 className="text-center fw-extrabold mb-20">
-          Select Your {carModelItem.name} {carModelItem.generation} Variants
-        </h5>
+        <h5 className="search-heading text-center mb-0">
+    <span className="heading-muted">Select Your</span>
+    <span className="heading-brand">{carModelItem.name} {carModelItem.generation}</span>
+    <span className="heading-muted">  Variants </span>
+  </h5>
+       
         <div className="row mt-5 brands-sec d-flex justify-content-center align-items-center">
         
           <div className="col-sm-12 col-md-4 col-lg-3 mb-3">

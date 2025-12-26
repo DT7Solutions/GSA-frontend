@@ -14,92 +14,108 @@ const PartGroupList = ({ id }) => {
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedVariant, setSelectedVariant] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  // ✅ Fetch default part groups
+  // ✅ Fetch part section full details and auto-populate filters
   useEffect(() => {
-    const fetchDefaultPartGroups = async () => {
+    const fetchPartSectionDetails = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${id}/`);
-        const parts = res.data || [];
-        setPartList(parts);
+        console.log("Fetching part section details for ID:", id);
+        const response = await axios.get(`${API_BASE_URL}api/home/part-section/${id}/full-details/`);
+        const data = response.data;
+        
+        console.log("Part Section Full Details:", data);
 
-        const categoryCounts = parts.reduce((acc, part) => {
-          const catId = String(part.part_section?.id || "");
-          const catName = part.part_section?.name;
-          if (catId && catName) {
-            if (!acc[catId]) acc[catId] = { id: catId, name: catName, count: 0 };
-            acc[catId].count += 1;
-          }
-          return acc;
-        }, {});
-        setCategories(Object.values(categoryCounts));
+        // Auto-populate the filters
+        if (data.car_make) {
+          setSelectedBrand(data.car_make.id);
+          console.log("Auto-selected Brand:", data.car_make.name);
+        }
+        
+        if (data.car_model) {
+          setSelectedModel(data.car_model.id);
+          console.log("Auto-selected Model:", data.car_model.name);
+        }
+        
+        if (data.car_variant) {
+          setSelectedVariant(data.car_variant.id);
+          console.log("Auto-selected Variant:", data.car_variant.name);
+        }
+        
+        if (data.id && data.name) {
+          setSelectedCategory(String(data.id));
+          console.log("✅ Category auto-filled:", data.name, "ID:", data.id);
+        }
+
       } catch (error) {
-        console.error("Error fetching default part groups:", error);
+        console.error("Error fetching part section details:", error);
       }
     };
-    if (id) fetchDefaultPartGroups();
+
+    if (id) {
+      fetchPartSectionDetails();
+    }
   }, [id]);
 
-  // ✅ Fetch parts & categories for selected variant
-  useEffect(() => {
-    if (!selectedVariant) return;
-    const fetchVariantParts = async () => {
-      try {
-        const [partsRes, catRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}api/home/part_groups_list/${selectedVariant}/`),
-          // ✅ 🔁 REPLACED OLD ENDPOINT HERE:
-          axios.get(`${API_BASE_URL}api/home/car_part_count_part_group_count/${selectedVariant}/`),
-        ]);
-
-        const parts = partsRes.data || [];
-        setPartList(parts);
-
-        // Build count per category from fetched parts
-        const categoryCounts = parts.reduce((acc, part) => {
-          const catId = String(part.part_section?.id || "");
-          const catName = part.part_section?.name;
-          if (catId && catName) {
-            if (!acc[catId]) acc[catId] = { id: catId, name: catName, count: 0 };
-            acc[catId].count += 1;
-          }
-          return acc;
-        }, {});
-
-        // ✅ Merge with new API data (which has part_groups_count)
-        const mergedCats = (catRes.data || []).map((cat) => {
-          const catId = String(cat.id);
-          return {
-            ...cat,
-            count: categoryCounts[catId]?.count || 0,
-            part_groups_count: cat.part_groups_count || 0,
-          };
-        });
-
-        setCategories(mergedCats);
-      } catch (err) {
-        console.error("Error fetching variant data:", err);
-      }
-    };
-    fetchVariantParts();
-  }, [selectedVariant]);
-
-  // ✅ Fetch parts by selected category
+  // ✅ Fetch parts based on selected CATEGORY (part section id)
   useEffect(() => {
     if (!selectedCategory) return;
+    
     const fetchCategoryParts = async () => {
       try {
+        console.log("Fetching parts for category (part section) ID:", selectedCategory);
         const res = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${selectedCategory}/`);
-        setPartList(Array.isArray(res.data) ? res.data : []);
+        const parts = Array.isArray(res.data) ? res.data : [];
+        console.log("Parts fetched for category:", parts.length);
+        setPartList(parts);
       } catch (error) {
         console.error("Error fetching parts by category:", error);
         setPartList([]);
       }
     };
+    
     fetchCategoryParts();
   }, [selectedCategory]);
+
+  // ✅ Fetch categories based on variant or initial load
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        if (selectedVariant) {
+          // Fetch categories for selected variant
+          console.log("Fetching categories for variant:", selectedVariant);
+          const catRes = await axios.get(`${API_BASE_URL}api/home/car_part_count_part_group_count/${selectedVariant}/`);
+          setCategories(catRes.data || []);
+        } else if (id) {
+          // Fetch initial categories using the part section id
+          console.log("Fetching initial categories for part section:", id);
+          const res = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${id}/`);
+          const parts = res.data || [];
+          
+          // Build category counts from parts
+          const categoryCounts = parts.reduce((acc, part) => {
+            const catId = String(part.part_section?.id || "");
+            const catName = part.part_section?.name;
+            if (catId && catName) {
+              if (!acc[catId]) acc[catId] = { id: catId, name: catName, part_groups_count: 0 };
+              acc[catId].part_groups_count += 1;
+            }
+            return acc;
+          }, {});
+          
+          setCategories(Object.values(categoryCounts));
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategories([]);
+      }
+    };
+    
+    fetchCategories();
+  }, [id, selectedVariant]);
 
   // ✅ Fetch car dropdown data
   useEffect(() => {
@@ -115,9 +131,6 @@ const PartGroupList = ({ id }) => {
       .get(`${API_BASE_URL}api/home/car-models/${selectedBrand}/`)
       .then((res) => {
         setCarModels(res.data);
-        setSelectedModel("");
-        setSelectedVariant("");
-        setModelVariants([]);
       })
       .catch((err) => console.error("Error fetching car models", err));
   }, [selectedBrand]);
@@ -128,7 +141,6 @@ const PartGroupList = ({ id }) => {
       .get(`${API_BASE_URL}api/home/car_variant/${selectedModel}/`)
       .then((res) => {
         setModelVariants(res.data);
-        setSelectedVariant("");
       })
       .catch((err) => console.error("Error fetching car variants", err));
   }, [selectedModel]);
@@ -136,10 +148,16 @@ const PartGroupList = ({ id }) => {
   // ✅ Search filter
   const partsToDisplay = useMemo(() => {
     let parts = partList;
+    
     if (searchKeyword.trim()) {
       const keyword = searchKeyword.toLowerCase();
-      parts = parts.filter((p) => p.product_name?.toLowerCase().includes(keyword));
+      parts = parts.filter((p) => {
+        const productName = p.product_name?.toLowerCase() || "";
+        const name = p.name?.toLowerCase() || "";
+        return productName.includes(keyword) || name.includes(keyword);
+      });
     }
+    
     return parts;
   }, [partList, searchKeyword]);
 
@@ -149,16 +167,6 @@ const PartGroupList = ({ id }) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return partsToDisplay.slice(startIndex, startIndex + itemsPerPage);
   }, [partsToDisplay, currentPage]);
-
-  // ✅ Dynamic counts for displayed parts
-  const filteredCategoryCounts = useMemo(() => {
-    const counts = {};
-    partsToDisplay.forEach((p) => {
-      const catId = String(p.part_section?.id || "");
-      if (catId) counts[catId] = (counts[catId] || 0) + 1;
-    });
-    return counts;
-  }, [partsToDisplay]);
 
   const selectedCategoryName =
     categories.find((cat) => String(cat.id) === selectedCategory)?.name || "";
@@ -174,44 +182,46 @@ const PartGroupList = ({ id }) => {
         <div className="row flex-row-reverse">
           {/* MAIN CONTENT */}
           <div className="col-xl-9 col-lg-8">
-            {/* <div className="d-flex justify-content-between align-items-center mb-3">
-              <h4 className="mb-0">
-                {selectedCategory
-                  ? `${selectedCategoryName} (${partsToDisplay.length} Items)`
-                  : `All Parts (${partsToDisplay.length} Items)`}
-              </h4>
-            </div> */}
-<div className="row gy-4">
-  {paginatedParts.length > 0 ? (
-    paginatedParts.map((item) => {
-      // Check if the selected category is CHASSIS
-      const isChassis = selectedCategoryName?.toUpperCase() === "CHASSIS";
-      const colClass = isChassis ? "col-xl-4" : "col-xl-3";
-      
-      return (
-        <div className={`${colClass} col-md-3 col-6`} key={item.id}>
-          <div className="product-card style2">
-            <div className="product-img">
-              <Link to={`/shop/${item.id}`}>
-                <img
-                  src={item.image || "/assets/img/placeholder.png"}
-                  alt={item.name}
-                />
-              </Link>
+            {/* Display selected category info */}
+            {selectedCategoryName && (
+              <div className="mb-3">
+                <h5>Showing: {selectedCategoryName} ({partsToDisplay.length} parts)</h5>
+              </div>
+            )}
+            
+            <div className="row gy-4">
+              {paginatedParts.length > 0 ? (
+                paginatedParts.map((item) => {
+                
+                  const isChassis = selectedCategoryName?.toUpperCase() === "CHASSIS";
+                  const colClass = isChassis ? "col-xl-4" : "col-xl-3";
+                  
+                  return (
+                    <div className={`${colClass} col-md-3 col-6`} key={item.id}>
+                      <div className="product-card style2">
+                        <div className="product-img">
+                          <Link to={`/shop/${item.id}`}>
+                            <img
+                              src={item.image || "/assets/img/placeholder.png"}
+                              alt={item.name}
+                            />
+                          </Link>
+                        </div>
+                        <div className="product-content text-center">
+                          <h6 className="product-title">
+                            <Link to={`/shop/${item.id}`}>{item.name}</Link>
+                          </h6>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="col-12">
+                  <p className="text-center">No parts found for this section.</p>
+                </div>
+              )}
             </div>
-            <div className="product-content text-center">
-              <h6 className="product-title">
-                <Link to={`/shop/${item.id}`}>{item.name}</Link>
-              </h6>
-            </div>
-          </div>
-        </div>
-      );
-    })
-  ) : (
-    <p className="text-center">No parts found.</p>
-  )}
-</div>
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -230,7 +240,6 @@ const PartGroupList = ({ id }) => {
                     
                     {[...Array(totalPages)].map((_, idx) => {
                       const pageNum = idx + 1;
-                      // Show first, last, current, and adjacent pages
                       if (
                         pageNum === 1 ||
                         pageNum === totalPages ||
@@ -281,84 +290,93 @@ const PartGroupList = ({ id }) => {
           <div className="col-xl-3 col-lg-4 sidebar-widget-area">
             <aside className="sidebar-area sidebar-shop">
               <div className="bg-white border-smooth">
-              <h4 className="widget_title bg-theme-sidebar p-3 mb-2">Filter by Car</h4>
+                <h4 className="widget_title bg-theme-sidebar p-3 mb-2">Filter by Car</h4>
 
-              {/* Brand */}
-              <div className="p-3">
-              <div className="mb-3 ">
-                <label className="form-label">Car Brand</label>
-                <select
-                  className="form-select"
-                  value={selectedBrand}
-                  onChange={(e) => setSelectedBrand(e.target.value)}
-                >
-                  <option value="">-- Select Brand --</option>
-                  {carMakes.map((make) => (
-                    <option key={make.id} value={make.id}>
-                      {make.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="p-3">
+                  {/* Brand */}
+                  <div className="mb-3">
+                    <label className="form-label">Car Brand</label>
+                    <select
+                      className="form-select"
+                      value={selectedBrand}
+                      onChange={(e) => setSelectedBrand(e.target.value)}
+                    >
+                      <option value="">-- Select Brand --</option>
+                      {carMakes.map((make) => (
+                        <option key={make.id} value={make.id}>
+                          {make.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Model */}
-              <div className="mb-3">
-                <label className="form-label">Car Model</label>
-                <select
-                  className="form-select"
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  disabled={!selectedBrand}
-                >
-                  <option value="">-- Select Model --</option>
-                  {carModels.map((model) => (
-                    <option key={model.id} value={model.id}>
-                      {model.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {/* Model */}
+                  <div className="mb-3">
+                    <label className="form-label">Car Model</label>
+                    <select
+                      className="form-select"
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      disabled={!selectedBrand}
+                    >
+                      <option value="">-- Select Model --</option>
+                      {carModels.map((model) => (
+                        <option key={model.id} value={model.id}>
+                          {model.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Variant */}
-              <div className="mb-3">
-                <label className="form-label">Car Variant</label>
-                <select
-                  className="form-select"
-                  value={selectedVariant}
-                  onChange={(e) => setSelectedVariant(e.target.value)}
-                  disabled={!selectedModel}
-                >
-                  <option value="">-- Select Variant --</option>
-                  {modelVariants.map((variant) => (
-                    <option key={variant.id} value={variant.id}>
-                      {variant.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              </div>
+                  {/* Variant */}
+                  <div className="mb-3">
+                    <label className="form-label">Car Variant</label>
+                    <select
+                      className="form-select"
+                      value={selectedVariant}
+                      onChange={(e) => setSelectedVariant(e.target.value)}
+                      disabled={!selectedModel}
+                    >
+                      <option value="">-- Select Variant --</option>
+                      {modelVariants.map((variant) => (
+                        <option key={variant.id} value={variant.id}>
+                          {variant.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
 
               {/* Part Sections */}
-             {categories.length > 0 && (
+              {categories.length > 0 && (
                 <div className="widget bg-white widget_categories mt-5 p-0">
                   <h5 className="widget_title bg-theme-sidebar mb-2 p-3">Part Sections</h5>
                   <ul className="category-list p-3">
-                    {categories.map((cat) => (
-                      <li key={cat.id}>
-                        <Link
-                          to="#"
-                          onClick={() => setSelectedCategory(String(cat.id))}
-                          style={
-                            selectedCategory === String(cat.id)
-                              ? { backgroundColor: "#0068a5", color: "#fff", padding: "8px 12px", borderRadius: "4px", display: "block" }
-                              : { padding: "8px 12px", display: "block" }
-                          }
-                        >
-                          {cat.name} ({cat.part_groups_count ?? 0})
-                        </Link>
-                      </li>
-                    ))}
+                    {categories.map((cat) => {
+                      const catId = String(cat.id);
+                      const isSelected = selectedCategory === catId;
+                      
+                      return (
+                        <li key={cat.id}>
+                          <Link
+                            to="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              console.log("Category clicked:", catId, cat.name);
+                              setSelectedCategory(catId);
+                            }}
+                            style={
+                              isSelected
+                                ? { backgroundColor: "#0068a5", color: "#fff", padding: "8px 12px", borderRadius: "4px", display: "block" }
+                                : { padding: "8px 12px", display: "block" }
+                            }
+                          >
+                            {cat.name} ({cat.part_groups_count ?? 0})
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               )}

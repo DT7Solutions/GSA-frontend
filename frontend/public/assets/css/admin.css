@@ -578,3 +578,27 @@
   .gradient-steel {
     background: linear-gradient(180deg, hsl(210 15% 25%) 0%, hsl(210 20% 15%) 100%);
 }
+
+.widget-contact-grid .icon{
+  border: 1px solid #fff!important;
+}
+.search-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #1f2937; 
+}
+
+.heading-muted {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.heading-brand {
+  color: #0068a5; 
+  position: relative;
+  padding: 0 8px;
+  font-weight: 800;
+}
+
+

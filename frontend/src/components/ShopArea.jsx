@@ -35,6 +35,11 @@ const ShopArea = ({ id }) => {
   const [partGroupsByCategory, setPartGroupsByCategory] = useState({});
   const [expandedPartGroupId, setExpandedPartGroupId] = useState(null);
   const [partItemsByGroup, setPartItemsByGroup] = useState({});
+  const [selectedCategoryName, setSelectedCategoryName] = useState("");
+  const [selectedPartGroupName, setSelectedPartGroupName] = useState("");
+
+  // New state for part group details
+  const [partGroupDetails, setPartGroupDetails] = useState(null);
 
   // Enquiry form state
   const [enquiryFormData, setEnquiryFormData] = useState({
@@ -48,6 +53,83 @@ const ShopArea = ({ id }) => {
   });
 
   const token = localStorage.getItem("accessToken");
+
+  // Fetch part group details when id changes
+  useEffect(() => {
+    const fetchPartGroupDetails = async () => {
+      if (!id) return;
+      
+      try {
+        const response = await axios.get(`${API_BASE_URL}api/home/part-group/${id}/`);
+        const data = response.data;
+        setPartGroupDetails(data);
+        
+        // Auto-select dropdowns based on part group data
+        if (data.car_make) {
+          setSelectedBrand(data.car_make.id);
+          setSelectedBrandName(data.car_make.name);
+          
+          // Fetch models for the selected brand
+          const modelsResponse = await axios.get(
+            `${API_BASE_URL}api/home/car-models/${data.car_make.id}/`
+          );
+          setCarModels(modelsResponse.data);
+        }
+        
+        if (data.car_model) {
+          setSelectedModel(data.car_model.id);
+          setSelectedModelName(data.car_model.name);
+          
+          // Fetch variants for the selected model
+          const variantsResponse = await axios.get(
+            `${API_BASE_URL}api/home/car_variant/${data.car_model.id}/`
+          );
+          setModelVariant(variantsResponse.data);
+        }
+        
+        if (data.car_variant) {
+          setSelectedVariant(data.car_variant.id);
+          setSelectedVariantName(data.car_variant.name);
+          
+          // Fetch categories for the selected variant
+          fetchCategoriesByVariant(data.car_variant.id);
+        }
+
+        // Auto-expand the category that contains this part group
+        if (data.part_section) {
+          setExpandedCategoryId(data.part_section.id);
+          setSelectedCategoryName(data.part_section.name);
+          console.log("Expanding category ID:", data.part_section.id);
+          
+          // Fetch part groups for this category
+          const partGroupsResponse = await axios.get(
+            `${API_BASE_URL}api/home/part_groups_list/${data.part_section.id}/`
+          );
+          setPartGroupsByCategory((prev) => ({
+            ...prev,
+            [data.part_section.id]: partGroupsResponse.data,
+          }));
+          
+          // Auto-expand this specific part group
+          setExpandedPartGroupId(parseInt(id));
+          setSelectedPartGroupName(data.name);
+          
+          // Fetch part items for this part group
+          const partItemsResponse = await axios.get(
+            `${API_BASE_URL}api/home/car_part_items/${id}/`
+          );
+          setPartItemsByGroup((prev) => ({
+            ...prev,
+            [id]: partItemsResponse.data,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching part group details:", error);
+      }
+    };
+
+    fetchPartGroupDetails();
+  }, [id]);
 
   // Update enquiry form when brand/model/variant changes
   useEffect(() => {
@@ -257,11 +339,11 @@ const ShopArea = ({ id }) => {
 
   useEffect(() => {
     const selectedBrandLS = JSON.parse(localStorage.getItem("selected_brand"));
-    if (selectedBrandLS?.model_variant) {
+    if (selectedBrandLS?.model_variant && !partGroupDetails) {
       setSelectedVariant(selectedBrandLS.model_variant);
       fetchCategoriesByVariant(selectedBrandLS.model_variant);
     }
-  }, []);
+  }, [partGroupDetails]);
 
   useEffect(() => {
     const fetchCarMakes = async () => {
@@ -323,53 +405,68 @@ const ShopArea = ({ id }) => {
     fetchCategoriesByVariant(variantId);
   };
 
-  const handleCategoryClick = async (categoryId) => {
-    if (expandedCategoryId === categoryId) {
-      setExpandedCategoryId(null);
-      return;
-    }
+  const handleCategoryClick = async (category) => {
+  // Always store selected category name
+  setSelectedCategoryName(category.name);
+  setSelectedPartGroupName(""); // reset only part group
 
-    setExpandedCategoryId(categoryId);
+  // Toggle collapse
+  if (expandedCategoryId === category.id) {
+    setExpandedCategoryId(null);
+    setExpandedPartGroupId(null);
+    return;
+  }
 
-    if (partGroupsByCategory[categoryId]) return;
+  // Expand new category
+  setExpandedCategoryId(category.id);
+  setExpandedPartGroupId(null);
 
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}api/home/part_groups_list/${categoryId}/`
-      );
-      setPartGroupsByCategory((prev) => ({
-        ...prev,
-        [categoryId]: response.data,
-      }));
-    } catch (error) {
-      console.error("Error fetching part groups:", error);
-    }
-  };
+  if (partGroupsByCategory[category.id]) return;
 
-  const handlePartGroupClick = async (groupId) => {
-    if (expandedPartGroupId === groupId) {
-      setExpandedPartGroupId(null);
-      return;
-    }
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}api/home/part_groups_list/${category.id}/`
+    );
+    setPartGroupsByCategory((prev) => ({
+      ...prev,
+      [category.id]: response.data,
+    }));
+  } catch (error) {
+    console.error("Error fetching part groups:", error);
+  }
+};
 
-    setExpandedPartGroupId(groupId);
 
-    if (partItemsByGroup[groupId]) return;
+  const handlePartGroupClick = async (groupId, groupName) => {
+  // Always store selected part group name
+  setSelectedPartGroupName(groupName);
 
-    try {
-      const response = await axios.get(`${API_BASE_URL}api/home/car_part_items/${groupId}/`);
-      setPartItemsByGroup((prev) => ({
-        ...prev,
-        [groupId]: response.data,
-      }));
-    } catch (error) {
-      console.error("Error fetching part items:", error);
-      setPartItemsByGroup((prev) => ({
-        ...prev,
-        [groupId]: [],
-      }));
-    }
-  };
+  // Toggle collapse
+  if (expandedPartGroupId === groupId) {
+    setExpandedPartGroupId(null);
+    return;
+  }
+
+  setExpandedPartGroupId(groupId);
+
+  if (partItemsByGroup[groupId]) return;
+
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}api/home/car_part_items/${groupId}/`
+    );
+    setPartItemsByGroup((prev) => ({
+      ...prev,
+      [groupId]: response.data,
+    }));
+  } catch (error) {
+    console.error("Error fetching part items:", error);
+    setPartItemsByGroup((prev) => ({
+      ...prev,
+      [groupId]: [],
+    }));
+  }
+};
 
   return (
     <section className="space-top space-extra-bottom shop-sec">
@@ -813,12 +910,15 @@ const ShopArea = ({ id }) => {
                   Product Categories
                 </h3>
                 <ul className="category-list list-unstyled mb-0 p-3">
+                  
                   {categories.length > 0 ? (
                     categories.map((category) => (
                       <li key={category.id} className="mb-3">
                         <div
                           className="category-card sidebar-point d-flex justify-content-between align-items-center  rounded border hover-shadow"
-                          onClick={() => handleCategoryClick(category.id)}
+                          onClick={() => handleCategoryClick(category)}
+
+
                           style={{ cursor: "pointer" }}
                         >
                           <span className="fw-semibold text-dark">
@@ -840,7 +940,8 @@ const ShopArea = ({ id }) => {
                                 <li key={group.id} className="mb-3 mt-3">
                                   <div
                                     className="part-group-card d-flex justify-content-between align-items-center p-2 rounded border hover-bg-light"
-                                    onClick={() => handlePartGroupClick(group.id)}
+                                    onClick={() => handlePartGroupClick(group.id, group.name)}
+
                                     style={{ cursor: "pointer" }}
                                   >
                                     <Link

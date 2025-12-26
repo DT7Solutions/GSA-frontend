@@ -808,12 +808,12 @@ const AddProductsForm = () => {
                         </div>
 
                         <div className="col-md-4">
-                            <label className="form-label">Remarks</label>
+                            <label className="form-label">HSN</label>
                             <input
                                 type="text"
                                 name="#0"
                                 className="form-control"
-                                placeholder="Enter remarks,"
+                                placeholder="Enter HSN code"
                                 onChange={(e) =>
                                     setFormData({ ...formData, remarks: e.target.value })
                                 }

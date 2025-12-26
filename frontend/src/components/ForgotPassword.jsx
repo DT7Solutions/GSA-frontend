@@ -86,54 +86,56 @@ const ForgotPassword = () => {
       {/* Left Side - Image with Overlay */}
       <div className="modern-auth-left">
         <img
-          src={`${process.env.PUBLIC_URL}/assets/img/normal/gowrisankaragencies.jpg`}
+          src={`${process.env.PUBLIC_URL}/assets/img/service/forgot-password-banner-image.jpg`}
           alt="Forgot Password"
           className="auth-side-image"
         />
         <div className="auth-overlay">
-          <div className="overlay-content">
-            <div className="overlay-logo-section">
-              <div className="overlay-logo-container">
-                <img
-                  src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
-                  alt="Logo"
-                  className="overlay-logo"
-                />
-              </div>
-              <h5 className="overlay-title">Gowrisankar Agencies</h5>
-              <p className="overlay-subtitle">Trusted Car Spare Parts Provider</p>
+         <div className="overlay-content">
+    <div className="overlay-logo-section">
+        <div className="overlay-logo-container">
+            <img
+                src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
+                alt="Logo"
+                className="overlay-logo"
+            />
+        </div>
+        <h5 className="overlay-title">Forgot Your Password?</h5>
+        <p className="overlay-subtitle">Don't worry, we've got you covered</p>
+    </div>
+
+    {/* Features Section */}
+    <div className="overlay-features-list">
+        <div className="overlay-feature-item">
+            <div className="feature-checkmark">✓</div>
+            <div className="feature-text">
+                <p>Quick & secure password recovery</p>
             </div>
+        </div>
 
-            {/* <div className="overlay-features">
-              <div className="overlay-feature">
-                <div className="feature-icon-overlay">🔒</div>
-                <div>
-                  <h6>Secure Reset</h6>
-                  <p>Your account security is our priority</p>
-                </div>
-              </div>
-              <div className="overlay-feature">
-                <div className="feature-icon-overlay">⚡</div>
-                <div>
-                  <h6>Quick Process</h6>
-                  <p>Reset password in 3 simple steps</p>
-                </div>
-              </div>
-              <div className="overlay-feature">
-                <div className="feature-icon-overlay">✉️</div>
-                <div>
-                  <h6>Email Verification</h6>
-                  <p>OTP sent to your registered email</p>
-                </div>
-              </div>
-            </div> */}
+        
+        <div className="overlay-feature-item">
+            <div className="feature-checkmark">✓</div>
+            <div className="feature-text">
+                <p>24/7 account support</p>
+            </div>
+        </div>
 
-            {/* <div className="overlay-footer">
-              <div className="footer-divider"></div>
-              <p className="footer-tagline">Driven By Quality</p>
-              <div className="footer-divider"></div>
-            </div> */}
-          </div>
+        <div className="overlay-feature-item">
+            <div className="feature-checkmark">✓</div>
+            <div className="feature-text">
+                <p>Your data is always safe with us</p>
+            </div>
+        </div>
+    </div>
+
+    {/* Footer Section */}
+    <div className="overlay-footer">
+        <div className="footer-divider"></div>
+        <div className="footer-tagline">Trusted Since 1985</div>
+        <div className="footer-divider"></div>
+    </div>
+</div>
         </div>
       </div>
 
@@ -263,7 +265,7 @@ const ForgotPassword = () => {
             </form>
           )}
 
-          <p className="signin-text">
+          <p className="signin-text pt-3">
             Remember your password?{" "}
             <Link to="/login" className="signin-link">
               Sign in
@@ -272,8 +274,8 @@ const ForgotPassword = () => {
         </div>
       </div>
       <style>
-        {`
-        /* Left Side with Image and Overlay */
+{`
+/* Left Side with Image and Overlay */
 .modern-auth-left {
   position: relative;
   overflow: hidden;
@@ -290,19 +292,14 @@ const ForgotPassword = () => {
 
 /* Overlay Styling */
 .auth-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-  135deg,
-  hsl(202 100% 32% / 0.9),
-  hsl(202 100% 15% / 0.95)
-);
-
-  backdrop-filter: blur(2px);
-  z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, hsl(202 100% 32% / 0.9), hsl(202 100% 15% / 0.95));
+    backdrop-filter: blur(2px);
+    z-index: 2;
 }
 
 .overlay-content {
@@ -311,7 +308,7 @@ const ForgotPassword = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 60px 50px;
+  padding: 50px 40px;
   color: white;
 }
 
@@ -323,8 +320,8 @@ const ForgotPassword = () => {
 
 .overlay-logo-container {
   background: white;
-  border-radius: 20px;
-  padding: 25px;
+  border-radius: 7px;
+  padding: 15px;
   display: inline-block;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
   margin-bottom: 25px;
@@ -336,7 +333,7 @@ const ForgotPassword = () => {
 }
 
 .overlay-logo {
-  width: 160px;
+  width: 120px;
   height: auto;
   display: block;
 }
@@ -357,50 +354,55 @@ const ForgotPassword = () => {
   letter-spacing: 0.5px;
 }
 
-/* Features Section */
-.overlay-features {
+/* Features List Section */
+.overlay-features-list {
   width: 100%;
-  max-width: 450px;
+  max-width: 500px;
   margin-bottom: 50px;
 }
 
-.overlay-feature {
+.overlay-feature-item {
   display: flex;
-  align-items:center;
-  gap: 18px;
-  padding: 22px 25px;
-  background: rgba(255, 255, 255, 0.15);
+  align-items: center;
+  gap: 20px;
+  padding: 18px 25px;
+  background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(10px);
-  border-radius: 15px;
-  margin-bottom: 18px;
+  border-radius: 12px;
+  margin-bottom: 16px;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 4px solid rgba(255, 255, 255, 0.6);
 }
 
-.overlay-feature:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateX(12px);
+.overlay-feature-item:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateX(10px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border-left-color: white;
 }
 
-.feature-icon-overlay {
-  font-size: 36px;
+.feature-checkmark {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
   flex-shrink: 0;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(219, 230, 223, 0.2);
+  border-radius: 50%;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.overlay-feature h6 {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 6px;
+.feature-text p {
+  font-size: 16px;
   color: white;
-}
-
-.overlay-feature p {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.6;
+  line-height: 1.5;
   margin: 0;
+  font-weight: 500;
 }
 
 /* Footer Section */
@@ -409,7 +411,7 @@ const ForgotPassword = () => {
   align-items: center;
   gap: 25px;
   width: 100%;
-  max-width: 450px;
+  max-width: 500px;
 }
 
 .footer-divider {
@@ -440,9 +442,48 @@ const ForgotPassword = () => {
   }
 }
 
-@media (min-width: 993px) and (max-width: 1200px) {
+/* Large screens */
+@media (min-width: 1400px) {
   .overlay-content {
-    padding: 40px 30px;
+    padding: 60px 50px;
+  }
+  
+  .overlay-logo {
+    width: 100px;
+  }
+  
+  .overlay-title {
+    font-size: 40px;
+  }
+  
+  .overlay-subtitle {
+    font-size: 19px;
+  }
+  
+  .overlay-features-list {
+    max-width: 550px;
+  }
+  
+  .overlay-feature-item {
+    padding: 20px 28px;
+    gap: 22px;
+  }
+  
+  .feature-text p {
+    font-size: 17px;
+  }
+  
+  .feature-checkmark {
+    font-size: 30px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Medium screens (993px to 1199px) */
+@media (min-width: 993px) and (max-width: 1199px) {
+  .overlay-content {
+    padding: 35px 30px;
   }
 
   .overlay-logo {
@@ -456,16 +497,92 @@ const ForgotPassword = () => {
   .overlay-subtitle {
     font-size: 16px;
   }
-
-  .overlay-features {
-    max-width: 380px;
+  
+  .overlay-logo-section {
+    margin-bottom: 35px;
   }
 
-  .overlay-feature {
-    padding: 18px 20px;
+  .overlay-features-list {
+    max-width: 420px;
+    margin-bottom: 35px;
   }
-}`}
-      </style>
+
+  .overlay-feature-item {
+    padding: 14px 20px;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .feature-checkmark {
+    font-size: 24px;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .feature-text p {
+    font-size: 14px;
+  }
+  
+  .overlay-footer {
+    max-width: 420px;
+    gap: 20px;
+  }
+  
+  .footer-tagline {
+    font-size: 13px;
+    letter-spacing: 2px;
+  }
+}
+
+/* Larger medium screens (1200px to 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .overlay-content {
+    padding: 45px 40px;
+  }
+  
+  .overlay-logo {
+    width: 120px;
+  }
+  
+  .overlay-title {
+    font-size: 34px;
+  }
+  
+  .overlay-subtitle {
+    font-size: 17px;
+  }
+  
+  .overlay-logo-section {
+    margin-bottom: 45px;
+  }
+  
+  .overlay-features-list {
+    max-width: 480px;
+    margin-bottom: 45px;
+  }
+  
+  .overlay-feature-item {
+    padding: 16px 24px;
+    gap: 18px;
+    margin-bottom: 14px;
+  }
+  
+  .feature-checkmark {
+    font-size: 26px;
+    width: 34px;
+    height: 34px;
+  }
+  
+  .feature-text p {
+    font-size: 15px;
+  }
+  
+  .footer-tagline {
+    font-size: 14px;
+  }
+}
+`}
+</style>
     </div>
   );
 };
