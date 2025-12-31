@@ -10,7 +10,7 @@ const TwoBannerSection = () => {
       buttonLink: "#shop",
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       buttonHoverColor: "#667eea",
-      backgroundImage: "url('assets/img/bg/Homepage-banner-one.png')",
+      backgroundImage: "url('/assets/img/bg/Homepage-banner-one.png')",
     },
     {
       id: 2,
@@ -20,7 +20,7 @@ const TwoBannerSection = () => {
       buttonLink: "#learn",
       gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
       buttonHoverColor: "#f5576c",
-      backgroundImage: "url('assets/img/bg/Homepage-banner-two.png')",
+      backgroundImage: "url('/assets/img/bg/Homepage-banner-two.png')",
     }
   ];
 

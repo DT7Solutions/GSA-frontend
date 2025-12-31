@@ -19,7 +19,7 @@ const PartGroupList = ({ id }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  // ✅ Fetch part section full details and auto-populate filters
+  // ✅ Fetch part section full details and auto-populate filters (only on mount)
   useEffect(() => {
     const fetchPartSectionDetails = async () => {
       try {
@@ -60,16 +60,20 @@ const PartGroupList = ({ id }) => {
     }
   }, [id]);
 
-  // ✅ Fetch parts based on selected CATEGORY (part section id)
+  // ✅ Fetch parts based on selected CATEGORY
   useEffect(() => {
-    if (!selectedCategory) return;
+    if (!selectedCategory) {
+      console.log("No category selected, clearing parts");
+      setPartList([]);
+      return;
+    }
     
     const fetchCategoryParts = async () => {
       try {
         console.log("Fetching parts for category (part section) ID:", selectedCategory);
         const res = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${selectedCategory}/`);
         const parts = Array.isArray(res.data) ? res.data : [];
-        console.log("Parts fetched for category:", parts.length);
+        console.log("Parts fetched for category:", parts.length, parts);
         setPartList(parts);
       } catch (error) {
         console.error("Error fetching parts by category:", error);
@@ -80,7 +84,7 @@ const PartGroupList = ({ id }) => {
     fetchCategoryParts();
   }, [selectedCategory]);
 
-  // ✅ Fetch categories based on variant or initial load
+  // ✅ Fetch categories based on variant selection
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -89,8 +93,11 @@ const PartGroupList = ({ id }) => {
           console.log("Fetching categories for variant:", selectedVariant);
           const catRes = await axios.get(`${API_BASE_URL}api/home/car_part_count_part_group_count/${selectedVariant}/`);
           setCategories(catRes.data || []);
-        } else if (id) {
-          // Fetch initial categories using the part section id
+          
+          // Only reset category if manually changed (not on initial load)
+          // Don't reset if category was just auto-populated
+        } else if (id && !selectedBrand && !selectedModel && !selectedVariant) {
+          // Only fetch initial categories if no filters are selected
           console.log("Fetching initial categories for part section:", id);
           const res = await axios.get(`${API_BASE_URL}api/home/part_groups_list/${id}/`);
           const parts = res.data || [];
@@ -107,6 +114,9 @@ const PartGroupList = ({ id }) => {
           }, {});
           
           setCategories(Object.values(categoryCounts));
+        } else if (selectedBrand && selectedModel && !selectedVariant) {
+          // Clear categories if brand and model are selected but no variant yet
+          setCategories([]);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -115,7 +125,7 @@ const PartGroupList = ({ id }) => {
     };
     
     fetchCategories();
-  }, [id, selectedVariant]);
+  }, [id, selectedVariant, selectedBrand, selectedModel]);
 
   // ✅ Fetch car dropdown data
   useEffect(() => {
@@ -125,8 +135,14 @@ const PartGroupList = ({ id }) => {
       .catch((err) => console.error("Error fetching car makes", err));
   }, []);
 
+  // ✅ Fetch car models when brand changes
   useEffect(() => {
-    if (!selectedBrand) return;
+    if (!selectedBrand) {
+      setCarModels([]);
+      setSelectedModel("");
+      return;
+    }
+    
     axios
       .get(`${API_BASE_URL}api/home/car-models/${selectedBrand}/`)
       .then((res) => {
@@ -135,8 +151,14 @@ const PartGroupList = ({ id }) => {
       .catch((err) => console.error("Error fetching car models", err));
   }, [selectedBrand]);
 
+  // ✅ Fetch car variants when model changes
   useEffect(() => {
-    if (!selectedModel) return;
+    if (!selectedModel) {
+      setModelVariants([]);
+      setSelectedVariant("");
+      return;
+    }
+    
     axios
       .get(`${API_BASE_URL}api/home/car_variant/${selectedModel}/`)
       .then((res) => {
@@ -144,6 +166,38 @@ const PartGroupList = ({ id }) => {
       })
       .catch((err) => console.error("Error fetching car variants", err));
   }, [selectedModel]);
+
+  // ✅ Handle brand change - reset dependent filters
+  const handleBrandChange = (e) => {
+    const newBrand = e.target.value;
+    setSelectedBrand(newBrand);
+    setSelectedModel("");
+    setSelectedVariant("");
+    setSelectedCategory("");
+    setCarModels([]);
+    setModelVariants([]);
+    setCategories([]);
+    setPartList([]);
+  };
+
+  // ✅ Handle model change - reset dependent filters
+  const handleModelChange = (e) => {
+    const newModel = e.target.value;
+    setSelectedModel(newModel);
+    setSelectedVariant("");
+    setSelectedCategory("");
+    setModelVariants([]);
+    setCategories([]);
+    setPartList([]);
+  };
+
+  // ✅ Handle variant change - reset category
+  const handleVariantChange = (e) => {
+    const newVariant = e.target.value;
+    setSelectedVariant(newVariant);
+    setSelectedCategory("");
+    setPartList([]);
+  };
 
   // ✅ Search filter
   const partsToDisplay = useMemo(() => {
@@ -181,44 +235,82 @@ const PartGroupList = ({ id }) => {
       <div className="container">
         <div className="row flex-row-reverse">
           {/* MAIN CONTENT */}
-          <div className="col-xl-9 col-lg-8">
-            {/* Display selected category info */}
-            {selectedCategoryName && (
-              <div className="mb-3">
-                <h5>Showing: {selectedCategoryName} ({partsToDisplay.length} parts)</h5>
+          <div className="col-xl-9 col-lg-8 order-2  order-lg-1">
+            {/* Search Bar */}
+         
+
+           {selectedCategory && (
+              <div className="mb-4">
+                <div className="row align-items-center">
+                  <div className="col-md-6 mb-3 mb-md-0">
+                    <h5 className="mb-0">
+                      {selectedCategoryName || "Selected Category"}
+                    </h5>
+                    <small className="text-muted">({partsToDisplay.length} parts)</small>
+                  </div>
+                  <div className="col-md-6">
+                    <div className="input-group">
+                      <input
+                        type="text"
+                        className="form-control bg-grey border-smooth"
+                        placeholder="Search part groups..."
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                      />
+                      <button className="btn-theme-admin btn-primary-600" type="button">
+                        <i className="fas fa-search"></i> Search
+                      </button>
+                      {searchKeyword && (
+                        <button 
+                          className="btn-theme-admin btn-primary-600" 
+                          type="button"
+                          onClick={() => setSearchKeyword("")}
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
             
             <div className="row gy-4">
-              {paginatedParts.length > 0 ? (
-                paginatedParts.map((item) => {
-                
-                  const isChassis = selectedCategoryName?.toUpperCase() === "CHASSIS";
-                  const colClass = isChassis ? "col-xl-4" : "col-xl-3";
+              {selectedCategory ? (
+                paginatedParts.length > 0 ? (
+                  paginatedParts.map((item) => {
                   
-                  return (
-                    <div className={`${colClass} col-md-3 col-6`} key={item.id}>
-                      <div className="product-card style2">
-                        <div className="product-img">
-                          <Link to={`/shop/${item.id}`}>
-                            <img
-                              src={item.image || "/assets/img/placeholder.png"}
-                              alt={item.name}
-                            />
-                          </Link>
-                        </div>
-                        <div className="product-content text-center">
-                          <h6 className="product-title">
-                            <Link to={`/shop/${item.id}`}>{item.name}</Link>
-                          </h6>
+                    const isChassis = selectedCategoryName?.toUpperCase() === "CHASSIS";
+                    const colClass = isChassis ? "col-xl-4" : "col-xl-3";
+                    
+                    return (
+                      <div className={`${colClass} col-md-3 col-6`} key={item.id}>
+                        <div className="product-card style2">
+                          <div className="product-img">
+                            <Link to={`/shop/${item.id}`}>
+                              <img
+                                src={item.image || "/assets/img/placeholder.png"}
+                                alt={item.name}
+                              />
+                            </Link>
+                          </div>
+                          <div className="product-content text-center">
+                            <h6 className="product-title  shop-name-title">
+                              <Link to={`/shop/${item.id}`}>{item.name}</Link>
+                            </h6>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  })
+                ) : (
+                  <div className="col-12">
+                    <p className="text-center">No parts found for this section.</p>
+                  </div>
+                )
               ) : (
                 <div className="col-12">
-                  <p className="text-center">No parts found for this section.</p>
+                  <p className="text-center">Please select a part section to view parts.</p>
                 </div>
               )}
             </div>
@@ -287,7 +379,7 @@ const PartGroupList = ({ id }) => {
           </div>
 
           {/* SIDEBAR */}
-          <div className="col-xl-3 col-lg-4 sidebar-widget-area">
+          <div className="col-xl-3 col-lg-4 order-1  order-lg-2 sidebar-widget-area">
             <aside className="sidebar-area sidebar-shop">
               <div className="bg-white border-smooth">
                 <h4 className="widget_title bg-theme-sidebar p-3 mb-2">Filter by Car</h4>
@@ -299,7 +391,7 @@ const PartGroupList = ({ id }) => {
                     <select
                       className="form-select"
                       value={selectedBrand}
-                      onChange={(e) => setSelectedBrand(e.target.value)}
+                      onChange={handleBrandChange}
                     >
                       <option value="">-- Select Brand --</option>
                       {carMakes.map((make) => (
@@ -316,7 +408,7 @@ const PartGroupList = ({ id }) => {
                     <select
                       className="form-select"
                       value={selectedModel}
-                      onChange={(e) => setSelectedModel(e.target.value)}
+                      onChange={handleModelChange}
                       disabled={!selectedBrand}
                     >
                       <option value="">-- Select Model --</option>
@@ -334,7 +426,7 @@ const PartGroupList = ({ id }) => {
                     <select
                       className="form-select"
                       value={selectedVariant}
-                      onChange={(e) => setSelectedVariant(e.target.value)}
+                      onChange={handleVariantChange}
                       disabled={!selectedModel}
                     >
                       <option value="">-- Select Variant --</option>

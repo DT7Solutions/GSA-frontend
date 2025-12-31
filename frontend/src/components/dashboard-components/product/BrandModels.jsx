@@ -139,10 +139,10 @@ const BrandModels = ({ id, carMakes }) => {
                     </div>
                     <div className="col-md-3">
                         <div className="d-flex justify-content-end align-items-center gap-2">
-                            <div className="position-relative" style={{ width: "100%", maxWidth: "300px" }}>
+                            <div className="position-relative bg-white" style={{ width: "100%", maxWidth: "300px" }}>
                                 <input
                                     type="text"
-                                    className="form-control ps-5 pe-4"
+                                    className="form-control ps-5 pe-4 bg-neutral-100"
                                     placeholder="Search models..."
                                     value={searchTerm}
                                     onChange={handleSearchChange}

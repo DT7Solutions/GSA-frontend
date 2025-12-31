@@ -24,6 +24,7 @@ import SearchVehicleArea from "../components/SearchVehicleArea";
 import TwoBannerSection from "components/Bannersection";
 import MarqueeOne from "components/MarqueeOne";
 import Shopbycategory from "components/Shopbycategory";
+import Bannercta from "components/dashboard-components/Bannercta";
 
 
 const HomePageSix = () => {
@@ -87,7 +88,7 @@ const HomePageSix = () => {
 
       {/* Subscribe Two */}
       {/* <SubscribeTwo /> */}
-
+      <Bannercta/>
      
       <FooterAreaFour />
     </>

@@ -402,7 +402,7 @@ const UserProfile = () => {
 
                                     <div className="col-12">
                                         <button 
-                                            className="btn btn-primary-600 style2" 
+                                            className="btn-theme-admin btn-primary-600 style2" 
                                             type="submit"
                                             disabled={loading}
                                         >

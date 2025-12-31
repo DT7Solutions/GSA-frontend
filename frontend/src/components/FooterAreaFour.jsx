@@ -26,13 +26,25 @@ Authorised dealers for Hyundai, Toyota and Ford.
 Available in Guntur
                 </p>
                 <div className="social-btn style3">
-                  <Link to="https://www.instagram.com/gowrisankaragencies/" tabIndex={-1}>
-                    <i className="fab fa-instagram" />
-                  </Link>
-                  <Link to="https://www.facebook.com/gowrisankaragencies" tabIndex={-1}>
-                    <i className="fab fa-facebook-f" />
-                  </Link>
-                </div>
+  <a
+    href="https://www.instagram.com/gowrisankaragencies/"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Instagram"
+  >
+    <i className="fab fa-instagram" />
+  </a>
+
+  <a
+    href="https://www.facebook.com/gowrisankaragencies"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Facebook"
+  >
+    <i className="fab fa-facebook-f" />
+  </a>
+</div>
+
               </div>
             </div>
             <div className="col-md-6 col-xl-2">
@@ -42,8 +54,12 @@ Available in Guntur
                   <ul className="menu">
                     <li>
                       <Link to="/about-us">About</Link>
-                    </li><li>
+                    </li>
+                    <li>
                       <Link to="/contact-us">Contact us</Link>
+                    </li>
+                     <li>
+                      <Link to="/shop/120">Shop</Link>
                     </li>
                    
                   

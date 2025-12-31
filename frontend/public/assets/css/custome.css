@@ -216,7 +216,8 @@ select.form-select option {
 
 .contact-grid-details h6 {
     font-size: 16px !important;
-    color: #ffffffb3 !important;
+    /* color: #ffffffb3 !important; */
+    color:#000!important;
 }
 .footer-widget .widget_title {
     position: relative;
@@ -423,5 +424,5 @@ select.form-select option {
     min-height: 65px !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
+    /* justify-content: center !important; */
 }

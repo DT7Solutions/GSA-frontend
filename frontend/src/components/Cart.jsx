@@ -8,6 +8,7 @@ import { CartContext } from "../context/CartContext";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { fetchCartCount } = useContext(CartContext);
   const [isShippingSameAsBilling, setIsShippingSameAsBilling] = useState(false);
@@ -37,7 +38,10 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       const token = localStorage.getItem("accessToken");
-      if (!token) return;
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const res = await axios.get(`${API_BASE_URL}api/home/cart/`, {
@@ -48,6 +52,8 @@ const Cart = () => {
         setCartItems(res.data.items);
       } catch (error) {
         console.error("Error fetching cart items:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -145,8 +151,7 @@ const Cart = () => {
   const sgst = subtotal * 0.09;
   const totalWithGST = subtotal + cgst + sgst;
 
-  // ✅ NEW: Auto-save billing address to user profile
-  const handleUpdateBillingAddress = async () => {
+  const handleCheckout = async () => {
     const { name, email, phone, address, city, state, district, zip } = billing;
 
     if (!name || !email || !phone || !address || !city || !state || !district || !zip) {
@@ -154,11 +159,21 @@ const Cart = () => {
       return;
     }
 
+    const shippingData = isShippingSameAsBilling ? billing : shipping;
+    const { name: shipName, email: shipEmail, phone: shipPhone, address: shipAddress, 
+            city: shipCity, state: shipState, district: shipDistrict, zip: shipZip } = shippingData;
+
+    if (!shipName || !shipEmail || !shipPhone || !shipAddress || !shipCity || !shipState || !shipDistrict || !shipZip) {
+      Swal.fire("Missing Fields", "Please fill out all shipping address fields including name.", "warning");
+      return;
+    }
+
     const token = localStorage.getItem("accessToken");
-    const [first_name, ...rest] = name.split(" ");
-    const last_name = rest.join(" ");
 
     try {
+      const [first_name, ...rest] = name.split(" ");
+      const last_name = rest.join(" ");
+
       await axios.patch(
         `${API_BASE_URL}api/auth/user/profile/`,
         {
@@ -179,193 +194,134 @@ const Cart = () => {
         }
       );
 
-      Swal.fire("Success", "Billing address saved to your profile.", "success");
+      console.log("✅ Billing address saved to profile");
+
+      const shippingAddressPayload = {
+        name: shippingData.name,
+        email: shippingData.email,
+        phone: shippingData.phone,
+        address: shippingData.address,
+        city: shippingData.city,
+        state: shippingData.state,
+        district: shippingData.district,
+        zip: shippingData.zip,
+      };
+
+      console.log("\n" + "=".repeat(60));
+      console.log("🚀 FRONTEND - Creating Razorpay Order");
+      console.log("=".repeat(60));
+      console.log("Shipping Address Payload:", JSON.stringify(shippingAddressPayload, null, 2));
+      console.log("=".repeat(60) + "\n");
+
+      const { data } = await axios.post(
+        `${API_BASE_URL}api/home/payment/order/`,
+        {
+          shipping_address: shippingAddressPayload
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("\n" + "=".repeat(60));
+      console.log("✅ FRONTEND - Razorpay Order Created");
+      console.log("=".repeat(60));
+      console.log("Order ID:", data.order_id);
+      console.log("Amount:", data.amount);
+      console.log("=".repeat(60) + "\n");
+
+      const options = {
+        key: data.razorpay_key,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Car Parts Store",
+        description: "Car Parts Purchase",
+        order_id: data.order_id,
+        handler: async function (response) {
+          console.log("\n" + "=".repeat(60));
+          console.log("💳 FRONTEND - Payment Completed");
+          console.log("=".repeat(60));
+          console.log("Razorpay Order ID:", response.razorpay_order_id);
+          console.log("Razorpay Payment ID:", response.razorpay_payment_id);
+          console.log("Razorpay Signature:", response.razorpay_signature);
+          console.log("=".repeat(60) + "\n");
+
+          try {
+            const verifyPayload = {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              shipping_address: shippingAddressPayload,
+            };
+
+            console.log("\n" + "=".repeat(60));
+            console.log("🔍 FRONTEND - Verifying Payment");
+            console.log("=".repeat(60));
+            console.log("Verify Payload:", JSON.stringify(verifyPayload, null, 2));
+            console.log("=".repeat(60) + "\n");
+
+            await fetchCartCount();
+            
+            setCartItems([]);
+            localStorage.removeItem("cartItems");
+
+            const verifyRes = await axios.post(
+              `${API_BASE_URL}api/home/payment/verify/`,
+              verifyPayload,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            console.log("\n" + "=".repeat(60));
+            console.log("✅ FRONTEND - Payment Verified Successfully");
+            console.log("=".repeat(60));
+            console.log("Response:", verifyRes.data);
+            console.log("=".repeat(60) + "\n");
+
+            Swal.fire("Order Placed!", "Your payment was successful.", "success");
+            navigate(`/thank-you?order_id=${verifyRes.data.order_id}`);
+          } catch (verifyError) {
+            console.error("\n" + "=".repeat(60));
+            console.error("❌ FRONTEND - Payment Verification Failed");
+            console.error("=".repeat(60));
+            console.error("Error:", verifyError);
+            console.error("Response:", verifyError.response?.data);
+            console.error("=".repeat(60) + "\n");
+
+            Swal.fire("Payment Failed", 
+              verifyError.response?.data?.error || "Could not verify payment.", 
+              "error");
+          }
+        },
+        prefill: {
+          name: billing.name,
+          email: billing.email,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      console.error("Error updating address:", error);
-      Swal.fire("Error", "Failed to update billing address in profile.", "error");
+      console.error("\n" + "=".repeat(60));
+      console.error("❌ FRONTEND - Checkout Error");
+      console.error("=".repeat(60));
+      console.error("Error:", error);
+      console.error("Response:", error.response?.data);
+      console.error("=".repeat(60) + "\n");
+
+      Swal.fire("Error", 
+        error.response?.data?.error || "Failed to process checkout.", 
+        "error");
     }
   };
-
- const handleCheckout = async () => {
-  // ✅ Auto-save billing address before checkout
-  const { name, email, phone, address, city, state, district, zip } = billing;
-
-  // Validate billing address
-  if (!name || !email || !phone || !address || !city || !state || !district || !zip) {
-    Swal.fire("Missing Fields", "Please fill out all billing address fields.", "warning");
-    return;
-  }
-
-  // Validate shipping address
-  const shippingData = isShippingSameAsBilling ? billing : shipping;
-  const { name: shipName, email: shipEmail, phone: shipPhone, address: shipAddress, 
-          city: shipCity, state: shipState, district: shipDistrict, zip: shipZip } = shippingData;
-
-  if (!shipName || !shipEmail || !shipPhone || !shipAddress || !shipCity || !shipState || !shipDistrict || !shipZip) {
-    Swal.fire("Missing Fields", "Please fill out all shipping address fields including name.", "warning");
-    return;
-  }
-
-  const token = localStorage.getItem("accessToken");
-
-  try {
-    // ✅ Save billing address to user profile first
-    const [first_name, ...rest] = name.split(" ");
-    const last_name = rest.join(" ");
-
-    await axios.patch(
-      `${API_BASE_URL}api/auth/user/profile/`,
-      {
-        first_name: first_name || "",
-        last_name: last_name || "",
-        email,
-        phone,
-        address,
-        city,
-        district,
-        state,
-        pincode: zip,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    console.log("✅ Billing address saved to profile");
-
-    // Prepare shipping address payload
-    const shippingAddressPayload = {
-      name: shippingData.name,
-      email: shippingData.email,
-      phone: shippingData.phone,
-      address: shippingData.address,
-      city: shippingData.city,
-      state: shippingData.state,
-      district: shippingData.district,
-      zip: shippingData.zip,
-    };
-
-    // DEBUG: Log what we're sending
-    console.log("\n" + "=".repeat(60));
-    console.log("🚀 FRONTEND - Creating Razorpay Order");
-    console.log("=".repeat(60));
-    console.log("Shipping Address Payload:", JSON.stringify(shippingAddressPayload, null, 2));
-    console.log("=".repeat(60) + "\n");
-
-    // Now proceed with payment
-    const { data } = await axios.post(
-      `${API_BASE_URL}api/home/payment/order/`,
-      {
-        shipping_address: shippingAddressPayload
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    // DEBUG: Log response
-    console.log("\n" + "=".repeat(60));
-    console.log("✅ FRONTEND - Razorpay Order Created");
-    console.log("=".repeat(60));
-    console.log("Order ID:", data.order_id);
-    console.log("Amount:", data.amount);
-    console.log("=".repeat(60) + "\n");
-
-    const options = {
-      key: data.razorpay_key,
-      amount: data.amount,
-      currency: data.currency,
-      name: "Car Parts Store",
-      description: "Car Parts Purchase",
-      order_id: data.order_id,
-      handler: async function (response) {
-        console.log("\n" + "=".repeat(60));
-        console.log("💳 FRONTEND - Payment Completed");
-        console.log("=".repeat(60));
-        console.log("Razorpay Order ID:", response.razorpay_order_id);
-        console.log("Razorpay Payment ID:", response.razorpay_payment_id);
-        console.log("Razorpay Signature:", response.razorpay_signature);
-        console.log("=".repeat(60) + "\n");
-
-        try {
-          const verifyPayload = {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            shipping_address: shippingAddressPayload,
-          };
-
-          console.log("\n" + "=".repeat(60));
-          console.log("🔍 FRONTEND - Verifying Payment");
-          console.log("=".repeat(60));
-          console.log("Verify Payload:", JSON.stringify(verifyPayload, null, 2));
-          console.log("=".repeat(60) + "\n");
-
-          await fetchCartCount();
-          
-          // ✅ CLEAR LOCAL CART ITEMS
-          setCartItems([]);
-          localStorage.removeItem("cartItems");
-
-          const verifyRes = await axios.post(
-            `${API_BASE_URL}api/home/payment/verify/`,
-            verifyPayload,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          console.log("\n" + "=".repeat(60));
-          console.log("✅ FRONTEND - Payment Verified Successfully");
-          console.log("=".repeat(60));
-          console.log("Response:", verifyRes.data);
-          console.log("=".repeat(60) + "\n");
-
-          Swal.fire("Order Placed!", "Your payment was successful.", "success");
-          navigate(`/thank-you?order_id=${verifyRes.data.order_id}`);
-        } catch (verifyError) {
-          console.error("\n" + "=".repeat(60));
-          console.error("❌ FRONTEND - Payment Verification Failed");
-          console.error("=".repeat(60));
-          console.error("Error:", verifyError);
-          console.error("Response:", verifyError.response?.data);
-          console.error("=".repeat(60) + "\n");
-
-          Swal.fire("Payment Failed", 
-            verifyError.response?.data?.error || "Could not verify payment.", 
-            "error");
-        }
-      },
-      prefill: {
-        name: billing.name,
-        email: billing.email,
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  } catch (error) {
-    console.error("\n" + "=".repeat(60));
-    console.error("❌ FRONTEND - Checkout Error");
-    console.error("=".repeat(60));
-    console.error("Error:", error);
-    console.error("Response:", error.response?.data);
-    console.error("=".repeat(60) + "\n");
-
-    Swal.fire("Error", 
-      error.response?.data?.error || "Failed to process checkout.", 
-      "error");
-  }
-};
 
   const handleBillingChange = (field, value) => {
     setBilling((prev) => ({
@@ -407,6 +363,34 @@ const Cart = () => {
       });
     }
   };
+
+  // Empty cart state
+  if (loading) {
+    return (
+      <div className="space-top space-extra-bottom">
+        <div className="container text-center py-5">
+          <p>Loading cart...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="space-top space-extra-bottom">
+        <div className="container">
+          <div className="text-center py-5">
+            <i className="fas fa-shopping-cart" style={{ fontSize: "80px", color: "#0068a5", marginBottom: "20px" }}></i>
+            <h5 className="mb-3">Your Cart is Empty</h5>
+            <p className="mb-5">Looks like you haven't added any items to your cart yet.</p>
+            <Link to="/shop/121" className="btn style2">
+              Continue Shopping
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-top space-extra-bottom">

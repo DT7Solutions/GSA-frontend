@@ -236,7 +236,7 @@
   color: #0068A5!important;
 }
 .footer-wrapper {
-  background-color: #364049!important;
+  background-color: #fff!important;
 }
 .footer-logo-img{
   height: 100px!important;
@@ -345,8 +345,10 @@
   font-size:12px!important;
 }
 .copyright-wrap{
-  background-color:#364049!important;
-  border-top:1px solid  hsl(0 0% 100% / 0.1)!important;
+  /* background-color:#364049!important; */
+  background-color: #fff!important;
+  border-top:1px solid #000!important;
+  /* border-top:1px solid  hsl(0 0% 100% / 0.1)!important; */
 
 }
 .heading-banner-section{
@@ -601,4 +603,45 @@
   font-weight: 800;
 }
 
+.bg-neutral-100 {
+    background-color: #f3f4f6 !important;
+}
+.footer-text{
+  color:#000!important;
+}
+.footer-widget.widget_nav_menu a {
+  color:#000!important;
+}
+.footer-widget .widget_title {
+  color:#000!important;
+}
+.widget-contact-grid p {
+  color:#000!important;
+}
+.widget-contact-grid .icon {
+  color:#000!important;
+}
+.copyright-text {
+  color:#000!important;
+}
+.footer-links p{
+  color:#000!important;
 
+}
+.footer-links a {
+  color:#000!important;
+
+}
+.widget-contact-grid h6 a  {
+  color:#000!important;
+}
+.product-footer{
+  display:flex;
+  justify-content: space-between;
+  align-items: center!important;
+}
+ .shop-name-title a{
+  display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}

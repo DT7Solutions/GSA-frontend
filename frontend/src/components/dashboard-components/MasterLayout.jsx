@@ -411,6 +411,37 @@ const MasterLayout = ({ children }) => {
                             </ul>
                         </li>
 
+                        {/* Settings at the bottom */}
+                        <li className='dropdown' style={{ marginTop: 'auto' }}>
+                            <Link to='#'>
+                                <Icon icon='solar:settings-outline' className='menu-icon' />
+                                <span>Settings</span>
+                            </Link>
+                            <ul className='sidebar-submenu'>
+                                <li>
+                                    <NavLink
+                                        to='/view-profile'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                                        My Profile
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <button
+                                        className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 w-100 text-start border-0 bg-transparent'
+                                        onClick={handleLogout}
+                                        style={{ paddingLeft: '28px' }}
+                                    >
+                                        <i className='ri-circle-fill circle-icon text-danger-600 w-auto' />{" "}
+                                        Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        </li>
+
                     </ul>
                 </div>
             </aside>

@@ -562,12 +562,14 @@ const ShopArea = ({ id }) => {
                                 />
                               </Link>
                             </div>
-                            <div className="product-content text-center">
+                            <div className="product-content ">
                               <h3 className="product-title">
                                 <Link to={`/shop-details/${product.id}`}>
                                   {product.product_name || "Unnamed Product"}
                                 </Link>
                               </h3>
+                              <div className="product-footer">
+                                
                               <span className="price">
                                 <del>₹{product.price}</del> ₹{product.sale_price}{" "}
                                 &nbsp;
@@ -575,12 +577,13 @@ const ShopArea = ({ id }) => {
 
                               <Link
                                 to="#"
-                                className="link-btn"
+                                className="link-btn mt-0"
                                 onClick={() => handleAddToCart(product.id)}
                               >
-                                Add to cart{" "}
+                                {" "}
                                 <i className="fas fa-shopping-cart me-2" />
                               </Link>
+                               </div>
                             </div>
                           </div>
                         </div>

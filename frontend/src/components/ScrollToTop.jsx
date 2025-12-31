@@ -29,7 +29,7 @@ const ScrollToTop = () => {
         <button id="button" onClick={scrollToTop} className="show">
           <span>
             <img
-              src="assets/img/client/scroll-to-top.png"
+              src="/assets/img/client/scroll-to-top.png"
               className="img-fluid"
               alt="Go to top"
             />

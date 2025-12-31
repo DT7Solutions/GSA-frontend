@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
 const TestimonialsSection = () => {
@@ -41,7 +41,30 @@ const TestimonialsSection = () => {
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 3;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const cardsPerView = isMobile ? 1 : 3;
+
+  // Auto-slide on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => 
+        prev + cardsPerView >= testimonials.length ? 0 : prev + 1
+      );
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isMobile, cardsPerView, testimonials.length]);
 
   const nextTestimonial = () => {
     setCurrentIndex((prev) => 
@@ -92,11 +115,13 @@ const TestimonialsSection = () => {
       font-weight: bold;
       color: #1e293b;
       margin: 0;
+      text-align: center;
     }
 
     @media (min-width: 768px) {
       .gsa-testimonial-title {
         font-size: 3rem;
+        text-align: left;
       }
     }
 
@@ -255,6 +280,12 @@ const TestimonialsSection = () => {
     .gsa-testimonial-dot-inactive:hover {
       background: #94a3b8;
     }
+
+    @media (max-width: 767px) {
+      .gsa-testimonial-nav {
+        display: none;
+      }
+    }
   `;
 
   return (
@@ -266,11 +297,11 @@ const TestimonialsSection = () => {
           <div className="gsa-testimonial-header">
             <div>
               <h4 className="gsa-testimonial-title">
-              What Our <span className="highlight-text"> Customers Say</span>
+                What Our <span style={{ color: '#0068a4' }}>Customers Say</span>
               </h4>
             </div>
             
-            {/* Navigation Arrows */}
+            {/* Navigation Arrows - Hidden on Mobile */}
             <div className="gsa-testimonial-nav">
               <button
                 onClick={prevTestimonial}

@@ -8,7 +8,7 @@ import API_BASE_URL from "../config";
 import "../assets/css/Auth.css";
 
 const Login = () => {
-  const [isOtpLogin, setIsOtpLogin] = useState(false);
+  const [loginMethod, setLoginMethod] = useState("email"); // "email", "phone", "emailOtp"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -25,7 +25,8 @@ const Login = () => {
     }
   }, [navigate]);
 
-  const requestOtp = async () => {
+  // Request OTP for phone
+  const requestPhoneOtp = async () => {
     try {
       const response = await axios.post(`${API_BASE_URL}api/auth/mobial_otp_request/`, {
         phone_number: phoneNumber,
@@ -68,86 +69,193 @@ const Login = () => {
     }
   };
 
-  const verifyOtp = async () => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}api/auth/verify_mobial_otp/`, {
-      phone_number: phoneNumber,
-      otp: otp,
-    });
-
-    if (response.data.access) {
-      // Store tokens
-      localStorage.setItem("accessToken", response.data.access);
-      localStorage.setItem("refreshToken", response.data.refresh);
-      localStorage.setItem("role", response.data.role?.toLowerCase() || "");
-
-      console.log("OTP Login Success:", response.data);
+  // Request OTP for email
+  const requestEmailOtp = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}api/auth/email_otp_request/`, {
+        email: email.toLowerCase(),
+      });
       
-      // Get user data to determine role
-      const userId = response.data.user_id;
+      if (response.data.success) {
+        setOtpSent(true);
+        Swal.fire({
+          title: "OTP Sent",
+          text: `An OTP has been sent to your email address.`,
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.error("OTP Request Failed:", error.response ? error.response.data : error.message);
       
-      try {
-        const userResponse = await axios.get(
-          `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${response.data.access}`,
-            },
-          }
-        );
-
-        console.log("User Data:", userResponse.data);
-
-        // Check for redirect URL first
-        const redirectUrl = localStorage.getItem("redirectAfterLogin");
-        if (redirectUrl) {
-          localStorage.removeItem("redirectAfterLogin");
-          window.location.href = redirectUrl;
-          return;
+      const errorData = error.response?.data;
+      let errorMessage = "Failed to send OTP. Please try again.";
+      let errorTitle = "OTP Request Failed";
+      
+      if (errorData?.error === "account_not_found") {
+        errorTitle = "Account Not Found";
+        errorMessage = "You don't have an account. Please sign up.";
+      } else if (errorData?.error === "account_deactivated") {
+        errorTitle = "Account Deactivated";
+        errorMessage = "Your account has been deactivated. Please contact the support team.";
+      }
+      
+      Swal.fire({
+        title: errorTitle,
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: errorTitle === "Account Not Found" ? "Sign Up" : "OK",
+      }).then((result) => {
+        if (result.isConfirmed && errorTitle === "Account Not Found") {
+          navigate("/register");
         }
+      });
+    }
+  };
 
-        // Navigate based on role
-        const { role_id } = userResponse.data;
-        if (role_id === 1) {
-          // Admin
-          navigate("/Dashboard");
-        } else {
-          // Customer or Staff
+  // Verify phone OTP
+  const verifyPhoneOtp = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}api/auth/verify_mobial_otp/`, {
+        phone_number: phoneNumber,
+        otp: otp,
+      });
+
+      if (response.data.access) {
+        localStorage.setItem("accessToken", response.data.access);
+        localStorage.setItem("refreshToken", response.data.refresh);
+        localStorage.setItem("role", response.data.role?.toLowerCase() || "");
+
+        const userId = response.data.user_id;
+        
+        try {
+          const userResponse = await axios.get(
+            `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
+            {
+              headers: {
+                Authorization: `Bearer ${response.data.access}`,
+              },
+            }
+          );
+
+          const redirectUrl = localStorage.getItem("redirectAfterLogin");
+          if (redirectUrl) {
+            localStorage.removeItem("redirectAfterLogin");
+            window.location.href = redirectUrl;
+            return;
+          }
+
+          const { role_id } = userResponse.data;
+          if (role_id === 1) {
+            navigate("/Dashboard");
+          } else {
+            navigate("/");
+          }
+        } catch (userError) {
+          console.error("Error fetching user data:", userError);
           navigate("/");
         }
-      } catch (userError) {
-        console.error("Error fetching user data:", userError);
-        // Fallback to home page if error
-        navigate("/");
       }
-    }
-  } catch (error) {
-    console.error("OTP Verification Failed:", error.response ? error.response.data : error.message);
-    
-    const errorData = error.response?.data;
-    let errorMessage = "Invalid OTP. Please try again.";
-    let errorTitle = "OTP Verification Failed";
-    
-    if (errorData?.error === "account_not_found") {
-      errorTitle = "Account Not Found";
-      errorMessage = "You don't have an account. Please sign up.";
-    } else if (errorData?.error === "account_deactivated") {
-      errorTitle = "Account Deactivated";
-      errorMessage = "Your account has been deactivated. Please contact the support team.";
-    }
-    
-    Swal.fire({
-      title: errorTitle,
-      text: errorMessage,
-      icon: "error",
-      confirmButtonText: errorTitle === "Account Not Found" ? "Sign Up" : "OK",
-    }).then((result) => {
-      if (result.isConfirmed && errorTitle === "Account Not Found") {
-        navigate("/register");
+    } catch (error) {
+      console.error("OTP Verification Failed:", error.response ? error.response.data : error.message);
+      
+      const errorData = error.response?.data;
+      let errorMessage = "Invalid OTP. Please try again.";
+      let errorTitle = "OTP Verification Failed";
+      
+      if (errorData?.error === "account_not_found") {
+        errorTitle = "Account Not Found";
+        errorMessage = "You don't have an account. Please sign up.";
+      } else if (errorData?.error === "account_deactivated") {
+        errorTitle = "Account Deactivated";
+        errorMessage = "Your account has been deactivated. Please contact the support team.";
       }
-    });
-  }
-};
+      
+      Swal.fire({
+        title: errorTitle,
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: errorTitle === "Account Not Found" ? "Sign Up" : "OK",
+      }).then((result) => {
+        if (result.isConfirmed && errorTitle === "Account Not Found") {
+          navigate("/register");
+        }
+      });
+    }
+  };
+
+  // Verify email OTP
+  const verifyEmailOtp = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}api/auth/verify_email_otp/`, {
+        email: email.toLowerCase(),
+        otp: otp,
+      });
+
+      if (response.data.access) {
+        localStorage.setItem("accessToken", response.data.access);
+        localStorage.setItem("refreshToken", response.data.refresh);
+        localStorage.setItem("role", response.data.role?.toLowerCase() || "");
+
+        const userId = response.data.user_id;
+        
+        try {
+          const userResponse = await axios.get(
+            `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
+            {
+              headers: {
+                Authorization: `Bearer ${response.data.access}`,
+              },
+            }
+          );
+
+          const redirectUrl = localStorage.getItem("redirectAfterLogin");
+          if (redirectUrl) {
+            localStorage.removeItem("redirectAfterLogin");
+            window.location.href = redirectUrl;
+            return;
+          }
+
+          const { role_id } = userResponse.data;
+          if (role_id === 1) {
+            navigate("/Dashboard");
+          } else {
+            navigate("/");
+          }
+        } catch (userError) {
+          console.error("Error fetching user data:", userError);
+          navigate("/");
+        }
+      }
+    } catch (error) {
+      console.error("OTP Verification Failed:", error.response ? error.response.data : error.message);
+      
+      const errorData = error.response?.data;
+      let errorMessage = "Invalid OTP. Please try again.";
+      let errorTitle = "OTP Verification Failed";
+      
+      if (errorData?.error === "account_not_found") {
+        errorTitle = "Account Not Found";
+        errorMessage = "You don't have an account. Please sign up.";
+      } else if (errorData?.error === "account_deactivated") {
+        errorTitle = "Account Deactivated";
+        errorMessage = "Your account has been deactivated. Please contact the support team.";
+      }
+      
+      Swal.fire({
+        title: errorTitle,
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: errorTitle === "Account Not Found" ? "Sign Up" : "OK",
+      }).then((result) => {
+        if (result.isConfirmed && errorTitle === "Account Not Found") {
+          navigate("/register");
+        }
+      });
+    }
+  };
+
+  // Email & Password Login
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -219,121 +327,133 @@ const Login = () => {
     }
   };
 
+  const handleMethodSwitch = (method) => {
+    setLoginMethod(method);
+    setOtpSent(false);
+    setOtp("");
+  };
+
   return (
     <div className="modern-auth-container">
       {/* Left Side - Enhanced Content */}
-     {/* Left Side - Enhanced Content with Background Image */}
-<div className="modern-auth-left login-left-content">
-  <img
-    src={`${process.env.PUBLIC_URL}/assets/img/service/register-background-banner-img.jpg`}
-    alt="Login"
-    className="auth-side-image"
-  />
-  
-  <div className="auth-overlay">
-    {/* Background Blobs */}
-    <div className="login-background-blobs">
-      <div className="blob blob-1"></div>
-      <div className="blob blob-2"></div>
-      <div className="blob blob-3"></div>
-    </div>
-
-    <div className="login-left-inner">
-      {/* Logo */}
-      <div className="login-left-logo">
-        <img className="bg-white p-2 rounded-md"
-          src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
-          alt="Gowrisankar Auto Express"
+      <div className="modern-auth-left login-left-content">
+        <img
+          src={`${process.env.PUBLIC_URL}/assets/img/service/register-background-banner-img.jpg`}
+          alt="Login"
+          className="auth-side-image"
         />
-      </div>
-
-      {/* Main Heading */}
-      <div className="login-left-hero">
-        <h1 className="text-center">Welcome Back!</h1>
-        <p className="login-left-tagline text-center">
-          Your trusted partner for genuine automotive parts & accessories
-        </p>
-      </div>
-
-      {/* Features Grid */}
-      <div className="login-features-grid">
-        <div className="feature-card">
-          <div className="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
-              <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
-            </svg>
+        
+        <div className="auth-overlay">
+          <div className="login-background-blobs">
+            <div className="blob blob-1"></div>
+            <div className="blob blob-2"></div>
+            <div className="blob blob-3"></div>
           </div>
-          <h4>1000+</h4>
-          <span>Products</span>
-        </div>
 
-        <div className="feature-card">
-          <div className="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
-              <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
-            </svg>
-          </div>
-          <h4>50+</h4>
-          <span>Brands</span>
-        </div>
+          <div className="login-left-inner">
+            <div className="login-left-logo">
+              <img className="bg-white p-2 rounded-md"
+                src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`}
+                alt="Gowrisankar Auto Express"
+              />
+            </div>
 
-        <div className="feature-card">
-          <div className="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
-              <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
-            </svg>
+            <div className="login-left-hero">
+              <h1 className="text-center">Welcome Back!</h1>
+              <p className="login-left-tagline text-center">
+                Your trusted partner for genuine automotive parts & accessories
+              </p>
+            </div>
+
+            <div className="login-features-grid">
+              <div className="feature-card">
+                <div className="feature-icon">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
+                    <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <h4>1000+</h4>
+                <span>Products</span>
+              </div>
+
+              <div className="feature-card">
+                <div className="feature-icon">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
+                    <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <h4>50+</h4>
+                <span>Brands</span>
+              </div>
+
+              <div className="feature-card">
+                <div className="feature-icon">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 2C8.268 2 2 8.268 2 16c0 7.732 6.268 14 14 14s14-6.268 14-14S23.732 2 16 2zm0 26c-6.627 0-12-5.373-12-12S9.373 4 16 4s12 5.373 12 12-5.373 12-12 12z" fill="currentColor"/>
+                    <path d="M13 10h-2v8h8v-2h-6v-6z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <h4>10K+</h4>
+                <span>Customers</span>
+              </div>
+            </div>
+
+            <div className="login-bottom-cta">
+              <div className="footer-divider-login"></div>
+              <p className="footer-tagline-login">Trusted Since 1985</p>
+              <div className="footer-divider-login"></div>
+            </div>
           </div>
-          <h4>10K+</h4>
-          <span>Customers</span>
         </div>
       </div>
 
-      {/* Bottom CTA */}
-      <div className="login-bottom-cta">
-        <div className="footer-divider-login"></div>
-        <p className="footer-tagline-login">Trusted Since 1985</p>
-        <div className="footer-divider-login"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-      {/* Right Side - Login Form (UNCHANGED) */}
+      {/* Right Side - Login Form */}
       <div className="modern-auth-right">
         <div className="modern-auth-form-wrapper">
-          {/* Welcome text */}
           <div className="modern-auth-header">
             <h1>Welcome back</h1>
             <p>Please enter your details</p>
           </div>
 
-          {/* Form Fields */}
+          {/* Login Method Tabs */}
+          <div className="login-method-tabs text-center">
+            <button
+              className={`method-tab ${loginMethod === "email" ? "active" : ""}`}
+              onClick={() => handleMethodSwitch("email")}
+            >
+              Email & Password
+            </button>
+            <button
+              className={`method-tab ${loginMethod === "emailOtp" ? "active" : ""}`}
+              onClick={() => handleMethodSwitch("emailOtp")}
+            >
+              Email OTP
+            </button>
+            {/* <button
+              className={`method-tab ${loginMethod === "phone" ? "active" : ""}`}
+              onClick={() => handleMethodSwitch("phone")}
+            >
+              Phone OTP
+            </button> */}
+          </div>
+
           <div className="modern-auth-form">
-            {isOtpLogin ? (
+            {/* Email OTP Login */}
+            {loginMethod === "emailOtp" && (
               <>
                 <div className="form-group-modern">
-                  <label>Phone Number</label>
-                  <div className="phone-input-group">
-                    <span className="phone-prefix">+91</span>
-                    <input
-                      type="tel"
-                      value={phoneNumber}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (/^\d{0,10}$/.test(value)) {
-                          setPhoneNumber(value);
-                        }
-                      }}
-                      placeholder="Enter phone number"
-                      required
-                      maxLength={10}
-                      disabled={otpSent}
-                      className="modern-input"
-                    />
-                  </div>
+                  <label>Email address</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    disabled={otpSent}
+                    className="modern-input"
+                  />
                 </div>
 
                 {otpSent && (
@@ -349,8 +469,17 @@ const Login = () => {
                     />
                   </div>
                 )}
+
+                <button
+                  onClick={otpSent ? verifyEmailOtp : requestEmailOtp}
+                  className="modern-btn-primary"
+                >
+                  {otpSent ? "Verify OTP" : "Request OTP"}
+                </button>
               </>
-            ) : (
+            )}
+            {/* Email & Password Login */}
+            {loginMethod === "email" && (
               <>
                 <div className="form-group-modern">
                   <label>Email address</label>
@@ -391,26 +520,63 @@ const Login = () => {
                     Forgot password
                   </Link>
                 </div>
+
+                <button onClick={handleLogin} className="modern-btn-primary">
+                  Sign in
+                </button>
               </>
             )}
 
-            <button
-              onClick={isOtpLogin ? (otpSent ? verifyOtp : requestOtp) : handleLogin}
-              className="modern-btn-primary"
-            >
-              {isOtpLogin ? (otpSent ? "Verify OTP" : "Request OTP") : "Sign in"}
-            </button>
+            
 
-            {/* <button
-              onClick={() => {
-                setIsOtpLogin(!isOtpLogin);
-                setOtpSent(false);
-                setOtp("");
-              }}
-              className="modern-btn-secondary"
-            >
-              {isOtpLogin ? "Login with Email & Password" : "Login with OTP"}
-            </button> */}
+            {/* Phone OTP Login */}
+            {loginMethod === "phone" && (
+              <>
+                <div className="form-group-modern">
+                  <label>Phone Number</label>
+                  <div className="phone-input-group">
+                    <span className="phone-prefix">+91</span>
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^\d{0,10}$/.test(value)) {
+                          setPhoneNumber(value);
+                        }
+                      }}
+                      placeholder="Enter phone number"
+                      required
+                      maxLength={10}
+                      disabled={otpSent}
+                      className="modern-input"
+                    />
+                  </div>
+                </div>
+
+                {otpSent && (
+                  <div className="form-group-modern">
+                    <label>Enter OTP</label>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="Enter OTP"
+                      required
+                      className="modern-input"
+                    />
+                  </div>
+                )}
+
+                <button
+                  onClick={otpSent ? verifyPhoneOtp : requestPhoneOtp}
+                  className="modern-btn-primary"
+                >
+                  {otpSent ? "Verify OTP" : "Request OTP"}
+                </button>
+               
+              </>
+            )}
 
             <p className="signup-text">
               Don't have an account?{' '}
@@ -422,357 +588,303 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Additional Styles */}
-    <style>{`
-  /* Left Side with Background Image */
-  .modern-auth-left {
-    position: relative;
-    overflow: hidden;
-  }
+      <style>{`
+        /* Login Method Tabs */
+        .login-method-tabs {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 24px;
+          background: #f5f5f5;
+          padding: 4px;
+          border-radius: 10px;
+        }
 
-  .auth-side-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+        .method-tab {
+          flex: 1;
+          padding: 10px 12px;
+          border: none;
+          background: transparent;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 500;
+          color: #666;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
 
-  /* Overlay Styling */
-  .auth-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, hsl(202 100% 32% / 0.9), hsl(202 100% 15% / 0.95));
-    backdrop-filter: blur(2px);
-    z-index: 2;
-  }
+        .method-tab.active {
+          background: white;
+          color: #0066cc;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-  .login-background-blobs {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    opacity: 0.1;
-    top: 0;
-    left: 0;
-    z-index: 1;
-  }
+        .method-tab:hover:not(.active) {
+          color: #333;
+        }
 
-  .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    animation: float 8s ease-in-out infinite;
-  }
+        /* Phone Input Group */
+        .phone-input-group {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
 
-  .blob-1 {
-    width: 300px;
-    height: 300px;
-    background: rgba(255, 255, 255, 0.3);
-    top: -50px;
-    left: 50px;
-  }
+        .phone-prefix {
+          padding: 12px 14px;
+          background: #f5f5f5;
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          font-weight: 500;
+          color: #333;
+        }
 
-  .blob-2 {
-    width: 250px;
-    height: 250px;
-    background: rgba(255, 255, 255, 0.2);
-    bottom: 100px;
-    right: -30px;
-    animation-delay: 2s;
-  }
+        .phone-input-group .modern-input {
+          flex: 1;
+        }
 
-  .blob-3 {
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 255, 255, 0.25);
-    bottom: 50px;
-    left: 20%;
-    animation-delay: 4s;
-  }
+        /* Left Side Styles */
+        .modern-auth-left {
+          position: relative;
+          overflow: hidden;
+        }
 
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px) translateX(0px);
-    }
-    25% {
-      transform: translateY(-30px) translateX(20px);
-    }
-    50% {
-      transform: translateY(-60px) translateX(-20px);
-    }
-    75% {
-      transform: translateY(-30px) translateX(20px);
-    }
-  }
+        .auth-side-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
 
-  .login-left-inner {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    padding: 50px 40px;
-  }
+        .auth-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, hsl(202 100% 32% / 0.9), hsl(202 100% 15% / 0.95));
+          backdrop-filter: blur(2px);
+          z-index: 2;
+        }
 
-  .login-left-logo {
-    margin-bottom: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+        .login-background-blobs {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          opacity: 0.1;
+          top: 0;
+          left: 0;
+          z-index: 1;
+        }
 
-  .login-left-logo img {
-    height: 85px;
-    width: auto;
-    object-fit: contain;
-    border-radius: 7px;
-  }
+        .blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          animation: float 8s ease-in-out infinite;
+        }
 
-  .login-left-hero {
-    margin-bottom: 40px;
-    max-width: 450px;
-    width: 100%;
-  }
+        .blob-1 {
+          width: 300px;
+          height: 300px;
+          background: rgba(255, 255, 255, 0.3);
+          top: -50px;
+          left: 50px;
+        }
 
-  .login-left-hero h1 {
-    font-size: 38px;
-    font-weight: 800;
-    color: white;
-    margin: 0 0 14px 0;
-    letter-spacing: -1px;
-    line-height: 1.1;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-  }
+        .blob-2 {
+          width: 250px;
+          height: 250px;
+          background: rgba(255, 255, 255, 0.2);
+          bottom: 100px;
+          right: -30px;
+          animation-delay: 2s;
+        }
 
-  .login-left-tagline {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0;
-    line-height: 1.6;
-  }
+        .blob-3 {
+          width: 200px;
+          height: 200px;
+          background: rgba(255, 255, 255, 0.25);
+          bottom: 50px;
+          left: 20%;
+          animation-delay: 4s;
+        }
 
-  .login-features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-bottom: 40px;
-    max-width: 480px;
-    width: 100%;
-  }
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) translateX(0px);
+          }
+          25% {
+            transform: translateY(-30px) translateX(20px);
+          }
+          50% {
+            transform: translateY(-60px) translateX(-20px);
+          }
+          75% {
+            transform: translateY(-30px) translateX(20px);
+          }
+        }
 
-  .feature-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 12px;
-    padding: 18px 12px;
-    text-align: center;
-    transition: all 0.3s ease;
-  }
+        .login-left-inner {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          justify-content: center;
+          align-items: center;
+          padding: 50px 40px;
+        }
 
-  .feature-card:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.35);
-    transform: translateY(-6px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  }
+        .login-left-logo {
+          margin-bottom: 35px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
 
-  .feature-icon {
-    margin-bottom: 10px;
-    color: white;
-    display: flex;
-    justify-content: center;
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
-  }
+        .login-left-logo img {
+          height: 85px;
+          width: auto;
+          object-fit: contain;
+          border-radius: 7px;
+        }
 
-  .feature-icon svg {
-    width: 28px;
-    height: 28px;
-  }
+        .login-left-hero {
+          margin-bottom: 40px;
+          max-width: 450px;
+          width: 100%;
+        }
 
-  .feature-card h4 {
-    font-size: 22px;
-    font-weight: 700;
-    color: white;
-    margin: 6px 0 3px 0;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-  }
+        .login-left-hero h1 {
+          font-size: 38px;
+          font-weight: 800;
+          color: white;
+          margin: 0 0 14px 0;
+          letter-spacing: -1px;
+          line-height: 1.1;
+          text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
 
-  .feature-card span {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.85);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 500;
-  }
+        .login-left-tagline {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          line-height: 1.6;
+        }
 
-  .login-bottom-cta {
-    padding-top: 22px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    max-width: 480px;
-    width: 100%;
-  }
+        .login-features-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+          margin-bottom: 40px;
+          max-width: 480px;
+          width: 100%;
+        }
 
-  .footer-divider-login {
-    flex: 1;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.6),
-      transparent
-    );
-  }
+        .feature-card {
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          border-radius: 12px;
+          padding: 18px 12px;
+          text-align: center;
+          transition: all 0.3s ease;
+        }
 
-  .footer-tagline-login {
-    font-size: 13px;
-    font-weight: 700;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: 2.2px;
-    white-space: nowrap;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-    margin: 0;
-  }
+        .feature-card:hover {
+          background: rgba(255, 255, 255, 0.2);
+          border-color: rgba(255, 255, 255, 0.35);
+          transform: translateY(-6px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
 
-  /* Responsive Styles */
-  @media (max-width: 992px) {
-    .modern-auth-left {
-      display: none;
-    }
-  }
+        .feature-icon {
+          margin-bottom: 10px;
+          color: white;
+          display: flex;
+          justify-content: center;
+          filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+        }
 
-  /* Large screens */
-  @media (min-width: 1400px) {
-    .login-left-inner {
-      padding: 60px 50px;
-    }
-    
-    .login-left-logo img {
-      height: 100px;
-    }
-    
-    .login-left-hero {
-      max-width: 520px;
-      margin-bottom: 45px;
-    }
-    
-    .login-left-hero h1 {
-      font-size: 44px;
-    }
-    
-    .login-left-tagline {
-      font-size: 17px;
-    }
-    
-    .login-features-grid {
-      gap: 16px;
-      margin-bottom: 45px;
-      max-width: 550px;
-    }
-    
-    .feature-card {
-      padding: 22px 14px;
-    }
-    
-    .feature-icon svg {
-      width: 30px;
-      height: 30px;
-    }
-    
-    .feature-card h4 {
-      font-size: 26px;
-    }
-    
-    .feature-card span {
-      font-size: 13px;
-    }
-    
-    .login-bottom-cta {
-      max-width: 550px;
-    }
-    
-    .footer-tagline-login {
-      font-size: 14px;
-    }
-  }
+        .feature-icon svg {
+          width: 28px;
+          height: 28px;
+        }
 
-  /* Medium screens (993px to 1199px) */
-  @media (min-width: 993px) and (max-width: 1199px) {
-    .login-left-inner {
-      padding: 35px 25px;
-    }
+        .feature-card h4 {
+          font-size: 22px;
+          font-weight: 700;
+          color: white;
+          margin: 6px 0 3px 0;
+          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
 
-    .login-left-logo img {
-      height: 70px;
-    }
+        .feature-card span {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.85);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          font-weight: 500;
+        }
 
-    .login-left-hero {
-      margin-bottom: 32px;
-      max-width: 380px;
-    }
+        .login-bottom-cta {
+          padding-top: 22px;
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          max-width: 480px;
+          width: 100%;
+        }
 
-    .login-left-hero h1 {
-      font-size: 32px;
-    }
+        .footer-divider-login {
+          flex: 1;
+          height: 2px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.6),
+            transparent
+          );
+        }
 
-    .login-left-tagline {
-      font-size: 14px;
-    }
+        .footer-tagline-login {
+          font-size: 13px;
+          font-weight: 700;
+          color: white;
+          text-transform: uppercase;
+          letter-spacing: 2.2px;
+          white-space: nowrap;
+          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+          margin: 0;
+        }
 
-    .login-features-grid {
-      gap: 10px;
-      margin-bottom: 32px;
-      max-width: 400px;
-    }
+        @media (max-width: 992px) {
+          .modern-auth-left {
+            display: none;
+          }
 
-    .feature-card {
-      padding: 14px 10px;
-    }
+          .login-method-tabs {
+            flex-direction: column;
+          }
 
-    .feature-icon svg {
-      width: 24px;
-      height: 24px;
-    }
+          .method-tab {
+            width: 100%;
+          }
+        }
 
-    .feature-card h4 {
-      font-size: 20px;
-    }
-
-    .feature-card span {
-      font-size: 10px;
-    }
-
-    .login-bottom-cta {
-      padding-top: 18px;
-      gap: 14px;
-      max-width: 400px;
-    }
-
-    .footer-tagline-login {
-      font-size: 11px;
-      letter-spacing: 1.8px;
-    }
-  }
-
-  /* Larger medium screens (1200px to 1399px) */
-  @media (min-width: 1200px) and (max-width: 1399px) {
-    .login-left-inner {
-      padding: 45px 35px;
-    }
-    
-    .login-left-logo img {
-      height: 85px;
-    }
+        @media (min-width: 1400px) {
+          .login-left-inner {
+            padding: 60px 50px;
+          }
+          
+          .login-left-logo img {
+            height: 100px;
+          }
+          
+         
     
     .login-left-hero {
       max-width: 460px;
