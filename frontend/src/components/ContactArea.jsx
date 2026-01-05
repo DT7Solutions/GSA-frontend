@@ -28,7 +28,7 @@ const ContactArea = () => {
                 </div>
                 <h6 className="contact-info_title">Phone Number</h6>
                 <p className="contact-info_text">
-                  <a href="tel:09248022760">092480 22760</a>
+                  <a href="tel:09248022760" target="_blank">092480 22760</a>
                 </p>
               </div>
             </div>
@@ -51,7 +51,7 @@ const ContactArea = () => {
                 </div>
                 <h6 className="contact-info_title">E-mail</h6>
                 <p className="contact-info_text">
-                  <a href="mailto:rajesh.katakam@gmail.com">
+                  <a href="mailto:rajesh.katakam@gmail.com" target="_blank">
                     rajesh.katakam@gmail.com
                   </a>
                 </p>

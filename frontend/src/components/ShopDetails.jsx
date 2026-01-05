@@ -237,11 +237,15 @@ const ShopDetails = () => {
                 </h6>
               </div>
             </div>
-            <div className="col-md-auto">
+            <div className="col-md-auto ">
               <div className="sec-btn mb-40">
-                <Link to="/shop" className="btn style-border2">
-                  See More
-                </Link>
+               <Link
+  to={`/shop/${product[0].part_group.id}`}
+  className="btn style-border2"
+>
+  See More
+</Link>
+
               </div>
             </div>
           </div>
@@ -291,38 +295,29 @@ const ShopDetails = () => {
                             alt={relatedProduct.product_name || "Product"}
                           />
                         </div>
-                        <div className="product-content">
-                          <h3 className="product-title">
-                            <Link to={`/shop-details/${relatedProduct.id}`}>
-                              {relatedProduct.product_name}
-                            </Link>
-                          </h3>
-                          <span className="star-rating">
-                            <i className="fas fa-star" />
-                            <i className="fas fa-star" />
-                            <i className="fas fa-star" />
-                            <i className="fas fa-star" />
-                            <i className="fas fa-star" />
-                          </span>
-                          <span className="price">
-                            ₹{relatedProduct.sale_price}{" "}
-                            {relatedProduct.price && (
-                              <del>₹{relatedProduct.price}</del>
-                            )}
-                          </span>
-                          <button
-                            onClick={() => handleAddToCart(relatedProduct.id)}
-                            className="link-btn"
-                            style={{
-                              background: "none",
-                              border: "none",
-                              cursor: "pointer",
-                              padding: 0,
-                            }}
-                          >
-                            Add to cart <i className="fas fa-arrow-right" />
-                          </button>
-                        </div>
+                       <div className="product-content ">
+                                                    <h3 className="product-title">
+                                                      <Link to={`/shop-details/${relatedProduct.id}`}>
+                                                        {relatedProduct.product_name || "Unnamed Product"}
+                                                      </Link>
+                                                    </h3>
+                                                    <div className="product-footer">
+                                                      
+                                                    <span className="price">
+                                                      <del>₹{relatedProduct.price}</del> ₹{relatedProduct.sale_price}{" "}
+                                                      &nbsp;
+                                                    </span>
+                      
+                                                    <Link
+                                                      to="#"
+                                                      className="link-btn mt-0"
+                                                      onClick={() => handleAddToCart(relatedProduct.id)}
+                                                    >
+                                                      {" "}
+                                                      <i className="fas fa-shopping-cart me-2" />
+                                                    </Link>
+                                                     </div>
+                                                  </div>
                       </div>
                     </div>
                   </SwiperSlide>

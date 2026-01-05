@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from "react-router-dom";
+
 import { ArrowRight } from 'lucide-react';
 
 const Bannercta = () => {
@@ -21,7 +23,7 @@ const Bannercta = () => {
     @media (max-width: 768px) {
       .banner-cta-section {
         padding: 40px 20px;
-        margin: 30px 0;
+        margin: 0px 0;
       }
 
       .banner-cta-container {
@@ -149,12 +151,13 @@ const Bannercta = () => {
 
           {/* Right Side - Button */}
           <div className="banner-cta-button-wrapper">
-            <a href="/shop/121">
+           <Link to="/shop/121" className="banner-cta-link">
   <button className="banner-cta-button">
     Shop Now
     <ArrowRight className="banner-cta-icon" size={20} />
   </button>
-</a>
+</Link>
+
 
           </div>
         </div>

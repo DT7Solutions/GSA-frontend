@@ -70,3 +70,6 @@
  .sidebar-menu-area{
   background-color: red !important;
  }
+.btn::after, .btn::before {
+    border: 1px solid #0068a5 !important;
+}

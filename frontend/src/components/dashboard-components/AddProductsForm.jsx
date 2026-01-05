@@ -565,34 +565,39 @@ const AddProductsForm = () => {
                 <div className="card-body">
                     <form className="row gy-3 needs-validation input-style" noValidate onSubmit={handleSubmit}>
                         {/* Car Brand Selection */}
-                        <div className="col-md-4">
-                            <label className="form-label">Select Car</label>
-                            <div className="input-group has-validation">
-                                <div className='addproduct-select search-select'>
-                                <Select
-                                    className="basic-single input-g"
-                                    classNamePrefix="select"
-                                    options={carMakes.map(make => ({
-                                        value: make.id,
-                                        label: make.name,
-                                  
-                                    }))}
-                                    onChange={(selectedOption) =>
-                                        handleCarMakeChange({ target: { value: selectedOption.value } })
-                                    }
-                                    placeholder="-- Select Your Car --"
-                                    isSearchable={true}
-                                />
-                                </div>
-                                <button
-                                    type="button"
-                                    className="input-group-text bg-base"
-                                    onClick={() => setShowModal(true)}
-                                >
-                                    <Icon icon="lucide:plus" /> Add Car
-                                </button>
-                            </div>
-                        </div>
+                       <div className="col-md-4">
+    <label className="form-label fw-semibold">
+        Select Car <span className="text-danger">*</span>
+    </label>
+
+    <div className="d-flex align-items-center gap-2">
+        <div className="flex-grow-1 addproduct-select search-select">
+            <Select
+                className="basic-single "
+                classNamePrefix="select"
+                options={carMakes.map(make => ({
+                    value: make.id,
+                    label: make.name,
+                }))}
+                onChange={(selectedOption) =>
+                    handleCarMakeChange({ target: { value: selectedOption.value } })
+                }
+                placeholder="Search & Select Car"
+                isSearchable={true}
+            />
+        </div>
+
+        <button
+            type="button"
+            className="btn btn-outline-primary d-flex align-items-center gap-1"
+            onClick={() => setShowModal(true)}
+        >
+            <Icon icon="lucide:plus" />
+            Add
+        </button>
+    </div>
+</div>
+
                         {/* Car Model Selection */}
                         <div className="col-md-4">
                             <label className="form-label">Select Car Model</label>

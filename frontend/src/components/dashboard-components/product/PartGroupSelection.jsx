@@ -241,7 +241,7 @@ const PartGroupList = ({ id }) => {
 
            {selectedCategory && (
               <div className="mb-4">
-                <div className="row align-items-center">
+                <div className="row align-items-center mb-5">
                   <div className="col-md-6 mb-3 mb-md-0">
                     <h5 className="mb-0">
                       {selectedCategoryName || "Selected Category"}

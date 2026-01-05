@@ -128,21 +128,21 @@ const BrandModels = ({ id, carMakes }) => {
     return (
         <div className="category-area-1 pb-100 brand-logo-display mt-5">
             <div className="container-fluid">
-                <div className="row align-items-center mb-4">
+                <div className="row align-items-center mb-5">
                     <div className="col-md-3"></div>
-                    <div className="col-md-6 text-center">
+                    <div className="col-md-6 text-center order-2 order-lg-2">
                         <h5 className="search-heading mb-0">
     <span className="heading-muted">Search By</span>
     <span className="heading-brand"> {carMakes.name}</span>
     <span className="heading-muted"> Car Model</span>
   </h5>
                     </div>
-                    <div className="col-md-3">
-                        <div className="d-flex justify-content-end align-items-center gap-2">
-                            <div className="position-relative bg-white" style={{ width: "100%", maxWidth: "300px" }}>
+                    <div className="col-md-3 order-1 order-lg-3">
+                        <div className="car-model-page   gap-2">
+                            <div className="position-relative bg-white mb-3 mb-lg-0" style={{ width: "100%", maxWidth: "300px" }}>
                                 <input
                                     type="text"
-                                    className="form-control ps-5 pe-4 bg-neutral-100"
+                                    className="form-control ps-5 pe-4 bg-white "
                                     placeholder="Search models..."
                                     value={searchTerm}
                                     onChange={handleSearchChange}

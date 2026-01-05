@@ -111,7 +111,7 @@ Available in Guntur
                     <div className="contact-grid-details">
                       <p>Phone Number</p>
                       <h6>
-                        <Link to="tel:888123456765">92480 22760</Link>
+                        <Link to="tel:92480 22760">92480 22760</Link>
                         <p />
                       </h6>
                     </div>
@@ -146,7 +146,7 @@ Available in Guntur
             </div>
             <div className="col-auto">
               <div className="footer-links">
-                <p className="m-0"> Designed by <a href="https://dt7.agency/" target="_blank" rel="noopener noreferrer">
+                <p className="m-0"> Designed by <a className="company-highlight" href="https://dt7.agency/" target="_blank" rel="noopener noreferrer" style={{color:"#0068a4!important;"}}>
                   Dt7 Agency
                 </a></p>
                 

@@ -51,7 +51,7 @@ const HeaderFive = () => {
             let userRole = "";
             if (role_id == 1) {
               userRole = "Admin";
-            } else if (role_id == 2) {
+            } else if (role_id == 2 || role_id == 4) {
               userRole = "Staff";
             } else {
               userRole = "Customer";
@@ -244,6 +244,20 @@ const HeaderFive = () => {
       <div className={`sticky-wrapper ${scroll && "sticky"} header-top bg-white`}>
         <div className="container ">
           <div className="row justify-content-around justify-content-md-between align-items-center gy-2">
+            {/* Hamburger Menu Icon - Visible on mobile */}
+            <div className="col-auto d-lg-none">
+              <button 
+                className="menu-toggle border-0 bg-transparent p-2" 
+                onClick={mobileMenu}
+                style={{ cursor: 'pointer' }}
+                aria-label="Toggle menu"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
             <div className="col-auto d-lg-block">
               <div className="header-logo">
                 <Link to="/">
@@ -426,7 +440,7 @@ const HeaderFive = () => {
                       <div className="header-grid-wrap">
                         <div className="simple-icon">
                           <Link to="/cart">
-                            <svg clipRule="evenodd" fillRule="evenodd" height="27" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 48 48" width="27" xmlns="http://www.w3.org/2000/svg">
+                            <svg clipRule="evenodd" fillRule="evenodd" height="27" strokeLinecap="round" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 48 48" width="27" xmlns="http://www.w3.org/2000/svg">
                               <g transform="translate(-53 -212)"><g transform="translate(-355 -60)"><g id="ngicon"><path d="m422.519 285.5h-2.657c-1.836 0-3.36 1.419-3.491 3.251l-1.714 24c-.069.969.267 1.923.929 2.634.663.711 1.59 1.115 2.562 1.115h27.704c.972 0 1.899-.404 2.562-1.115.662-.711.998-1.665.929-2.634l-1.714-24c-.131-1.832-1.655-3.251-3.491-3.251h-2.638v-.5c0-5.247-4.253-9.5-9.5-9.5-5.055 0-9.727 4.026-9.5 9.5.007.166.013.333.019.5zm18.981 3v7.5c0 .828-.672 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-7.5h-13v7.5c0 .828-.672 1.5-1.5 1.5s-1.5-.672-1.5-1.5c0 0 .13-3.505.087-7.5h-2.725c-.262 0-.48.203-.498.464 0 0-1.715 24-1.715 24-.01.139.038.275.133.377.095.101.227.159.366.159h27.704c.139 0 .271-.058.366-.159.095-.102.143-.238.133-.377l-1.715-24c-.018-.261-.236-.464-.498-.464zm-3-3v-.5c0-3.59-2.91-6.5-6.5-6.5-3.59 0-6.5 2.91-6.5 6.5v.5z"/></g></g></g>
                             </svg>
                             <span className="badge">{cartCount}</span>
@@ -437,7 +451,7 @@ const HeaderFive = () => {
                       <div className="header-grid-wrap">
                         <div className="simple-icon">
                           <Link to="/cart">
-                            <svg clipRule="evenodd" fillRule="evenodd" height="27" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 48 48" width="27" xmlns="http://www.w3.org/2000/svg">
+                            <svg clipRule="evenodd" fillRule="evenodd" height="27" strokeLinecap="round" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 48 48" width="27" xmlns="http://www.w3.org/2000/svg">
                               <g transform="translate(-53 -212)"><g transform="translate(-355 -60)"><g id="ngicon"><path d="m422.519 285.5h-2.657c-1.836 0-3.36 1.419-3.491 3.251l-1.714 24c-.069.969.267 1.923.929 2.634.663.711 1.59 1.115 2.562 1.115h27.704c.972 0 1.899-.404 2.562-1.115.662-.711.998-1.665.929-2.634l-1.714-24c-.131-1.832-1.655-3.251-3.491-3.251h-2.638v-.5c0-5.247-4.253-9.5-9.5-9.5-5.055 0-9.727 4.026-9.5 9.5.007.166.013.333.019.5zm18.981 3v7.5c0 .828-.672 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-7.5h-13v7.5c0 .828-.672 1.5-1.5 1.5s-1.5-.672-1.5-1.5c0 0 .13-3.505.087-7.5h-2.725c-.262 0-.48.203-.498.464 0 0-1.715 24-1.715 24-.01.139.038.275.133.377.095.101.227.159.366.159h27.704c.139 0 .271-.058.366-.159.095-.102.143-.238.133-.377l-1.715-24c-.018-.261-.236-.464-.498-.464zm-3-3v-.5c0-3.59-2.91-6.5-6.5-6.5-3.59 0-6.5 2.91-6.5 6.5v.5z"/></g></g></g>
                             </svg>
                           </Link>
@@ -462,10 +476,10 @@ const HeaderFive = () => {
         <div className="mobile-menu">
           <ul id="offcanvas-navigation">
             <li className="menu-item-has-children submenu-item-has-children">
-              <Link to="/About">About</Link>
+              <Link to="/About" onClick={mobileMenu}>About</Link>
             </li>
             <li>
-              <NavLink to="/contact" className={(navData) => (navData.isActive ? "active" : "")}>
+              <NavLink to="/contact" className={(navData) => (navData.isActive ? "active" : "")} onClick={mobileMenu}>
                 Contact
               </NavLink>
             </li>

@@ -514,7 +514,7 @@ const Login = () => {
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
-                    <span>Remember for 30 days</span>
+                    {/* <span>Remember for 30 days</span> */}
                   </label>
                   <Link to="/forgot-password" className="forgot-password-link">
                     Forgot password

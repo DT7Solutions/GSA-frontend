@@ -11,14 +11,18 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Invoicetemplate from '../Orders/Invoicetemplate';
 import PackingSlipTemplate from '../Orders/PackingSlipTemplate';
-import { createRoot } from 'react-dom/client'; // ✅ Modern React 18 API
+import { createRoot } from 'react-dom/client';
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [tableInitialized, setTableInitialized] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const token = localStorage.getItem("accessToken");
+  const tableRef = useRef(null);
 
   useEffect(() => {
     if (token) {
@@ -27,21 +31,32 @@ const OrdersList = () => {
       })
       .then((response) => {
          console.log("📦 Orders Data:", response.data);
-        // Check if shipping address is present
         response.data.forEach((order, idx) => {
           console.log(`Order ${idx + 1} Shipping Address:`, order.shipping_address);
         });
         setOrders(response.data);
-        setTimeout(() => {
-          if (!tableInitialized) {
-            $('#dataTable').DataTable({ pageLength: 10, destroy: true });
-            setTableInitialized(true);
-          }
-        }, 100);
+        setFilteredOrders(response.data);
       })
       .catch((error) => console.error("Error fetching orders:", error));
     }
-  }, [token, tableInitialized]);
+  }, [token]);
+
+  // Separate useEffect for DataTable initialization
+  useEffect(() => {
+    if (filteredOrders.length > 0 && !tableInitialized) {
+      setTimeout(() => {
+        if ($.fn.DataTable.isDataTable('#ordersDataTable')) {
+          $('#ordersDataTable').DataTable().destroy();
+        }
+        tableRef.current = $('#ordersDataTable').DataTable({ 
+          pageLength: 10, 
+          destroy: true,
+          order: [[4, 'desc']] // Sort by date column descending
+        });
+        setTableInitialized(true);
+      }, 100);
+    }
+  }, [filteredOrders, tableInitialized]);
 
   const handleEditClick = (order) => {
     setSelectedOrder({ ...order });
@@ -76,9 +91,12 @@ const OrdersList = () => {
       );
   
       if (response.status === 200) {
-        setOrders(prev =>
-          prev.map(o => o.id === selectedOrder.id ? { ...o, status: response.data.new_status || selectedOrder.status } : o)
+        const updatedOrders = orders.map(o => 
+          o.id === selectedOrder.id ? { ...o, status: response.data.new_status || selectedOrder.status } : o
         );
+        setOrders(updatedOrders);
+        applyDateFilter(updatedOrders);
+        
         await Swal.fire({ 
           title: 'Status Updated', 
           text: 'Order status has been updated.', 
@@ -99,7 +117,6 @@ const OrdersList = () => {
     }
   };
 
-  // ✅ Invoice PDF with modern createRoot API
   const handlePrint = async (order) => {
     const container = document.createElement('div');
     container.style.position = 'absolute';
@@ -116,7 +133,6 @@ const OrdersList = () => {
       signature: '/assets/img/signature.png'
     };
 
-    // ✅ Use createRoot instead of ReactDOM.render
     const root = createRoot(container);
     root.render(<Invoicetemplate order={order} company={company} />);
 
@@ -133,14 +149,12 @@ const OrdersList = () => {
       } catch (err) {
         console.error('Error generating invoice PDF:', err);
       } finally {
-        // ✅ Modern way to unmount
         root.unmount();
         container.remove();
       }
     }, 100);
   };
 
-  // ✅ Packing Slip PDF with modern createRoot API
   const handlePackingSlipPrint = async (order) => {
     if (!order) return;
 
@@ -159,7 +173,6 @@ const OrdersList = () => {
     container.style.top = '0';
     document.body.appendChild(container);
 
-    // ✅ Use createRoot instead of ReactDOM.render
     const root = createRoot(container);
     root.render(<PackingSlipTemplate order={order} company={company} />);
 
@@ -176,19 +189,154 @@ const OrdersList = () => {
       } catch (err) {
         console.error('Error generating packing slip PDF:', err);
       } finally {
-        // ✅ Modern way to unmount
         root.unmount();
         container.remove();
       }
     }, 100);
   };
 
+  const applyDateFilter = (ordersToFilter = orders) => {
+    let filtered = ordersToFilter;
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+
+      filtered = ordersToFilter.filter(order => {
+        const orderDate = new Date(order.created_at);
+        orderDate.setHours(0, 0, 0, 0); // Normalize to midnight for comparison
+        return orderDate >= start && orderDate <= end;
+      });
+    } else if (startDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      filtered = ordersToFilter.filter(order => {
+        const orderDate = new Date(order.created_at);
+        orderDate.setHours(0, 0, 0, 0);
+        return orderDate >= start;
+      });
+    } else if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      filtered = ordersToFilter.filter(order => {
+        const orderDate = new Date(order.created_at);
+        return orderDate <= end;
+      });
+    }
+
+    console.log('Filtering orders:', {
+      startDate,
+      endDate,
+      totalOrders: ordersToFilter.length,
+      filteredCount: filtered.length,
+      sampleDates: ordersToFilter.slice(0, 3).map(o => o.created_at)
+    });
+
+    setFilteredOrders(filtered);
+    
+    // Refresh DataTable
+    if (tableRef.current) {
+      tableRef.current.destroy();
+    }
+    setTimeout(() => {
+      if ($.fn.DataTable.isDataTable('#ordersDataTable')) {
+        $('#ordersDataTable').DataTable().destroy();
+      }
+      tableRef.current = $('#ordersDataTable').DataTable({ 
+        pageLength: 10, 
+        destroy: true,
+        order: [[4, 'desc']]
+      });
+    }, 0);
+  };
+
+  const handleFilterSubmit = (e) => {
+    e.preventDefault();
+    applyDateFilter();
+  };
+
+  const handleResetFilter = () => {
+    setStartDate('');
+    setEndDate('');
+    setFilteredOrders(orders);
+    
+    if (tableRef.current) {
+      tableRef.current.destroy();
+    }
+    setTimeout(() => {
+      if ($.fn.DataTable.isDataTable('#ordersDataTable')) {
+        $('#ordersDataTable').DataTable().destroy();
+      }
+      tableRef.current = $('#ordersDataTable').DataTable({ 
+        pageLength: 10, 
+        destroy: true,
+        order: [[4, 'desc']]
+      });
+    }, 0);
+  };
+
   return (
     <div className="card basic-data-table">
-      {/* <div className="card-header"><h5>Orders List</h5></div> */}
       <div className="card-body">
+        {/* Date Filter Form */}
+        <div className="mb-5 p-3 border rounded bg-light ">
+          
+          <form onSubmit={handleFilterSubmit}>
+            <div className="row g-3 align-items-end">
+              <div className="col-md-4">
+                <label htmlFor="startDate" className="form-label">Start Date</label>
+                <input
+                  type="date"
+                  id="startDate"
+                  className="form-control"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div className="col-md-4">
+                <label htmlFor="endDate" className="form-label">End Date</label>
+                <input
+                  type="date"
+                  id="endDate"
+                  className="form-control"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </div>
+              <div className="col-md-4 d-flex gap-2">
+  <button
+    type="submit"
+    className="btn-theme-admin btn-primary d-inline-flex align-items-center gap-1"
+  >
+    <Icon icon="mdi:filter" />
+    Apply Filter
+  </button>
+
+  <button
+    type="button"
+    className="btn-theme-admin btn-secondary d-inline-flex align-items-center gap-1"
+    onClick={handleResetFilter}
+  >
+    <Icon icon="mdi:refresh" />
+    Reset
+  </button>
+</div>
+
+            </div>
+          </form>
+          {(startDate || endDate) && (
+            <div className="mt-2">
+              <small className="text-muted">
+                Showing {filteredOrders.length} of {orders.length} orders
+              </small>
+            </div>
+          )}
+        </div>
+
         <div className="table-responsive">
-        <table className="table bordered-table mb-0 sm-table" id="dataTable">
+        <table className="table bordered-table mb-0 sm-table" id="ordersDataTable">
           <thead>
             <tr>
               <th>S.L</th>
@@ -202,7 +350,7 @@ const OrdersList = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, idx) => (
+            {filteredOrders.map((order, idx) => (
               <tr key={order.id}>
                 <td>{String(idx + 1).padStart(2, '0')}</td>
                 <td>GSA{order.id}</td>

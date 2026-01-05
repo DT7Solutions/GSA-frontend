@@ -496,7 +496,7 @@ const ShopArea = ({ id }) => {
                 {currentProducts.length > 0 ? (
                   <>
                     {/* Product Count and Sort Options Bar */}
-                    <div className="d-flex justify-content-between align-items-center mb-5 p-3 bg-light rounded">
+                    <div className="d-flex justify-content-between align-items-center flex-wrap mb-5 p-3 bg-light rounded">
                       <div className="product-count">
                         <p className="mb-0">
                           Showing <strong>{indexOfFirstProduct + 1}</strong> to{" "}

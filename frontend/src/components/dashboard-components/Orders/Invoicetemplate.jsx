@@ -141,6 +141,10 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       fontSize: '13px',
       color: '#555',
     },
+    smallText: {
+      fontSize: '12px',
+      color: '#666',
+    },
   };
 
   return (
@@ -254,11 +258,11 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
               <tr style={styles.focusBg}>
                 <th style={{ ...styles.thtd, width: '5%' }}>SL</th>
                 <th style={{ ...styles.thtd, width: '25%' }}>Product</th>
-                <th style={{ ...styles.thtd, width: '12%' }}>SKU</th>
-                <th style={{ ...styles.thtd, width: '12%' }}>HSN</th>
-                <th style={{ ...styles.thtd, width: '12%' }}>Rate (₹)</th>
+                <th style={{ ...styles.thtd, width: '10%' }}>SKU</th>
+                <th style={{ ...styles.thtd, width: '10%' }}>HSN</th>
+                <th style={{ ...styles.thtd, width: '10%' }}>Rate (₹)</th>
                 <th style={{ ...styles.thtd, width: '8%' }}>Qty</th>
-                <th style={{ ...styles.thtd, width: '15%', textAlign: 'right' }}>Amount (₹)</th>
+                <th style={{ ...styles.thtd, width: '12%', textAlign: 'right' }}>Amount (₹)</th>
               </tr>
             </thead>
             <tbody>
@@ -268,19 +272,28 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                   const rate = Number(it.price) || 0;
                   const amount = rate * qty;
                   const productName = it.part_name || "N/A";
-                  const sku = it.sku || it.part_no || "N/A";
-                  const hsn = it.remarks || it.hsn_code || "8708";
+                  const sku = it.sku || "N/A";
+                  const hsn = it.remarks || "8708";
                   
                   return (
-                    <tr key={i} style={i % 2 ? styles.focusBg : {}}>
-                      <td style={styles.thtd}>{String(i + 1).padStart(2, '0')}</td>
-                      <td style={styles.thtd}>{productName}</td>
-                      <td style={styles.thtd}>{sku}</td>
-                      <td style={styles.thtd}>{hsn}</td>
-                      <td style={styles.thtd}>{rate.toFixed(2)}</td>
-                      <td style={styles.thtd}>{qty}</td>
-                      <td style={{ ...styles.thtd, textAlign: 'right' }}>{amount.toFixed(2)}</td>
-                    </tr>
+                    <React.Fragment key={i}>
+                      <tr style={i % 2 ? styles.focusBg : {}}>
+                        <td style={styles.thtd}>{String(i + 1).padStart(2, '0')}</td>
+                        <td style={styles.thtd}>{productName}</td>
+                        <td style={styles.thtd}>{sku}</td>
+                        <td style={styles.thtd}>{hsn}</td>
+                        <td style={styles.thtd}>{rate.toFixed(2)}</td>
+                        <td style={styles.thtd}>{qty}</td>
+                        <td style={{ ...styles.thtd, textAlign: 'right' }}>{amount.toFixed(2)}</td>
+                      </tr>
+                      {it.remarks && (
+                        <tr style={i % 2 ? styles.focusBg : {}}>
+                          <td colSpan="7" style={{ ...styles.thtd, ...styles.smallText, paddingTop: '5px', paddingBottom: '10px' }}>
+                            <b>Remarks:</b> {it.remarks}
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })
               ) : (

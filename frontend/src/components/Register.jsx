@@ -17,19 +17,32 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showPassword2, setShowPassword2] = useState(false);
     const navigate = useNavigate();
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         // Check if passwords match
-        if (password !== confirmPassword) {
-            Swal.fire({
-                title: "Error",
-                text: "Passwords do not match!",
-                icon: "error",
-                confirmButtonText: "OK",
-            });
-            return;
-        }
+  if (phoneNumber.length < 10) {
+    Swal.fire({
+      title: "Invalid Phone Number",
+      text: "Phone number must be exactly 10 digits.",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+    return;
+  }
+
+  // 🔐 Password match check
+  if (password !== confirmPassword) {
+    Swal.fire({
+      title: "Error",
+      text: "Passwords do not match!",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+    return;
+  }
+
 
         try {
             const response = await axios.post(`${API_BASE_URL}api/auth/register/`, {
