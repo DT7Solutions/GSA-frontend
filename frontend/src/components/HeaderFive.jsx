@@ -476,10 +476,10 @@ const HeaderFive = () => {
         <div className="mobile-menu">
           <ul id="offcanvas-navigation">
             <li className="menu-item-has-children submenu-item-has-children">
-              <Link to="/About" onClick={mobileMenu}>About</Link>
+              <Link to="/about-us" onClick={mobileMenu}>About</Link>
             </li>
             <li>
-              <NavLink to="/contact" className={(navData) => (navData.isActive ? "active" : "")} onClick={mobileMenu}>
+              <NavLink to="/contact-us" className={(navData) => (navData.isActive ? "active" : "")} onClick={mobileMenu}>
                 Contact
               </NavLink>
             </li>

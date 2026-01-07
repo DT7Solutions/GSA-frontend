@@ -34,8 +34,14 @@ const OrdersList = () => {
         response.data.forEach((order, idx) => {
           console.log(`Order ${idx + 1} Shipping Address:`, order.shipping_address);
         });
-        setOrders(response.data);
-        setFilteredOrders(response.data);
+        
+        // Sort orders by date (newest first)
+        const sortedOrders = response.data.sort((a, b) => {
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
+        
+        setOrders(sortedOrders);
+        setFilteredOrders(sortedOrders);
       })
       .catch((error) => console.error("Error fetching orders:", error));
     }
@@ -234,6 +240,9 @@ const OrdersList = () => {
       sampleDates: ordersToFilter.slice(0, 3).map(o => o.created_at)
     });
 
+    // Sort filtered orders by date (newest first)
+    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
     setFilteredOrders(filtered);
     
     // Refresh DataTable
@@ -247,7 +256,10 @@ const OrdersList = () => {
       tableRef.current = $('#ordersDataTable').DataTable({ 
         pageLength: 10, 
         destroy: true,
-        order: [[4, 'desc']]
+        order: [[4, 'desc']], // Sort by date column descending
+        columnDefs: [
+          { orderable: false, targets: 0 } // Disable sorting on S.L column
+        ]
       });
     }, 0);
   };
@@ -281,8 +293,8 @@ const OrdersList = () => {
     <div className="card basic-data-table">
       <div className="card-body">
         {/* Date Filter Form */}
-        <div className="mb-5 p-3 border rounded bg-light ">
-          
+        <div className="mb-4 p-3 border rounded bg-light">
+          <h6 className="mb-3">Filter Orders by Date</h6>
           <form onSubmit={handleFilterSubmit}>
             <div className="row g-3 align-items-end">
               <div className="col-md-4">
@@ -305,25 +317,16 @@ const OrdersList = () => {
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </div>
-              <div className="col-md-4 d-flex gap-2">
-  <button
-    type="submit"
-    className="btn-theme-admin btn-primary d-inline-flex align-items-center gap-1"
-  >
-    <Icon icon="mdi:filter" />
-    Apply Filter
-  </button>
-
-  <button
-    type="button"
-    className="btn-theme-admin btn-secondary d-inline-flex align-items-center gap-1"
-    onClick={handleResetFilter}
-  >
-    <Icon icon="mdi:refresh" />
-    Reset
-  </button>
-</div>
-
+              <div className="col-md-4">
+                <button type="submit" className="btn btn-primary me-2">
+                  <Icon icon="mdi:filter" className="me-1" />
+                  Apply Filter
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={handleResetFilter}>
+                  <Icon icon="mdi:refresh" className="me-1" />
+                  Reset
+                </button>
+              </div>
             </div>
           </form>
           {(startDate || endDate) && (

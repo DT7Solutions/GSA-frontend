@@ -10,6 +10,8 @@ import TestimonialOne from "../components/TestimonialOne";
 import SubscribeOne from "../components/SubscribeOne";
 // import TeamAreaTwo from "../components/TeamAreaTwo";
 import Preloader from "../helper/Preloader";
+import CounterOne from "components/CounterOne";
+import Aboutbreadcrumb from "components/Aboutbreadcrumb";
 
 const AboutPage = () => {
   let [active, setActive] = useState(true);
@@ -26,17 +28,17 @@ const AboutPage = () => {
       {/* Header one */}
       <HeaderFive />
 
-      {/* Breadcrumb */}
-      <Breadcrumb statictitle={"About Us"} />
-
+     <Aboutbreadcrumb/>
+        
       {/* About Area */}
       <AboutTwo />
+     
 
       {/* Process Area One */}
  
       {/* CTA Area One */}
       
-
+    
       {/* Testimonial One */}
       <TestimonialOne />
 

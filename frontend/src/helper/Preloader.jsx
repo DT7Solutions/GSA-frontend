@@ -4,9 +4,9 @@ const Preloader = () => {
   return (
     <>
       {/* Preloader Start*/}
-      <div className="preloader ">
+      <div className="preloader bg-white">
         <div className="preloader-inner">
-          <span className="loader" />
+          <span className="loader text-theme" />
         </div>
       </div>
     </>

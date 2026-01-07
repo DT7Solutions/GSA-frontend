@@ -73,3 +73,7 @@
 .btn::after, .btn::before {
     border: 1px solid #0068a5 !important;
 }
+
+.text-theme{
+  color:#0068a5!important;
+}
