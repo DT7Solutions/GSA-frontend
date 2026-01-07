@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -20,6 +20,12 @@ const MasterLayout = ({ children }) => {
     const [userRole, setUserRole] = useState("");
     const [notificationCount, setNotificationCount] = useState(0);
     const [hasShownNotifications, setHasShownNotifications] = useState(new Set());
+    
+    // Toast queue management
+    const toastQueueRef = useRef([]);
+    const activeToastsRef = useRef(0);
+    const MAX_ACTIVE_TOASTS = 3;
+    const isProcessingQueueRef = useRef(false);
 
     // Dropdown menu effect
     useEffect(() => {
@@ -132,6 +138,64 @@ const MasterLayout = ({ children }) => {
         }
     }, []);
 
+    // Function to process toast queue
+    const processToastQueue = () => {
+        if (isProcessingQueueRef.current) return;
+        if (toastQueueRef.current.length === 0) return;
+        if (activeToastsRef.current >= MAX_ACTIVE_TOASTS) return;
+
+        isProcessingQueueRef.current = true;
+
+        // Get next notification from queue
+        const notification = toastQueueRef.current.shift();
+
+        if (notification) {
+            activeToastsRef.current++;
+
+            // Play notification sound
+            const audio = new Audio('/notification-sound.mp3');
+            audio.play().catch(e => console.log('Audio play failed:', e));
+
+            // Show toast notification
+            toast.success(
+                <div>
+                    <strong>🛒 New Order!</strong>
+                    <div style={{ fontSize: '0.9em', marginTop: '5px' }}>
+                        Order #{notification.order_id} from {notification.customer_name}
+                        <br />
+                        Amount: ₹{notification.total_amount.toFixed(2)}
+                    </div>
+                </div>,
+                {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    onClose: () => {
+                        // Decrease active toast count when this toast closes
+                        activeToastsRef.current--;
+                        // Try to process next notification in queue after a small delay
+                        setTimeout(() => {
+                            isProcessingQueueRef.current = false;
+                            processToastQueue();
+                        }, 500);
+                    }
+                }
+            );
+        }
+
+        isProcessingQueueRef.current = false;
+
+        // Try to show more toasts if we haven't reached the limit
+        setTimeout(() => {
+            if (activeToastsRef.current < MAX_ACTIVE_TOASTS && toastQueueRef.current.length > 0) {
+                processToastQueue();
+            }
+        }, 300);
+    };
+
     // Notification polling effect
     useEffect(() => {
         // Only start polling if user is admin or staff
@@ -141,33 +205,15 @@ const MasterLayout = ({ children }) => {
             // Handle incoming notifications
             const handleNotification = (notifications) => {
                 notifications.forEach(notification => {
-                    // Play notification sound
-                    const audio = new Audio('/notification-sound.mp3');
-                    audio.play().catch(e => console.log('Audio play failed:', e));
-                    
-                    // Show toast notification
-                    toast.success(
-                        <div>
-                            <strong>🛒 New Order!</strong>
-                            <div style={{ fontSize: '0.9em', marginTop: '5px' }}>
-                                Order #{notification.order_id} from {notification.customer_name}
-                                <br />
-                                Amount: ₹{notification.total_amount.toFixed(2)}
-                            </div>
-                        </div>,
-                        {
-                            position: "top-right",
-                            autoClose: 8000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                        }
-                    );
+                    // Add notification to queue
+                    toastQueueRef.current.push(notification);
                     
                     // Update notification count
                     setNotificationCount(prev => prev + 1);
                 });
+
+                // Start processing the queue
+                processToastQueue();
             };
             
             notificationService.addListener(handleNotification);
@@ -176,6 +222,9 @@ const MasterLayout = ({ children }) => {
             return () => {
                 notificationService.removeListener(handleNotification);
                 notificationService.stopPolling();
+                // Clear queue on cleanup
+                toastQueueRef.current = [];
+                activeToastsRef.current = 0;
             };
         }
     }, [userRole]);
@@ -185,6 +234,10 @@ const MasterLayout = ({ children }) => {
         localStorage.removeItem("refreshToken");
         setIsLoggedIn(false);
         notificationService.stopPolling();
+        // Clear toast queue on logout
+        toastQueueRef.current = [];
+        activeToastsRef.current = 0;
+        toast.dismiss(); // Dismiss all active toasts
         navigate("/login");
     };
 
@@ -413,34 +466,34 @@ const MasterLayout = ({ children }) => {
 
                         {/* Settings at the bottom */}
                         <li className='dropdown' style={{ marginTop: 'auto' }}>
-    <Link to='#'>
-        <Icon icon='solar:settings-outline' className='menu-icon' />
-        <span>Settings</span>
-    </Link>
-    <ul className='sidebar-submenu'>
-        <li>
-            <NavLink
-                to='/view-profile'
-                className={(navData) =>
-                    navData.isActive ? "active-page" : ""
-                }
-            >
-                <Icon icon='solar:user-outline' className='circle-icon text-primary-600 ' />{" "}
-                My Profile
-            </NavLink>
-        </li>
-        <li>
-            <button
-                className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 w-100 text-start border-0 bg-transparent'
-                onClick={handleLogout}
-                style={{ paddingLeft: '28px' }}
-            >
-                <Icon icon='solar:logout-outline' className='circle-icon text-danger-600 w-auto' />{" "}
-                Logout
-            </button>
-        </li>
-    </ul>
-</li>
+                            <Link to='#'>
+                                <Icon icon='solar:settings-outline' className='menu-icon' />
+                                <span>Settings</span>
+                            </Link>
+                            <ul className='sidebar-submenu'>
+                                <li>
+                                    <NavLink
+                                        to='/view-profile'
+                                        className={(navData) =>
+                                            navData.isActive ? "active-page" : ""
+                                        }
+                                    >
+                                        <Icon icon='solar:user-outline' className='circle-icon text-primary-600 ' />{" "}
+                                        My Profile
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <button
+                                        className='dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 w-100 text-start border-0 bg-transparent'
+                                        onClick={handleLogout}
+                                        style={{ paddingLeft: '28px' }}
+                                    >
+                                        <Icon icon='solar:logout-outline' className='circle-icon text-danger-600 w-auto' />{" "}
+                                        Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        </li>
 
                     </ul>
                 </div>
@@ -566,10 +619,10 @@ const MasterLayout = ({ children }) => {
                     </div>
                 </div>
 
-                {/* Toast Container */}
+                {/* Toast Container - Limited to 3 visible toasts */}
                 <ToastContainer
                     position="top-right"
-                    autoClose={8000}
+                    autoClose={5000}
                     hideProgressBar={false}
                     newestOnTop={true}
                     closeOnClick
@@ -578,6 +631,7 @@ const MasterLayout = ({ children }) => {
                     draggable
                     pauseOnHover
                     theme="light"
+                    limit={3}
                 />
 
                 {/* dashboard-main-body */}

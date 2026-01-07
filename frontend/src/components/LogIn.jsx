@@ -502,8 +502,18 @@ const Login = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
                       required
-                      className="modern-input"
+                      className="modern-input password-input-field"
                     />
+                    {password && (
+                      <button
+                        type="button"
+                        className="password-toggle-btn"
+                        onClick={() => setShowPassword(!showPassword)}
+                        tabIndex="-1"
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -598,7 +608,10 @@ const Login = () => {
           padding: 4px;
           border-radius: 10px;
         }
-
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+          display: none;
+        }
         .method-tab {
           flex: 1;
           padding: 10px 12px;

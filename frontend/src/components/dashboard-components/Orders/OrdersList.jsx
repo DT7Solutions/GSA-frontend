@@ -57,7 +57,10 @@ const OrdersList = () => {
         tableRef.current = $('#ordersDataTable').DataTable({ 
           pageLength: 10, 
           destroy: true,
-          order: [[4, 'desc']] // Sort by date column descending
+          order: [], // Disable initial sorting - we're already sorted
+          columnDefs: [
+            { orderable: false, targets: [0, 7] } // Disable sorting on S.L and Action columns
+          ]
         });
         setTableInitialized(true);
       }, 100);
@@ -100,6 +103,10 @@ const OrdersList = () => {
         const updatedOrders = orders.map(o => 
           o.id === selectedOrder.id ? { ...o, status: response.data.new_status || selectedOrder.status } : o
         );
+        
+        // Keep the sorting (newest first) after update
+        updatedOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
         setOrders(updatedOrders);
         applyDateFilter(updatedOrders);
         
@@ -212,7 +219,7 @@ const OrdersList = () => {
 
       filtered = ordersToFilter.filter(order => {
         const orderDate = new Date(order.created_at);
-        orderDate.setHours(0, 0, 0, 0); // Normalize to midnight for comparison
+        orderDate.setHours(0, 0, 0, 0);
         return orderDate >= start && orderDate <= end;
       });
     } else if (startDate) {
@@ -256,9 +263,9 @@ const OrdersList = () => {
       tableRef.current = $('#ordersDataTable').DataTable({ 
         pageLength: 10, 
         destroy: true,
-        order: [[4, 'desc']], // Sort by date column descending
+        order: [], // No initial sorting - we pre-sorted the data
         columnDefs: [
-          { orderable: false, targets: 0 } // Disable sorting on S.L column
+          { orderable: false, targets: [0, 7] } // Disable sorting on S.L and Action columns
         ]
       });
     }, 0);
@@ -272,7 +279,10 @@ const OrdersList = () => {
   const handleResetFilter = () => {
     setStartDate('');
     setEndDate('');
-    setFilteredOrders(orders);
+    
+    // Reset to original orders (already sorted newest first)
+    const sortedOrders = [...orders].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    setFilteredOrders(sortedOrders);
     
     if (tableRef.current) {
       tableRef.current.destroy();
@@ -284,7 +294,10 @@ const OrdersList = () => {
       tableRef.current = $('#ordersDataTable').DataTable({ 
         pageLength: 10, 
         destroy: true,
-        order: [[4, 'desc']]
+        order: [], // No initial sorting
+        columnDefs: [
+          { orderable: false, targets: [0, 7] }
+        ]
       });
     }, 0);
   };
@@ -293,50 +306,63 @@ const OrdersList = () => {
     <div className="card basic-data-table">
       <div className="card-body">
         {/* Date Filter Form */}
-        <div className="mb-4 p-3 border rounded bg-light">
-          <h6 className="mb-3">Filter Orders by Date</h6>
-          <form onSubmit={handleFilterSubmit}>
-            <div className="row g-3 align-items-end">
-              <div className="col-md-4">
-                <label htmlFor="startDate" className="form-label">Start Date</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  className="form-control"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </div>
-              <div className="col-md-4">
-                <label htmlFor="endDate" className="form-label">End Date</label>
-                <input
-                  type="date"
-                  id="endDate"
-                  className="form-control"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
-              <div className="col-md-4">
-                <button type="submit" className="btn btn-primary me-2">
-                  <Icon icon="mdi:filter" className="me-1" />
-                  Apply Filter
-                </button>
-                <button type="button" className="btn btn-secondary" onClick={handleResetFilter}>
-                  <Icon icon="mdi:refresh" className="me-1" />
-                  Reset
-                </button>
-              </div>
-            </div>
-          </form>
-          {(startDate || endDate) && (
-            <div className="mt-2">
-              <small className="text-muted">
-                Showing {filteredOrders.length} of {orders.length} orders
-              </small>
-            </div>
-          )}
-        </div>
+       <div className="mb-5 p-3 border rounded bg-light">
+  <h6 className="mb-3">Filter Orders by Date</h6>
+
+  <form onSubmit={handleFilterSubmit}>
+    <div className="row g-3 align-items-end">
+      <div className="col-md-4">
+        <label htmlFor="startDate" className="form-label">Start Date</label>
+        <input
+          type="date"
+          id="startDate"
+          className="form-control"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+      </div>
+
+      <div className="col-md-4">
+        <label htmlFor="endDate" className="form-label">End Date</label>
+        <input
+          type="date"
+          id="endDate"
+          className="form-control"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+      </div>
+
+      <div className="col-md-4 d-flex align-items-end">
+        <button
+          type="submit"
+          className="btn-theme-admin btn-primary me-2 d-inline-flex align-items-center"
+        >
+          <Icon icon="mdi:filter" className="me-1" />
+          <span>Apply Filter</span>
+        </button>
+
+        <button
+          type="button"
+          className="btn-theme-admin btn-secondary d-inline-flex align-items-center"
+          onClick={handleResetFilter}
+        >
+          <Icon icon="mdi:refresh" className="me-1" />
+          <span>Reset</span>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  {(startDate || endDate) && (
+    <div className="mt-2">
+      <small className="text-muted">
+        Showing {filteredOrders.length} of {orders.length} orders
+      </small>
+    </div>
+  )}
+</div>
+
 
         <div className="table-responsive">
         <table className="table bordered-table mb-0 sm-table" id="ordersDataTable">

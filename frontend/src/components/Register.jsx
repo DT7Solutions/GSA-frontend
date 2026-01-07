@@ -21,28 +21,102 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Check if passwords match
-  if (phoneNumber.length < 10) {
-    Swal.fire({
-      title: "Invalid Phone Number",
-      text: "Phone number must be exactly 10 digits.",
-      icon: "error",
-      confirmButtonText: "OK",
-    });
-    return;
-  }
+        
+        // Validate all fields are filled
+        if (!username.trim()) {
+            Swal.fire({
+                title: "Missing Field",
+                text: "Please enter your username.",
+                icon: "warning",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
 
-  // 🔐 Password match check
-  if (password !== confirmPassword) {
-    Swal.fire({
-      title: "Error",
-      text: "Passwords do not match!",
-      icon: "error",
-      confirmButtonText: "OK",
-    });
-    return;
-  }
+        if (!email.trim()) {
+            Swal.fire({
+                title: "Missing Field",
+                text: "Please enter your email address.",
+                icon: "warning",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
 
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            Swal.fire({
+                title: "Invalid Email",
+                text: "Please enter a valid email address.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        if (!phoneNumber.trim()) {
+            Swal.fire({
+                title: "Missing Field",
+                text: "Please enter your phone number.",
+                icon: "warning",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        // Phone number validation
+        if (phoneNumber.length !== 10) {
+            Swal.fire({
+                title: "Invalid Phone Number",
+                text: "Phone number must be exactly 10 digits.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        if (!password) {
+            Swal.fire({
+                title: "Missing Field",
+                text: "Please enter your password.",
+                icon: "warning",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        // Password strength validation
+        if (password.length < 6) {
+            Swal.fire({
+                title: "Weak Password",
+                text: "Password must be at least 6 characters long.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        if (!confirmPassword) {
+            Swal.fire({
+                title: "Missing Field",
+                text: "Please confirm your password.",
+                icon: "warning",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        // Password match check
+        if (password !== confirmPassword) {
+            Swal.fire({
+                title: "Password Mismatch",
+                text: "Passwords do not match!",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
 
         try {
             const response = await axios.post(`${API_BASE_URL}api/auth/register/`, {
@@ -54,7 +128,15 @@ const Register = () => {
             });
 
             console.log("Registration Successful:", response.data);
-            navigate("/Dashboard");
+            
+            Swal.fire({
+                title: "Success!",
+                text: "Your account has been created successfully.",
+                icon: "success",
+                confirmButtonText: "Continue",
+            }).then(() => {
+                navigate("/Dashboard");
+            });
 
         } catch (error) {
             console.error("Registration Failed:", error.response ? error.response.data : error.message);
@@ -170,7 +252,7 @@ const Register = () => {
                     <div className="modern-auth-form compact">
                         {/* Username */}
                         <div className="form-group-modern">
-                            <label>Username</label>
+                            <label>Username <span className="required-asterisk">*</span></label>
                             <input
                                 type="text"
                                 value={username}
@@ -183,7 +265,7 @@ const Register = () => {
 
                         {/* Email */}
                         <div className="form-group-modern">
-                            <label>Email address</label>
+                            <label>Email address <span className="required-asterisk">*</span></label>
                             <input
                                 type="email"
                                 value={email}
@@ -196,7 +278,7 @@ const Register = () => {
 
                         {/* Phone Number */}
                         <div className="form-group-modern">
-                            <label>Phone Number</label>
+                            <label>Phone Number <span className="required-asterisk">*</span></label>
                             <div className="phone-input-group">
                                 <span className="phone-prefix">+91</span>
                                 <input
@@ -218,7 +300,7 @@ const Register = () => {
 
                         {/* Password */}
                         <div className="form-group-modern">
-                            <label>Password</label>
+                            <label>Password <span className="required-asterisk">*</span></label>
                             <div className="password-input-wrapper">
                                 <input
                                     type={showPassword ? "text" : "password"}
@@ -226,15 +308,24 @@ const Register = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Enter your password"
                                     required
-                                    className="modern-input"
+                                    className="modern-input password-input-field"
                                 />
-                                
+                                {password && (
+                                    <button
+                                        type="button"
+                                        className="password-toggle-btn"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        tabIndex="-1"
+                                    >
+                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </button>
+                                )}
                             </div>
                         </div>
 
                         {/* Confirm Password */}
                         <div className="form-group-modern">
-                            <label>Confirm Password</label>
+                            <label>Confirm Password <span className="required-asterisk">*</span></label>
                             <div className="password-input-wrapper">
                                 <input
                                     type={showPassword2 ? "text" : "password"}
@@ -242,9 +333,18 @@ const Register = () => {
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     placeholder="Confirm your password"
                                     required
-                                    className="modern-input"
+                                    className="modern-input password-input-field"
                                 />
-                                
+                                {confirmPassword && (
+                                    <button
+                                        type="button"
+                                        className="password-toggle-btn"
+                                        onClick={() => setShowPassword2(!showPassword2)}
+                                        tabIndex="-1"
+                                    >
+                                        {showPassword2 ? <FaEyeSlash /> : <FaEye />}
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -268,6 +368,77 @@ const Register = () => {
             </div>
            <style>
 {`
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-field {
+  width: 100%;
+  padding-right: 45px !important;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.password-toggle-btn:hover {
+  color: #0066cc;
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+}
+
+.password-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Hide default Edge password reveal button */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Required Asterisk */
+.required-asterisk {
+  color: #e74c3c;
+  margin-left: 3px;
+  font-weight: 600;
+}
+
+/* Phone Input Group */
+
+
+.phone-prefix {
+  padding: 12px 14px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.phone-input-group .modern-input {
+  flex: 1;
+}
+
 /* Left Side with Image and Overlay */
 .modern-auth-left {
   position: relative;
