@@ -217,9 +217,7 @@ const HeroFive = () => {
                           Highly Modified Car Repair system
                         </h1>
                         <p className="hero-text text-white">
-                          Vestibulum rhoncus nisl ac gravida porta. Mauris eu
-                          sapien lacus. Etiam molestie justo neque, in convallis
-                          massa tempus in.
+                          Premium parts engineered to enhance engine power, efficiency, and long-term performance.
                         </p>
                         <div className="btn-group">
                           <Link to="/about-us" className="btn-no-animation">
@@ -255,9 +253,7 @@ const HeroFive = () => {
                           Complete Engine Parts Collection
                         </h1>
                         <p className="hero-text text-white">
-                          Vestibulum rhoncus nisl ac gravida porta. Mauris eu
-                          sapien lacus. Etiam molestie justo neque, in convallis
-                          massa tempus in.
+                          Specially designed components suitable for customized and performance-enhanced vehicles.
                         </p>
                         <div className="btn-group">
                           <Link to="/about-us" className="btn-no-animation">
@@ -292,9 +288,7 @@ const HeroFive = () => {
                           Complete Engine Parts Collection
                         </h1>
                         <p className="hero-text text-white">
-                          Vestibulum rhoncus nisl ac gravida porta. Mauris eu
-                          sapien lacus. Etiam molestie justo neque, in convallis
-                          massa tempus in.
+                          Extensive range of reliable engine components for multiple car models and configurations.
                         </p>
                         <div className="btn-group">
                           <Link to="/about-us" className="btn-no-animation">

@@ -157,7 +157,7 @@ const Shopbycategory = ({ id = 4 }) => {
             <div className="col-lg-12">
               <div className="client-slider3">
                 <div className="title-area">
-                  <h4 className="sec-title text-dark text-center">Shop by <span className="highlight-text">Category</span></h4>
+                  <h4 className="sec-title text-dark text-center">Shop By <span className="highlight-text">Category</span></h4>
                 </div>
                 
                 <Swiper

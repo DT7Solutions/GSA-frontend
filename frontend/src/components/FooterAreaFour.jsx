@@ -43,6 +43,14 @@ Available in Guntur
   >
     <i className="fab fa-facebook-f" />
   </a>
+    <a
+    href="https://www.youtube.com/@Gowrisankaragencies"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="YouTube"
+  >
+    <i className="fab fa-youtube" />
+  </a>
 </div>
 
               </div>
@@ -141,7 +149,7 @@ Available in Guntur
           <div className="row gy-3 justify-content-md-between justify-content-center">
             <div className="col-auto align-self-center">
               <p className="copyright-text text-center">
-             Copyright ©  2025 <Link to="#" className="highlight-text">GOWRISANKAR AGENCIES</Link> | All Rights Reserved
+             Copyright ©  2026 <Link to="#" className="highlight-text">GOWRISANKAR AGENCIES</Link> | All Rights Reserved
               </p>
             </div>
             <div className="col-auto">

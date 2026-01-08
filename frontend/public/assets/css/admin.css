@@ -690,3 +690,12 @@
 .sidebar-close-btn svg{
   color:#000!important;
 }
+.bg-theme-button{
+  background-color: #0068A5!important;
+  color: #fff!important;
+  font-weight: 600;
+}
+
+.Add-car-top-gap{
+  padding:13px 13px;
+}

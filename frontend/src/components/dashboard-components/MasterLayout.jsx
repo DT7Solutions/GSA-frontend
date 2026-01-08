@@ -641,7 +641,7 @@ const MasterLayout = ({ children }) => {
                 <footer className='d-footer'>
                     <div className='row align-items-center justify-content-between'>
                         <div className='col-auto'>
-                            <p className='mb-0'>© 2025 Gowri sankar agencies. All Rights Reserved.</p>
+                            <p className='mb-0'>© 2026 Gowri sankar agencies. All Rights Reserved.</p>
                         </div>
                         <div className='col-auto'>
                             <p className='mb-0'>

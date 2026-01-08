@@ -567,10 +567,10 @@ const AddProductsForm = () => {
                         {/* Car Brand Selection */}
                        <div className="col-md-4">
     <label className="form-label fw-semibold">
-        Select Car <span className="text-danger">*</span>
+        Select Car 
     </label>
 
-    <div className="d-flex align-items-center gap-2">
+    <div className="d-flex align-items-center ">
         <div className="flex-grow-1 addproduct-select search-select">
             <Select
                 className="basic-single "
@@ -582,18 +582,34 @@ const AddProductsForm = () => {
                 onChange={(selectedOption) =>
                     handleCarMakeChange({ target: { value: selectedOption.value } })
                 }
-                placeholder="Search & Select Car"
+                placeholder=" Select Car"
                 isSearchable={true}
+                styles={{
+ 
+    valueContainer: (base) => ({
+      ...base,
+      height: "50px",
+      
+    }),
+    input: (base) => ({
+      ...base,
+      height: "40px",
+    }),
+    indicatorsContainer: (base) => ({
+      ...base,
+      height: "40px",
+    }),
+  }}
             />
         </div>
 
         <button
             type="button"
-            className="btn btn-outline-primary d-flex align-items-center gap-1"
+            className="input-group-text bg-theme-button gap-1 Add-car-top-gap"
             onClick={() => setShowModal(true)}
         >
             <Icon icon="lucide:plus" />
-            Add
+            Add Car
         </button>
     </div>
 </div>
@@ -612,7 +628,7 @@ const AddProductsForm = () => {
                                 </select>
                                 <button
                                     type="button"
-                                    className="input-group-text bg-base"
+                                    className="input-group-text  bg-theme-button gap-1"
                                     onClick={() => setShowCarModelModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Model
@@ -631,7 +647,7 @@ const AddProductsForm = () => {
                                 </select>
                                 <button
                                     type="button"
-                                    className="input-group-text bg-base"
+                                    className="input-group-text bg-theme-button gap-1"
                                     onClick={() => setShowCarVariantModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Variant
@@ -652,7 +668,7 @@ const AddProductsForm = () => {
                                 </select>
                                 <button
                                     type="button"
-                                    className="input-group-text bg-base"
+                                    className="input-group-text  bg-theme-button gap-1"
                                     onClick={() => setShowPartSelectionCatModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Part
@@ -673,7 +689,7 @@ const AddProductsForm = () => {
                                 </select>
                                 <button
                                     type="button"
-                                    className="input-group-text bg-base"
+                                    className="input-group-text bg-theme-button gap-1"
                                     onClick={() => setShowPartGroupModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Part
