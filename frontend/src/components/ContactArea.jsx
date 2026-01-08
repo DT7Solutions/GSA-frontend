@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock } from "react-icons/fa";
+import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock ,FaPaperPlane} from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
 import API_BASE_URL from "../config";
@@ -633,16 +633,16 @@ const ContactPage = () => {
                       <small className="error">{errors.phone}</small>
                     )}
                   </div>
-                  <div className="form-group  mb-1">
+                  <div className="form-group  mb-1 TypeofEnquiry">
                     <label>Type of Enquiry *</label>
                     <select
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
                       disabled={isSubmitting}
-                      className={errors.subject ? "error-input" : ""}
+                      className={errors.subject ? "error-input" : "error-free"}
                     >
-                      <option value="">Select enquiry type</option>
+                      <option value="" >Select enquiry type</option>
                       <option value="Spare Parts">Spare Parts</option>
                       <option value="General Enquiry">General Enquiry</option>
                     </select>
@@ -675,7 +675,8 @@ const ContactPage = () => {
                   className="submit-btn"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "⏳ Sending..." : "🚀 Send Message"}
+                  <FaPaperPlane />
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </div>

@@ -4,7 +4,7 @@ const TwoBannerSection = () => {
   const banners = [
     {
       id: 1,
-      heading: "Premium Quality Auto Parts",
+      heading: "Premium Quality Car Parts",
       paragraph: "Get the best genuine parts for vehicles",
       buttonText: "Shop Now",
       buttonLink: "#shop",

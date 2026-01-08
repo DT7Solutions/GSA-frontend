@@ -115,6 +115,7 @@ const Thankyou = () => {
             border-radius: 10px;
             margin-bottom: 2rem;
             text-align: center;
+            border: 1px solid #d1d5db !important;
           }
           .order-section {
             background: white;

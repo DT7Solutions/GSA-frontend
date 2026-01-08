@@ -77,3 +77,9 @@
 .text-theme{
   color:#0068a5!important;
 }
+
+.TypeofEnquiry .single-select,.TypeofEnquiry .form-select,.TypeofEnquiry select {
+  line-height: 42px!important;
+}
+
+
