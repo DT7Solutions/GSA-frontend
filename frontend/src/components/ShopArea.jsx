@@ -493,245 +493,169 @@ const ShopArea = ({ id }) => {
               </div>
             ) : (
               <>
-                {currentProducts.length > 0 ? (
-                  <>
-                    {/* Product Count and Sort Options Bar */}
-                    <div className="d-flex justify-content-between align-items-center flex-wrap mb-5 p-3 bg-light rounded">
-                      <div className="product-count">
-                        <p className="mb-0">
-                          Showing <strong>{indexOfFirstProduct + 1}</strong> to{" "}
-                          <strong>
-                            {Math.min(indexOfLastProduct, filteredProducts.length)}
-                          </strong>{" "}
-                          of <strong>{filteredProducts.length}</strong> products
-                        </p>
-                      </div>
+            {currentProducts.length > 0 ? (
+  <>
+    {/* Part Group Header with Image */}
+    {partGroupDetails && (
+      <div className="mb-4">
+        <div className="card-body">
+          <div className="row align-items-center">
+            <div className="col-md-5">
+              {partGroupDetails.image ? (
+                <img 
+                  src={partGroupDetails.image} 
+                  alt={partGroupDetails.name}
+                  className="img-fluid rounded shadow-sm"
+                  style={{ maxHeight: "500px", objectFit: "cover", width: "100%" }}
+                />
+              ) : (
+                <div 
+                  className="bg-light rounded d-flex align-items-center justify-content-center"
+                  style={{ height: "200px" }}
+                >
+                  <i className="fas fa-image fa-3x text-muted"></i>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
 
-                      <div className="d-flex gap-3 align-items-center show-num">
-                        {/* Products Per Page */}
-                        <div className="d-flex align-items-center gap-2">
-                          <label htmlFor="perPage" className="mb-0 text-nowrap">
-                            Show:
-                          </label>
-                          <select
-                            id="perPage"
-                            className=""
-                            style={{ width: "80px" }}
-                            value={productsPerPage}
-                            onChange={handleProductsPerPageChange}
-                          >
-                            <option value={9}>9</option>
-                            <option value={12}>12</option>
-                            <option value={18}>18</option>
-                            <option value={24}>24</option>
-                          </select>
-                        </div>
+    {/* Product Count Info */}
+    <div className="mb-3 d-flex justify-content-between align-items-center">
+      <p className="text-muted mb-0">
+        Showing <strong>{indexOfFirstProduct + 1}</strong> to <strong>{Math.min(indexOfLastProduct, filteredProducts.length)}</strong> of <strong>{filteredProducts.length}</strong> products
+      </p>
+      <div className="d-flex gap-2 align-items-center">
+        <label className="mb-0 me-2">Items per page:</label>
+        <select 
+          value={productsPerPage}
+          onChange={handleProductsPerPageChange}
+          className="form-select form-select-sm"
+          style={{ width: "80px" }}
+        >
+          <option value={9}>9</option>
+          <option value={12}>12</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+        </select>
+      </div>
+    </div>
 
-                        {/* Sort By */}
-                        <div className="d-flex align-items-center gap-2 show-num">
-                          <label htmlFor="sortBy" className="mb-0 text-nowrap">
-                            Sort by:
-                          </label>
-                          <select
-                            id="sortBy"
-                            className=""
-                            style={{ width: "150px" }}
-                            value={sortBy}
-                            onChange={handleSortChange}
-                          >
-                            <option value="latest">Latest</option>
-                            <option value="price-low-high">Price: Low to High</option>
-                            <option value="price-high-low">Price: High to Low</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
+    {/* Products Table */}
+    <div className="table-responsive shadow-sm rounded">
+      <table className="table table-hover table-bordered align-middle mb-0 bg-white">
+        <thead className="table-light">
+          <tr>
+            <th scope="col" style={{ width: "5%" }} className="text-center">SKU</th>
+            <th scope="col" style={{ width: "12%" }}>Part No</th>
+            <th scope="col" style={{ width: "35%" }}>Part Name</th>
+            <th scope="col" style={{ width: "12%" }}>Stock</th>
+            <th scope="col" style={{ width: "15%" }}>Price</th>
+            <th scope="col" style={{ width: "15%" }} className="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentProducts.map((product, index) => (
+            <tr key={product.id}>
+              <td className="text-center fw-semibold text-muted">
+                {product.sku || "N/A"}
+              </td>
+              <td>
+                <span className="text-muted">
+                  {product.part_no || product.product_code || "N/A"}
+                </span>
+              </td>
+              <td>
+                <Link 
+                  to={`/shop-details/${product.id}`}
+                  className="text-decoration-none text-dark fw-medium d-flex align-items-center"
+                >
+                  <span>{product.product_name || "Unnamed Product"}</span>
+                </Link>
+              </td>
+              
+              <td>
+                <span 
+                  className={`badge p-3 ${
+                    product.stock_count > 10 
+                      ? "bg-success" 
+                      : product.stock_count > 0 
+                      ? "bg-warning text-dark" 
+                      : "bg-danger"
+                  }`}
+                >
+                  {product.stock_count > 0 ? `${product.stock_count} Available` : "Out of Stock"}
+                </span>
+              </td>
+              <td>
+                <div className="d-flex flex-column">
+                  <span className="text-muted text-decoration-line-through small">
+                    ₹{product.price || "0"}
+                  </span>
+                  <span className="fw-bold text-primary fs-6">
+                    ₹{product.sale_price || product.price || "0"}
+                  </span>
+                </div>
+              </td>
+              <td className="text-center">
+                <button
+                  className="btn btn-primary btn-sm px-3"
+                  onClick={() => handleAddToCart(product.id)}
+                  disabled={product.stock_count === 0}
+                  title={product.stock_count === 0 ? "Out of stock" : "Add to cart"}
+                >
+                  <i className="fas fa-shopping-cart me-1" />
+                  Cart
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
 
-                    <div className="row gy-4">
-                      {currentProducts.map((product, index) => (
-                        <div className="col-xl-4 col-md-6 col-6" key={index}>
-                          <div className="product-card style2">
-                            <div className="product-img">
-                              <Link to={`/shop-details/${product.id}`}>
-                                <img
-                                  src={
-                                    product.product_image ||
-                                    "/assets/img/update-img/product/1-1.png"
-                                  }
-                                  alt={product.product_name || "Product"}
-                                />
-                              </Link>
-                            </div>
-                            <div className="product-content ">
-                              <h3 className="product-title">
-                                <Link to={`/shop-details/${product.id}`}>
-                                  {product.product_name || "Unnamed Product"}
-                                </Link>
-                              </h3>
-                              <div className="product-footer">
-                                
-                              <span className="price">
-                                <del>₹{product.price}</del> ₹{product.sale_price}{" "}
-                                &nbsp;
-                              </span>
-
-                              <Link
-                                to="#"
-                                className="link-btn mt-0"
-                                onClick={() => handleAddToCart(product.id)}
-                              >
-                                {" "}
-                                <i className="fas fa-shopping-cart me-2" />
-                              </Link>
-                               </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {totalPages > 1 && (
-                      <div className="pagination mt-5 d-flex justify-content-center">
-                        <ul className="pagination-list d-flex align-items-center gap-2">
-                          <li
-                            className={`page-item ${
-                              currentPage === 1 ? "disabled" : ""
-                            }`}
-                          >
-                            <button
-                              className="page-link"
-                              onClick={() =>
-                                currentPage > 1 &&
-                                handlePageChange(currentPage - 1)
-                              }
-                            >
-                              &laquo;
-                            </button>
-                          </li>
-
-                          {(() => {
-                            const maxVisible = 5;
-                            let startPage = Math.max(
-                              2,
-                              currentPage - Math.floor(maxVisible / 2)
-                            );
-                            let endPage = Math.min(
-                              totalPages - 1,
-                              currentPage + Math.floor(maxVisible / 2)
-                            );
-
-                            if (currentPage <= Math.floor(maxVisible / 2)) {
-                              startPage = 2;
-                              endPage = Math.min(totalPages - 1, maxVisible + 1);
-                            }
-
-                            if (
-                              currentPage + Math.floor(maxVisible / 2) >=
-                              totalPages
-                            ) {
-                              startPage = Math.max(2, totalPages - maxVisible);
-                              endPage = totalPages - 1;
-                            }
-
-                            const pages = [];
-
-                            pages.push(
-                              <li
-                                key={1}
-                                className={`page-item ${
-                                  currentPage === 1 ? "active" : ""
-                                }`}
-                              >
-                                <button
-                                  className="page-link"
-                                  onClick={() => handlePageChange(1)}
-                                >
-                                  1
-                                </button>
-                              </li>
-                            );
-
-                            if (startPage > 2) {
-                              pages.push(
-                                <li
-                                  key="start-ellipsis"
-                                  className="page-item disabled"
-                                >
-                                  <span className="page-link">…</span>
-                                </li>
-                              );
-                            }
-
-                            for (let i = startPage; i <= endPage; i++) {
-                              pages.push(
-                                <li
-                                  key={i}
-                                  className={`page-item ${
-                                    currentPage === i ? "active" : ""
-                                  }`}
-                                >
-                                  <button
-                                    className="page-link"
-                                    onClick={() => handlePageChange(i)}
-                                  >
-                                    {i}
-                                  </button>
-                                </li>
-                              );
-                            }
-
-                            if (endPage < totalPages - 1) {
-                              pages.push(
-                                <li
-                                  key="end-ellipsis"
-                                  className="page-item disabled"
-                                >
-                                  <span className="page-link">…</span>
-                                </li>
-                              );
-                            }
-
-                            if (totalPages > 1) {
-                              pages.push(
-                                <li
-                                  key={totalPages}
-                                  className={`page-item ${
-                                    currentPage === totalPages ? "active" : ""
-                                  }`}
-                                >
-                                  <button
-                                    className="page-link"
-                                    onClick={() => handlePageChange(totalPages)}
-                                  >
-                                    {totalPages}
-                                  </button>
-                                </li>
-                              );
-                            }
-
-                            return pages;
-                          })()}
-
-                          <li
-                            className={`page-item ${
-                              currentPage === totalPages ? "disabled" : ""
-                            }`}
-                          >
-                            <button
-                              className="page-link"
-                              onClick={() =>
-                                currentPage < totalPages &&
-                                handlePageChange(currentPage + 1)
-                              }
-                            >
-                              &raquo;
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </>
-                ) : (
+    {/* Pagination */}
+    {totalPages > 1 && (
+      <nav className="mt-4 d-flex justify-content-center" aria-label="Page navigation">
+        <ul className="pagination">
+          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+            <button 
+              className="page-link" 
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
+            >
+              First
+            </button>
+          </li>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <li 
+              key={page} 
+              className={`page-item ${currentPage === page ? 'active' : ''}`}
+            >
+              <button 
+                className="page-link" 
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            </li>
+          ))}
+          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+            <button 
+              className="page-link" 
+              onClick={() => handlePageChange(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              Last
+            </button>
+          </li>
+        </ul>
+      </nav>
+    )}
+  </>
+) : (
                   // Enquiry Form when no products found
                   <div className="">
                     <div className="card-body p-4">

@@ -3,6 +3,7 @@ import { Icon } from '@iconify/react';
 import axios from 'axios';
 import API_BASE_URL from "../../../config";
 import MasterLayout from '../MasterLayout';
+import { Link } from "react-router-dom";
 
 const StaffList = () => {
     const [staffList, setStaffList] = useState([]);
@@ -194,10 +195,13 @@ const StaffList = () => {
                 <h6 className="fw-semibold mb-0">Staff Management</h6>
                 <ul className="d-flex align-items-center gap-2">
                     <li className="fw-medium list-none">
-                        <a href="/Dashboard" className="d-flex align-items-center gap-1 hover-text-primary">
-                            <Icon icon="solar:home-smile-angle-outline" className="icon text-lg" />
-                            Dashboard
-                        </a>
+                       <Link
+  to="/Dashboard"
+  className="d-flex align-items-center gap-1 text-primary text-decoration-none"
+>
+  <Icon icon="solar:home-smile-angle-outline" className="icon text-lg" />
+  Dashboard
+</Link>
                     </li>
                     <li className="list-none">-</li>
                     <li className="fw-medium list-none">Staff</li>

@@ -176,6 +176,9 @@ const ShopDetails = () => {
                 <span className="posted_in">
                   Category: <span>{product[0].part_section.name}</span>
                 </span>
+                 <span className="posted_in">
+                  Category: <span>{product[0].part_section.name}</span>
+                </span>
                 <span>
                   Vendor: <span> Gowrisankar agencies</span>
                 </span>

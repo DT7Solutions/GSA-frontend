@@ -90,7 +90,7 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
     table: {
       width: "100%",
       borderCollapse: "collapse",
-      tableLayout: "fixed",
+      tableLayout: "auto",
       wordBreak: "break-word",
     },
     thtd: {
@@ -100,6 +100,18 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       textAlign: "left",
       wordBreak: "break-word",
       whiteSpace: "normal",
+    },
+    colSl: {
+      width: "60px",
+      maxWidth: "80px",
+    },
+    colProductName: {
+      minWidth: "100px",
+      maxWidth: "500px",
+    },
+    colQuantity: {
+      width: "100px",
+      maxWidth: "120px",
     },
     thtd2: {
       lineHeight: "1.55em",
@@ -196,11 +208,11 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
           <table style={styles.table}>
             <thead>
               <tr style={styles.focusBg}>
-                <th style={styles.thtd}>S.L</th>
-                <th style={styles.thtd}>Product Name</th>
-                <th style={styles.thtd}>Quantity</th>
-                <th style={styles.thtd}>Unit Price (₹)</th>
-                <th style={styles.thtd}>Total (₹)</th>
+                <th style={{...styles.thtd, ...styles.colSl}}>S.L</th>
+                <th style={{...styles.thtd, ...styles.colProductName}}>Product Name</th>
+                <th style={{...styles.thtd, ...styles.colQuantity}}>Qty</th>
+                {/* <th style={styles.thtd}>Unit Price (₹)</th>
+                <th style={styles.thtd}>Total (₹)</th> */}
               </tr>
             </thead>
             <tbody>
@@ -215,11 +227,11 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
 
                   return (
                     <tr key={idx}>
-                      <td style={styles.thtd}>{idx + 1}</td>
-                      <td style={styles.thtd}>{productName}</td>
-                      <td style={styles.thtd}>{qty}</td>
-                      <td style={styles.thtd}>{unitPrice.toFixed(2)}</td>
-                      <td style={styles.thtd}>{total.toFixed(2)}</td>
+                      <td style={{...styles.thtd, ...styles.colSl}}>{idx + 1}</td>
+                      <td style={{...styles.thtd, ...styles.colProductName}}>{productName}</td>
+                      <td style={{...styles.thtd, ...styles.colQuantity}}>{qty}</td>
+                      {/* <td style={styles.thtd}>{unitPrice.toFixed(2)}</td>
+                      <td style={styles.thtd}>{total.toFixed(2)}</td> */}
                     </tr>
                   );
                 })
@@ -235,7 +247,7 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
         </div>
 
         {/* Totals */}
-        {items.length > 0 && (
+        {/* {items.length > 0 && (
           <div style={{ textAlign: "right", marginTop: "20px" }}>
             <div>Subtotal: ₹{subtotal.toFixed(2)}</div>
             <div>Tax (18%): ₹{taxAmount.toFixed(2)}</div>
@@ -243,7 +255,7 @@ const PackingSlipTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
               <strong>Grand Total: ₹{grandTotal.toFixed(2)}</strong>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Footer */}
         <div style={styles.footer}>

@@ -96,31 +96,113 @@ const AddProductsForm = () => {
 
     // Handle final product save logic 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post(`${API_BASE_URL}api/home/create_car_part/`, formData, {
+    e.preventDefault();
+    
+    // 🐛 DEBUG: Print form data before sending
+    console.log("\n" + "=".repeat(80));
+    console.log("🚀 SUBMITTING FORM - Form Data:");
+    console.log("=".repeat(80));
+    console.log("Form Data Object:", formData);
+    console.log("\n🔗 Compatibility Data:");
+    console.log("Type:", typeof formData.compatibility);
+    console.log("Is Array:", Array.isArray(formData.compatibility));
+    console.log("Length:", formData.compatibility?.length || 0);
+    console.log("Value:", formData.compatibility);
+    
+    if (formData.compatibility && formData.compatibility.length > 0) {
+        console.log("\n📋 Compatibility Items:");
+        formData.compatibility.forEach((item, index) => {
+            console.log(`   [${index}]:`, item);
+            if (typeof item === 'object') {
+                console.log(`      - value: ${item.value}`);
+                console.log(`      - label: ${item.label}`);
+            }
+        });
+    }
+    console.log("=".repeat(80) + "\n");
+    
+    try {
+        // Create FormData object
+        const submitData = new FormData();
+        
+        // Append all fields
+        submitData.append('carMakeId', formData.carMakeId);
+        submitData.append('carModelId', formData.carModelId);
+        submitData.append('carVariantId', formData.carVariantId);
+        submitData.append('partCategoryId', formData.partCategoryId);
+        submitData.append('partId', formData.partId);
+        submitData.append('partName', formData.partName);
+        submitData.append('partNumber', formData.partNumber);
+        submitData.append('figureNumber', formData.figureNumber);
+        submitData.append('price', formData.price);
+        submitData.append('salePrice', formData.salePrice);
+        submitData.append('discount', formData.discount);
+        submitData.append('qty', formData.qty);
+        submitData.append('sku', formData.sku);
+        submitData.append('remarks', formData.remarks);
+        submitData.append('description', formData.description);
+        
+        // Append image if exists
+        if (formData.partImage) {
+            submitData.append('partImage', formData.partImage);
+        }
+        
+        // ✅ IMPORTANT: Convert compatibility to JSON string
+        if (formData.compatibility && formData.compatibility.length > 0) {
+            // Extract just the IDs from React Select format
+            const compatibilityIds = formData.compatibility.map(item => 
+                typeof item === 'object' ? item.value : item
+            );
+            console.log("🔄 Sending compatibility IDs:", compatibilityIds);
+            submitData.append('compatibility', JSON.stringify(compatibilityIds));
+        } else {
+            console.log("⚠️ No compatibility data to send");
+            submitData.append('compatibility', JSON.stringify([]));
+        }
+        
+        // Debug: Print what's being sent
+        console.log("\n📤 FormData being sent to backend:");
+        for (let pair of submitData.entries()) {
+            console.log(`   ${pair[0]}:`, pair[1]);
+        }
+        console.log("\n");
+        
+        const response = await axios.post(
+            `${API_BASE_URL}api/home/create_car_part/`, 
+            submitData, 
+            {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
                 },
-            });
-            Swal.fire({
-                title: "Success Created Car Part Sucessfully",
-                text: response.data.message,
-                icon: "success",
-                confirmButtonText: "OK",
-            });
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || "Failed to save part";
-            Swal.fire({
-                title: "Request Failed",
-                text: errorMessage,
-                icon: "error",
-                confirmButtonText: "Retry",
-            });
-        }
-    };
-
+            }
+        );
+        
+        console.log("✅ Response from backend:", response.data);
+        
+        Swal.fire({
+            title: "Success!",
+            text: "Car Part Created Successfully",
+            icon: "success",
+            confirmButtonText: "OK",
+        });
+        
+        // Optionally reset form
+        // resetForm();
+        
+    } catch (error) {
+        console.error("❌ Error submitting form:", error);
+        console.error("Error response:", error.response?.data);
+        
+        const errorMessage = error.response?.data?.message || "Failed to save part";
+        Swal.fire({
+            title: "Request Failed",
+            text: errorMessage,
+            icon: "error",
+            confirmButtonText: "Retry",
+        });
+    }
+};
 
     // Handle Add Car (Brand)
     const handleAddCar = async (e) => {
@@ -500,13 +582,26 @@ const AddProductsForm = () => {
 
     // Handle Part Compatibility
     const handleChange = (selectedOptions) => {
-        setSelectedParts(selectedOptions);
-        setFormData((formData) => ({
-            ...formData,
-            compatibility: selectedOptions,
-        }));
-        console.log("Selected Parts:", selectedOptions);
+    console.log("\n🔄 Compatibility Selection Changed:");
+    console.log("Selected Options:", selectedOptions);
+    console.log("Type:", typeof selectedOptions);
+    console.log("Is Array:", Array.isArray(selectedOptions));
+    
+    if (selectedOptions && selectedOptions.length > 0) {
+        console.log("First item:", selectedOptions[0]);
+        console.log("Has 'value':", 'value' in selectedOptions[0]);
+        console.log("Has 'label':", 'label' in selectedOptions[0]);
     }
+    
+    setSelectedParts(selectedOptions);
+    setFormData((formData) => ({
+        ...formData,
+        compatibility: selectedOptions || [],
+    }));
+    
+    console.log("✅ Updated formData.compatibility:", selectedOptions);
+    console.log("\n");
+};
 
 
     const carOptions = carMakes.map(make => ({

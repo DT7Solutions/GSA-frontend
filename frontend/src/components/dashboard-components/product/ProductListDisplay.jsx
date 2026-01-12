@@ -26,21 +26,17 @@ const ProductListDisplay = () => {
         fetchProductList();
     }, [token]);
 
-
-
-
     useEffect(() => {
         let table;
         if (products.length > 0) {
             table = $('#dataTable').DataTable({
                 destroy: true,
                 pageLength: 10,
-                
                 searching: true,
                 ordering: true,
                 lengthMenu: [5, 10, 25, 50, 100],
                 language: {
-                    search: "Filter records:", // Optional customization
+                    search: "Filter records:",
                 }
             });
         }
@@ -52,17 +48,25 @@ const ProductListDisplay = () => {
         };
     }, [products]);
 
+    // Helper function to display compatible models
+    const getCompatibilityDisplay = (compatibility) => {
+        if (!compatibility || compatibility.length === 0) {
+            return "N/A";
+        }
+        
+        return compatibility
+            .map(comp => `${comp.compatible_model_name} (${comp.generation})`)
+            .join(", ");
+    };
+
     return (
         <div className="card basic-data-table">
-            {/* <div className="card-header">
-                <h5 className="card-title mb-0">Product List</h5>
-            </div> */}
             <div className="card-body">
                 <div className="table-responsive">
                     <table className="display table table-striped table-bordered sm-table" id="dataTable" style={{ width: "100%" }}>
                         <thead className="bg-theme-table">
                             <tr>
-                                <th className="bg-theme-color" >S.L</th>
+                                <th className="bg-theme-color">S.L</th>
                                 <th className="bg-theme-color">Car Details</th>
                                 <th className="bg-theme-color">Part Name</th>
                                 <th className="bg-theme-color">Figure No</th>
@@ -75,7 +79,7 @@ const ProductListDisplay = () => {
                                 <th className="bg-theme-color">Stock</th>
                                 <th className="bg-theme-color">Remarks</th>
                                 <th className="bg-theme-color">Description</th>
-                                <th className="bg-theme-color">Compatibility</th>
+                                <th className="bg-theme-color">Compatible Models</th>
                                 <th className="bg-theme-color">Actions</th>
                             </tr>
                         </thead>
@@ -83,8 +87,10 @@ const ProductListDisplay = () => {
                             {products.map((item, index) => (
                                 <tr key={item.id}>
                                     <td>{index + 1}</td>
-                                    
-                                    <td>{item.car_make?.name}-{item.car_model?.name}-{item.car_variant?.name}-{item.part_section?.name}</td>
+                                    <td>
+                                        {item.car_make?.name}-{item.car_model?.name}-
+                                        {item.car_variant?.name}-{item.part_section?.name}
+                                    </td>
                                     <td>{item.product_name}</td>
                                     <td>{item.fig_no}</td>
                                     <td>{item.part_no}</td>
@@ -96,7 +102,11 @@ const ProductListDisplay = () => {
                                     <td>{item.stock_count}</td>
                                     <td>{item.remarks}</td>
                                     <td>{item.description}</td>
-                                    <td>{`${item.car_make?.name} ${item.car_model?.name} ${item.car_variant?.name}`}</td>
+                                    <td>
+                                        <small>
+                                            {getCompatibilityDisplay(item.compatibilities)}
+                                        </small>
+                                    </td>
                                     <td>
                                         <Link
                                             to={`/update-products/${item.id}`}
@@ -117,5 +127,3 @@ const ProductListDisplay = () => {
 };
 
 export default ProductListDisplay;
-
-

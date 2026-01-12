@@ -177,7 +177,7 @@ const ModelVariantsList = () => {
                           <th scope="col">Production Year</th>
                           <th scope="col">Engine</th>
                           <th scope="col">Chassis Type</th>
-                          <th scope="col">Description</th>
+                          <th scope="col">Fuel Type</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -194,7 +194,7 @@ const ModelVariantsList = () => {
                                   const updated = {
                                     ...existing,
                                     model_variant: variant.id,
-                                    model_variant_name: `${variant.name} (${carModelItem.fuel_type})`,
+                                    model_variant_name: `${variant.name}  (${carModelItem.fuel_type})`,
                                   };
                                   localStorage.setItem(
                                     "selected_brand",
@@ -203,7 +203,7 @@ const ModelVariantsList = () => {
                                 }}
                                 className="text-primary-600"
                               >
-                                {variant.name} ({carModelItem.fuel_type})-
+                                {variant.name} ({carModelItem.transmission_type}) ({carModelItem.fuel_type})-
                                 {carModelItem.generation}
                               </Link>
                             </td>
@@ -225,7 +225,7 @@ const ModelVariantsList = () => {
                             </td>
                             <td>{variant.engine}</td>
                             <td>{variant.chassis_type}</td>
-                            <td>{variant.description}</td>
+                            <td>{carModelItem.fuel_type}</td>
                           </tr>
                         ))}
                       </tbody>
