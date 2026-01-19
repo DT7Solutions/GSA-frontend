@@ -146,10 +146,17 @@ const Cart = () => {
     }
   };
 
+  // Calculate totals - Customer pays WITHOUT GST
   const subtotal = cartItems.reduce((acc, item) => acc + item.total_price, 0);
-  const cgst = subtotal * 0.09;
-  const sgst = subtotal * 0.09;
-  const totalWithGST = subtotal + cgst + sgst;
+  
+  // GST is already included in product prices, so we don't add it separately
+  const totalToPay = subtotal;
+  
+  // Calculate the GST breakdown from the included price (for display purposes)
+  // If price includes 18% GST, the base price is: price / 1.18
+  const basePrice = subtotal / 1.18;
+  const cgst = basePrice * 0.09;
+  const sgst = basePrice * 0.09;
 
   const handleCheckout = async () => {
     const { name, email, phone, address, city, state, district, zip } = billing;
@@ -418,15 +425,21 @@ const Cart = () => {
               align-items: center;
               justify-content: center;
             }
+            .gst-info {
+              font-size: 0.85rem;
+              color: #666;
+              font-style: italic;
+              margin-top: 5px;
+            }
           `}</style>
           <table className="cart_table">
             <thead>
               <tr>
                 <th className="cart-col-image">Image</th>
                 <th className="cart-col-productname">Product Name</th>
-                <th className="cart-col-price">Price</th>
+                <th className="cart-col-price">Price (incl. GST)</th>
                 <th className="cart-col-quantity">Quantity</th>
-                <th className="cart-col-total">Total</th>
+                <th className="cart-col-total">Total (incl. GST)</th>
                 <th className="cart-col-remove">Remove</th>
               </tr>
             </thead>
@@ -505,6 +518,9 @@ const Cart = () => {
               ))}
             </tbody>
           </table>
+          <div className="gst-info text-end mt-2">
+            * All prices include GST (18% - CGST 9% + SGST 9%)
+          </div>
         </form>
 
         <div className="row cart-page">
@@ -713,35 +729,36 @@ const Cart = () => {
               <table className="cart_totals">
                 <tbody>
                   <tr>
-                    <td>Subtotal</td>
+                    <td>Subtotal (incl. all taxes)</td>
                     <td>
                       <bdi>₹{subtotal.toFixed(2)}</bdi>
                     </td>
                   </tr>
-                  <tr>
-                    <td>CGST (9%)</td>
-                    <td>
-                      <bdi>₹{cgst.toFixed(2)}</bdi>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>SGST (9%)</td>
-                    <td>
-                      <bdi>₹{sgst.toFixed(2)}</bdi>
+                  <tr style={{ fontSize: '0.9rem', color: '#666' }}>
+                    <td colSpan="2" style={{ padding: '10px', backgroundColor: '#f8f9fa' }}>
+                      <strong>Tax Breakdown (Included in prices):</strong>
+                      <div style={{ marginTop: '5px', marginLeft: '10px' }}>
+                        <div>Base Price: ₹{basePrice.toFixed(2)}</div>
+                        <div>CGST (9%): ₹{cgst.toFixed(2)}</div>
+                        <div>SGST (9%): ₹{sgst.toFixed(2)}</div>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
                 <tfoot>
                   <tr className="order-total">
-                    <td>Order Total</td>
+                    <td>Total Amount to Pay</td>
                     <td>
                       <strong>
-                        <bdi className="tot-amount">₹{totalWithGST.toFixed(2)}</bdi>
+                        <bdi className="tot-amount">₹{totalToPay.toFixed(2)}</bdi>
                       </strong>
                     </td>
                   </tr>
                 </tfoot>
               </table>
+              <div className="text-muted small mt-2 px-3">
+                * All taxes are included in the displayed prices
+              </div>
               <div className="wc-proceed-to-checkout mb-30">
                 <button onClick={handleCheckout} className="btn style2 btn-fw">
                   Proceed to checkout

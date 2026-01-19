@@ -93,16 +93,20 @@ const Thankyou = () => {
     );
   }
 
-  // Calculate totals - safely convert to numbers
+  // Calculate totals - GST is already included in prices
   const subtotal = orderDetails.items?.reduce((acc, item) => {
     const price = parseFloat(item.price) || 0;
     const quantity = parseInt(item.quantity) || 0;
     return acc + (price * quantity);
   }, 0) || 0;
   
-  const cgst = subtotal * 0.09;
-  const sgst = subtotal * 0.09;
-  const total = parseFloat(orderDetails.total_price) || (subtotal + cgst + sgst);
+  // Total to pay is the subtotal (GST already included)
+  const total = parseFloat(orderDetails.total_price) || subtotal;
+  
+  // Calculate GST breakdown from included price (for display only)
+  const basePrice = total / 1.18;
+  const cgst = basePrice * 0.09;
+  const sgst = basePrice * 0.09;
 
   return (
     <div className="py-5" style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}>
@@ -226,6 +230,13 @@ const Thankyou = () => {
             background: #d4edda;
             color: #155724;
           }
+          .tax-breakdown-box {
+            background: #f8f9fa;
+            border-left: 4px solid #0068a5;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+          }
         `}</style>
 
         {/* Header Section */}
@@ -246,69 +257,56 @@ const Thankyou = () => {
         </div>
 
         {/* Order Items Section */}
-       {/* Order Items Section */}
-<div className="order-section">
-  <h6 className="section-title">Order Items</h6>
-  <div className="table-responsive">
-    <table className=" table basic-border-table table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>GST (18%)</th>
-          <th className="text-end">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {orderDetails.items?.map((item, index) => {
-          // Print entire item data
-          console.log("\n" + "=".repeat(60));
-          console.log(`📦 Item ${index + 1} Data:`);
-          console.log("=".repeat(60));
-          console.log("Complete Item Object:", JSON.stringify(item, null, 2));
-          console.log("Item keys:", Object.keys(item));
-          console.log("Part object:", item.part);
-          console.log("=".repeat(60) + "\n");
-          
-          const price = parseFloat(item.price) || 0;
-          const quantity = parseInt(item.quantity) || 0;
-          const subtotal = price * quantity;
-          const gst = subtotal * 0.18;
-          const itemTotal = subtotal + gst;
-          
-          return (
-            <tr key={index}>
-              <td>
-                <div className="d-flex align-items-center">
-                  {/* <img 
-                    src={item.part_image || item.part?.image || "/placeholder.jpg"} 
-                    alt={item.part_name || item.part?.part_name || "Product"} 
-                    className="product-image me-3"
-                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
-                    onError={(e) => {
-                      console.error("Image failed to load:", e.target.src);
-                      e.target.src = "/placeholder.jpg";
-                    }}
-                  /> */}
-                  <div>
-                    <div className="fw-bold">
-                      {item.part_name || item.part?.product_name || "N/A"}
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td className="align-middle">₹{price.toFixed(2)}</td>
-              <td className="align-middle">{quantity}</td>
-              <td className="align-middle">₹{gst.toFixed(2)}</td>
-              <td className="align-middle text-end fw-bold text-primary">₹{itemTotal.toFixed(2)}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  </div>
-</div>
+        <div className="order-section">
+          <h6 className="section-title">Order Items</h6>
+          <div className="table-responsive">
+            <table className="table basic-border-table table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price (incl. GST)</th>
+                  <th>Quantity</th>
+                  <th className="text-end">Total (incl. GST)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orderDetails.items?.map((item, index) => {
+                  console.log("\n" + "=".repeat(60));
+                  console.log(`📦 Item ${index + 1} Data:`);
+                  console.log("=".repeat(60));
+                  console.log("Complete Item Object:", JSON.stringify(item, null, 2));
+                  console.log("Item keys:", Object.keys(item));
+                  console.log("Part object:", item.part);
+                  console.log("=".repeat(60) + "\n");
+                  
+                  const price = parseFloat(item.price) || 0;
+                  const quantity = parseInt(item.quantity) || 0;
+                  const itemTotal = price * quantity;
+                  
+                  return (
+                    <tr key={index}>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <div>
+                            <div className="fw-bold">
+                              {item.part_name || item.part?.product_name || "N/A"}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="align-middle">₹{price.toFixed(2)}</td>
+                      <td className="align-middle">{quantity}</td>
+                      <td className="align-middle text-end fw-bold text-primary">₹{itemTotal.toFixed(2)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="text-muted small mt-2">
+            * All prices include GST (18% - CGST 9% + SGST 9%)
+          </div>
+        </div>
 
         {/* Addresses Section */}
         <div className="order-section">
@@ -365,29 +363,34 @@ const Thankyou = () => {
           <table className="table basic-border-table summary-table">
             <tbody>
               <tr>
-                <td className="label">Subtotal:</td>
-                <td className="value">₹{subtotal.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td className="label">CGST (9%):</td>
-                <td className="value">₹{cgst.toFixed(2)}</td>
-              </tr>
-              <tr>
-                <td className="label">SGST (9%):</td>
-                <td className="value">₹{sgst.toFixed(2)}</td>
+                <td className="label">Subtotal (incl. all taxes):</td>
+                <td className="value">₹{total.toFixed(2)}</td>
               </tr>
               <tr className="total-row">
-                <td className="label">Total Amount:</td>
+                <td className="label">Total Amount Paid:</td>
                 <td className="value">₹{total.toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
           
+          <div className="tax-breakdown-box">
+            <small>
+              <strong>Tax Breakdown (Included in prices):</strong><br/>
+              <div className="mt-2" style={{ marginLeft: '10px' }}>
+                <div>Base Price: ₹{basePrice.toFixed(2)}</div>
+                <div>CGST (9%): ₹{cgst.toFixed(2)}</div>
+                <div>SGST (9%): ₹{sgst.toFixed(2)}</div>
+                {/* <div className="mt-1 pt-1" style={{ borderTop: '1px solid #dee2e6' }}>
+                  <strong>Total with GST: ₹{total.toFixed(2)}</strong>
+                </div> */}
+              </div>
+            </small>
+          </div>
+          
           <div className="mt-3 p-3" style={{ background: '#f8f9fa', borderRadius: '8px' }}>
             <small className="text-muted">
               <strong>Payment Details:</strong><br/>
               Payment ID: {orderDetails.razorpay_payment_id}<br/>
-              {/* Order Date: {new Date(orderDetails.created_time).toLocaleDateString()} */}
             </small>
           </div>
         </div>

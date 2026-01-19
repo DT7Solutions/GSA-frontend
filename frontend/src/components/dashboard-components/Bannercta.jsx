@@ -96,7 +96,7 @@ const Bannercta = () => {
       color: #0068a5;
       padding: 16px 40px;
       border: none;
-      border-radius: 50px;
+      border-radius: 8px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;

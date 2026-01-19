@@ -249,7 +249,7 @@ const PartGroupList = ({ id }) => {
                     <small className="text-muted">({partsToDisplay.length} parts)</small>
                   </div>
                   <div className="col-md-6">
-                    <div className="input-group">
+                   <div className="input-group">
                       <input
                         type="text"
                         className="form-control bg-grey border-smooth"
@@ -257,16 +257,17 @@ const PartGroupList = ({ id }) => {
                         value={searchKeyword}
                         onChange={(e) => setSearchKeyword(e.target.value)}
                       />
-                      <button className="btn-theme-admin btn-primary-600" type="button">
-                        <i className="fas fa-search"></i> Search
-                      </button>
-                      {searchKeyword && (
+                      {!searchKeyword ? (
+                        <button className="btn-theme-admin " type="button">
+                          <i className="fas fa-search"></i> Search
+                        </button>
+                      ) : (
                         <button 
-                          className="btn-theme-admin btn-primary-600" 
+                          className="btn-theme-admin " 
                           type="button"
                           onClick={() => setSearchKeyword("")}
                         >
-                          Clear
+                          <i className="fas fa-times"></i> Clear
                         </button>
                       )}
                     </div>

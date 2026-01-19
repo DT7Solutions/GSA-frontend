@@ -120,12 +120,12 @@ const CTAAreaTwo = () => {
     .gsa-cta-btn-primary {
       background: #0068a4;
       color: white;
-      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+      
     }
 
     .gsa-cta-btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 35px rgba(245, 158, 11, 0.4);
+      
     }
 
     .gsa-cta-btn-secondary {

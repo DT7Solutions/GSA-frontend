@@ -699,3 +699,37 @@
 .Add-car-top-gap{
   padding:13px 13px;
 }
+.txt-light-ver{
+  font-size:12px;
+  color:#999!important;
+}
+
+.badge-shop {
+    display: inline-block;
+    padding: .5em .65em;
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 9999px;
+}
+
+
+.shadow-shop {
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.08),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.shadow-shop:hover {
+  box-shadow:
+    0 15px 25px -5px rgba(0, 0, 0, 0.12),
+    0 8px 10px -5px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+

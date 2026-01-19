@@ -9,14 +9,17 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
   console.log("🚚 Invoice - Shipping Address:", JSON.stringify(shippingAddress, null, 2));
   console.log("👤 Invoice - User Data:", JSON.stringify(user, null, 2));
 
-  // ✅ Calculate subtotal, tax, and grand total
-  const subtotal = items.reduce(
+  // ✅ Calculate totals with GST inclusive pricing
+  const taxPct = 0.18;
+  const totalWithGst = items.reduce(
     (s, it) => s + ((Number(it.price) || 0) * (Number(it.quantity) || 1)),
     0
   );
-  const taxPct = 0.18;
-  const taxAmount = subtotal * taxPct;
-  const grandTotal = subtotal + taxAmount;
+  
+  // Calculate base price (excluding GST) and tax amount
+  const subtotal = totalWithGst / (1 + taxPct);
+  const taxAmount = totalWithGst - subtotal;
+  const grandTotal = totalWithGst;
 
   // ✅ Prepare shipping address for display
   const deliveryAddress = {
@@ -260,7 +263,7 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                 <th style={{ ...styles.thtd, width: '25%' }}>Product</th>
                 <th style={{ ...styles.thtd, width: '10%' }}>SKU</th>
                 <th style={{ ...styles.thtd, width: '10%' }}>HSN</th>
-                <th style={{ ...styles.thtd, width: '10%' }}>Rate (₹)</th>
+                <th style={{ ...styles.thtd, width: '10%' }}>Rate (₹)<br/><span style={{fontSize: '11px', fontWeight: 'normal'}}>(incl. GST)</span></th>
                 <th style={{ ...styles.thtd, width: '8%' }}>Qty</th>
                 <th style={{ ...styles.thtd, width: '12%', textAlign: 'right' }}>Amount (₹)</th>
               </tr>
@@ -269,8 +272,8 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
               {items.length ? (
                 items.map((it, i) => {
                   const qty = Number(it.quantity) || 1;
-                  const rate = Number(it.price) || 0;
-                  const amount = rate * qty;
+                  const rateInclGst = Number(it.price) || 0;
+                  const amount = rateInclGst * qty;
                   const productName = it.part_name || "N/A";
                   const sku = it.sku || "N/A";
                   const hsn = it.remarks || "8708";
@@ -282,7 +285,7 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                         <td style={styles.thtd}>{productName}</td>
                         <td style={styles.thtd}>{sku}</td>
                         <td style={styles.thtd}>{hsn}</td>
-                        <td style={styles.thtd}>{rate.toFixed(2)}</td>
+                        <td style={styles.thtd}>{rateInclGst.toFixed(2)}</td>
                         <td style={styles.thtd}>{qty}</td>
                         <td style={{ ...styles.thtd, textAlign: 'right' }}>{amount.toFixed(2)}</td>
                       </tr>
@@ -307,19 +310,22 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
           </table>
         </div>
 
-        {/* ✅ Totals Box */}
+        {/* ✅ Totals Box - Now shows breakdown of GST inclusive pricing */}
         <div style={styles.totalsBox}>
           <div style={styles.totalsRow}>
-            <span style={styles.totalsLabel}>Sub Total:</span>
+            <span style={styles.totalsLabel}>Taxable Amount:</span>
             <span style={styles.totalsValue}>₹{subtotal.toFixed(2)}</span>
           </div>
           <div style={styles.totalsRow}>
-            <span style={styles.totalsLabel}>Tax (18%):</span>
+            <span style={styles.totalsLabel}>GST (18%):</span>
             <span style={styles.totalsValue}>₹{taxAmount.toFixed(2)}</span>
           </div>
           <div style={{ ...styles.totalsRow, borderTop: '1px solid #ccc', paddingTop: '8px', marginTop: '8px' }}>
-            <span style={styles.totalsLabel}>Grand Total:</span>
+            <span style={styles.totalsLabel}>Total Amount:</span>
             <span style={{ ...styles.totalsValue, fontWeight: 'bold' }}>₹{grandTotal.toFixed(2)}</span>
+          </div>
+          <div style={{ fontSize: '11px', color: '#666', marginTop: '8px', fontStyle: 'italic' }}>
+            (All prices include GST)
           </div>
         </div>
 
