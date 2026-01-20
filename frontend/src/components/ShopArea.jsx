@@ -771,7 +771,7 @@ const ShopArea = ({ id }) => {
                               </td>
                               <td>
                                 <Link 
-                                  to={`/shop-details/${product.id}`}
+                                  // to={`/shop-details/${product.id}`}
                                   className="text-decoration-none text-dark fw-medium d-flex align-items-center"
                                 >
                                   <span>{product.product_name || "Unnamed Product"}</span>

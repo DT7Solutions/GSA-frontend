@@ -26,7 +26,7 @@ const CTAAreaTwo = () => {
   }, []);
 
   const handleCallNow = () => {
-    window.location.href = "tel:+919876543210"; // Replace with actual phone number
+    window.location.href = "tel:+9192480 22760"; // Replace with actual phone number
   };
 
   const handleGetDirections = () => {

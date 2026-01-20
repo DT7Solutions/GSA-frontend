@@ -688,9 +688,9 @@ const ContactPage = () => {
                 </div>
                 <h3>Our Location</h3>
                 <p>
-                  Auto Nagar, Guntur,
+                  PLOT NO.381,PHASE 1&2,
                   <br />
-                  Andhra Pradesh 522001
+                  INDIRA AUTONAGAR ,Guntur, Andhra Pradesh 522001
                 </p>
               </div>
 
@@ -700,9 +700,9 @@ const ContactPage = () => {
                 </div>
                 <h3>Phone</h3>
                 <p>
-                  <a href="tel:+919876543210">+91 98765 43210</a>
-                  <br />
-                  <a href="tel:+918630012345">+91 86300 12345</a>
+                  <a href="tel:+919248022760">+91 92480 22760</a>
+                
+                 
                 </p>
               </div>
 
@@ -712,11 +712,9 @@ const ContactPage = () => {
                 </div>
                 <h3>Email</h3>
                 <p>
-                  <a href="mailto:info@gowrisankar.com">info@gowrisankar.com</a>
+                  <a href="mailto:rajesh.katakam@gmail.com">rajesh.katakam@gmail.com</a>
                   <br />
-                  <a href="mailto:sales@gowrisankar.com">
-                    sales@gowrisankar.com
-                  </a>
+                
                 </p>
               </div>
 

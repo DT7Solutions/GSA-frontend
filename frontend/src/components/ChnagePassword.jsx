@@ -116,48 +116,53 @@ const ForgotPassword = () => {
 
           {step === 1 && (
             <form className="modern-auth-form" onSubmit={handleChangePassword}>
-              <div className="form-group-modern">
-                <label>New Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="modern-input"
-                    placeholder="Enter new password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle-btn"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-              </div>
+             <div className="form-group-modern">
+  <label>New Password</label>
+  <div className="password-input-wrapper">
+    <input
+      type={showPassword ? "text" : "password"}
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      className="modern-input password-input-field"
+      placeholder="Enter new password"
+      required
+    />
+    {password && (
+      <button
+        type="button"
+        className="password-toggle-btn"
+        onClick={() => setShowPassword(!showPassword)}
+        tabIndex="-1"
+      >
+        {showPassword ? <FaEyeSlash /> : <FaEye />}
+      </button>
+    )}
+  </div>
+</div>
 
-              <div className="form-group-modern">
-                <label>Confirm Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="modern-input"
-                    placeholder="Confirm new password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle-btn"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-              </div>
-
+<div className="form-group-modern">
+  <label>Confirm Password</label>
+  <div className="password-input-wrapper">
+    <input
+      type={showConfirmPassword ? "text" : "password"}
+      value={confirmPassword}
+      onChange={(e) => setConfirmPassword(e.target.value)}
+      className="modern-input password-input-field"
+      placeholder="Confirm new password"
+      required
+    />
+    {confirmPassword && (
+      <button
+        type="button"
+        className="password-toggle-btn"
+        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+        tabIndex="-1"
+      >
+        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+      </button>
+    )}
+  </div>
+</div>
               <button type="submit" className="modern-btn-primary">
                 Send OTP
               </button>

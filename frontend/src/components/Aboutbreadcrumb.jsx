@@ -34,7 +34,7 @@ const Aboutbreadcrumb = () => {
       max-width: 900px;
     }
 
-    .badge {
+    .badge-about {
       display: inline-block;
       background-color: #64748b;
       color: white;
@@ -153,7 +153,7 @@ const Aboutbreadcrumb = () => {
       {/* About Header Section */}
       <section className="about-header">
         <div className="container">
-          <div className="badge">Est. 1995 • Guntur, Andhra Pradesh</div>
+          <div className="badge-about">Est. 1995 • Guntur, Andhra Pradesh</div>
 
           <h1 className="text-white">
             About <span className="highlight">Gowrisankar Agencies</span>

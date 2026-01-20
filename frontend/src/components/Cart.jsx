@@ -447,7 +447,7 @@ const Cart = () => {
               {cartItems.map((item) => (
                 <tr className="cart_item" key={item.id}>
                   <td data-title="Product">
-                    <Link className="cart-productimage" to="/shop-details">
+                    <Link className="cart-productimage" >
                       <img
                         width={91}
                         height={91}
@@ -457,7 +457,7 @@ const Cart = () => {
                     </Link>
                   </td>
                   <td data-title="Name">
-                    <Link className="cart-productname" to="/shop-details">
+                    <Link className="cart-productname">
                       {item.part.product_name}-{item.part.part_no}
                     </Link>
                   </td>

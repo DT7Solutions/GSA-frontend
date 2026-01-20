@@ -18,10 +18,10 @@ const PrivacyPolicyPage = () => {
         <p>
           The information we collect is used to:
           <ul>
-            <li>Respond to inquiries and provide customer support</li>
-            <li>Process transactions and deliver products</li>
-            <li>Improve our services and user experience</li>
-            <li>Send updates, offers, and promotions (only with your consent)</li>
+            <li style={{listStyleType:"none"}}>Respond to inquiries and provide customer support</li>
+            <li style={{listStyleType:"none"}}>Process transactions and deliver products</li>
+            <li style={{listStyleType:"none"}}>Improve our services and user experience</li>
+            <li style={{listStyleType:"none"}}>Send updates, offers, and promotions (only with your consent)</li>
           </ul>
         </p>
 
