@@ -733,3 +733,12 @@
   transform: translateY(-2px);
 }
 
+
+.btn-theme-admin {
+ 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+}
+

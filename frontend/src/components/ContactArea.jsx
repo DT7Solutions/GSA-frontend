@@ -40,6 +40,9 @@ const ContactPage = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
+     if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    }
 
     if (!formData.subject) {
       newErrors.subject = "Please select enquiry type";

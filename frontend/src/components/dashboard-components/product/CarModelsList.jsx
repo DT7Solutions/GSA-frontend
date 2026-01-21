@@ -260,7 +260,7 @@ const CarModelsDisplay = () => {
                                         <td>
                                             <button
                                                 onClick={() => handleEditClick(item)}
-                                                className="btn btn-sm btn-success"
+                                                className="btn-theme-admin py-3"
                                                 title="Edit"
                                             >
                                                 <Icon icon="lucide:edit" />

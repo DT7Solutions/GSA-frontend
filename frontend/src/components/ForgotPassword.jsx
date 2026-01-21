@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -16,6 +16,22 @@ const ForgotPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+    setIsAuthenticated(!!token);
+  }, []);
+
+  // Handle back button click
+  const handleBackClick = () => {
+    if (isAuthenticated) {
+      navigate("/"); // Redirect to homepage for all logged-in users
+    } else {
+      navigate("/login");
+    }
+  };
 
   // Step 1: Request OTP
   const handleRequestOtp = async (e) => {
@@ -72,7 +88,13 @@ const ForgotPassword = () => {
 
       if (response.data.success) {
         Swal.fire("Success", "Password reset successfully.", "success");
-        navigate("/login");
+        
+        // If user was authenticated, redirect to homepage, otherwise to login
+        if (isAuthenticated) {
+          navigate("/");
+        } else {
+          navigate("/login");
+        }
       } else {
         Swal.fire("Error", response.data.message, "error");
       }
@@ -139,11 +161,11 @@ const ForgotPassword = () => {
         </div>
       </div>
 
-      {/* Right Form - UNCHANGED */}
+      {/* Right Form */}
       <div className="modern-auth-right">
         <div className="modern-auth-form-wrapper">
-          <button className="back-button" onClick={() => navigate("/login")}>
-            ← Back to login
+          <button className="back-button" onClick={handleBackClick}>
+            ← Back to {isAuthenticated ? "home" : "login"}
           </button>
 
           <div className="modern-auth-header">
@@ -251,12 +273,14 @@ const ForgotPassword = () => {
             </form>
           )}
 
-          <p className="signin-text pt-3">
-            Remember your password?{" "}
-            <Link to="/login" className="signin-link">
-              Sign in
-            </Link>
-          </p>
+          {!isAuthenticated && (
+            <p className="signin-text pt-3">
+              Remember your password?{" "}
+              <Link to="/login" className="signin-link">
+                Sign in
+              </Link>
+            </p>
+          )}
         </div>
       </div>
       <style>

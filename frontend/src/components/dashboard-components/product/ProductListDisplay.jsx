@@ -110,7 +110,7 @@ const ProductListDisplay = () => {
                                     <td>
                                         <Link
                                             to={`/update-products/${item.id}`}
-                                            className="btn-theme-admin"
+                                            className="btn-theme-admin py-3"
                                             title="Edit"
                                         >
                                             <Icon icon="lucide:edit" />

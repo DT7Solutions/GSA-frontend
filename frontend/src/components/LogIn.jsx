@@ -76,110 +76,125 @@ useEffect(() => {
 }, []);
 
   // Handle Google Response
-  const handleGoogleResponse = async (response) => {
-    if (!response.credential) {
-      console.error("No credential received from Google");
-      Swal.fire({
-        title: "Error",
-        text: "Failed to get Google credentials",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
+// Handle Google Response
+const handleGoogleResponse = async (response) => {
+  if (!response.credential) {
+    console.error("No credential received from Google");
+    Swal.fire({
+      title: "Error",
+      text: "Failed to get Google credentials",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+    return;
+  }
 
-    setGoogleLoading(true);
+  setGoogleLoading(true);
 
-    try {
-      // Send token to backend
-      const backendResponse = await axios.post(
-        `${API_BASE_URL}api/auth/google_login/`,
-        {
-          token: response.credential,
-        }
+  try {
+    // Send token to backend
+    const backendResponse = await axios.post(
+      `${API_BASE_URL}api/auth/google_login/`,
+      {
+        token: response.credential,
+      }
+    );
+
+    if (backendResponse.data.access) {
+      // Store tokens
+      localStorage.setItem("accessToken", backendResponse.data.access);
+      localStorage.setItem("refreshToken", backendResponse.data.refresh);
+      localStorage.setItem(
+        "role",
+        backendResponse.data.role?.toLowerCase() || ""
       );
 
-      if (backendResponse.data.access) {
-        // Store tokens
-        localStorage.setItem("accessToken", backendResponse.data.access);
-        localStorage.setItem("refreshToken", backendResponse.data.refresh);
-        localStorage.setItem(
-          "role",
-          backendResponse.data.role?.toLowerCase() || ""
+      const userId = backendResponse.data.user_id;
+
+      // Fetch user data
+      try {
+        const userResponse = await axios.get(
+          `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${backendResponse.data.access}`,
+            },
+          }
         );
 
-        const userId = backendResponse.data.user_id;
+        // Check for redirect
+        const redirectUrl = localStorage.getItem("redirectAfterLogin");
+        if (redirectUrl) {
+          localStorage.removeItem("redirectAfterLogin");
+          window.location.href = redirectUrl;
+          return;
+        }
 
-        // Fetch user data
-        try {
-          const userResponse = await axios.get(
-            `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
-            {
-              headers: {
-                Authorization: `Bearer ${backendResponse.data.access}`,
-              },
-            }
-          );
-
-          // Check for redirect
-          const redirectUrl = localStorage.getItem("redirectAfterLogin");
-          if (redirectUrl) {
-            localStorage.removeItem("redirectAfterLogin");
-            window.location.href = redirectUrl;
-            return;
-          }
-
-          // Navigate based on role
-          const { role_id } = userResponse.data;
-          if (role_id === 1) {
-            navigate("/Dashboard");
-          } else {
-            navigate("/");
-          }
-
-          // Show success message
-          Swal.fire({
-            title: "Login Successful",
-            text: `Welcome ${backendResponse.data.user.first_name || "User"}!`,
-            icon: "success",
-            confirmButtonText: "OK",
-            timer: 2000,
-          });
-        } catch (userError) {
-          console.error("Error fetching user data:", userError);
+        // Navigate based on role
+        const { role_id } = userResponse.data;
+        if (role_id === 1) {
+          navigate("/Dashboard");
+        } else {
           navigate("/");
         }
+
+        // Show success message
+        const userName = backendResponse.data.user?.first_name || 
+                        backendResponse.data.user?.username || 
+                        "User";
+        
+        Swal.fire({
+          title: "Login Successful",
+          text: `Welcome ${userName}!`,
+          icon: "success",
+          confirmButtonText: "OK",
+          timer: 2000,
+        });
+      } catch (userError) {
+        console.error("Error fetching user data:", userError);
+        // Still navigate to home even if user data fetch fails
+        navigate("/");
+        
+        Swal.fire({
+          title: "Login Successful",
+          text: "Welcome!",
+          icon: "success",
+          confirmButtonText: "OK",
+          timer: 2000,
+        });
       }
-    } catch (error) {
-      console.error("Google login error:", error);
-
-      const errorData = error.response?.data;
-      let errorMessage = "Google login failed. Please try again.";
-      let errorTitle = "Login Failed";
-
-      if (errorData?.error === "account_not_found") {
-        errorTitle = "Account Not Found";
-        errorMessage = "You don't have an account. Please sign up first.";
-      } else if (errorData?.error === "account_deactivated") {
-        errorTitle = "Account Deactivated";
-        errorMessage = "Your account has been deactivated. Please contact support.";
-      } else if (errorData?.error === "invalid_token") {
-        errorTitle = "Invalid Token";
-        errorMessage = "The Google token is invalid. Please try again.";
-      } else if (errorData?.message) {
-        errorMessage = errorData.message;
-      }
-
-      Swal.fire({
-        title: errorTitle,
-        text: errorMessage,
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    } finally {
-      setGoogleLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Google login error:", error);
+
+    const errorData = error.response?.data;
+    let errorMessage = "Google login failed. Please try again.";
+    let errorTitle = "Login Failed";
+
+    // Handle specific errors (account_not_found removed - backend auto-creates accounts)
+    if (errorData?.error === "account_deactivated") {
+      errorTitle = "Account Deactivated";
+      errorMessage = "Your account has been deactivated. Please contact support.";
+    } else if (errorData?.error === "invalid_token") {
+      errorTitle = "Invalid Token";
+      errorMessage = "The Google token is invalid. Please try again.";
+    } else if (errorData?.error === "email_not_verified") {
+      errorTitle = "Email Not Verified";
+      errorMessage = "Please verify your email with Google first.";
+    } else if (errorData?.message) {
+      errorMessage = errorData.message;
+    }
+
+    Swal.fire({
+      title: errorTitle,
+      text: errorMessage,
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+  } finally {
+    setGoogleLoading(false);
+  }
+};
 
   // Request Email OTP
   const requestEmailOtp = async () => {
@@ -522,35 +537,7 @@ useEffect(() => {
             <p>Please enter your details</p>
           </div>
 
-          {/* Google Sign-In Button */}
-          <div
-            ref={googleButtonRef}
-            style={{
-              marginBottom: "24px",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          ></div>
-
-          {/* Divider */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              margin: "20px 0",
-              gap: "10px",
-            }}
-          >
-            <div
-              style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}
-            ></div>
-            <span style={{ color: "#999", fontSize: "14px" }}>
-              Or continue with
-            </span>
-            <div
-              style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}
-            ></div>
-          </div>
+        
 
           {/* Login Method Tabs */}
           <div className="login-method-tabs text-center">
@@ -603,7 +590,7 @@ useEffect(() => {
 
                 <button
                   onClick={otpSent ? verifyEmailOtp : requestEmailOtp}
-                  className="modern-btn-primary"
+                  className="modern-btn-primary text-center"
                 >
                   {otpSent ? "Verify OTP" : "Request OTP"}
                 </button>
@@ -662,7 +649,7 @@ useEffect(() => {
                   </Link>
                 </div>
 
-                <button onClick={handleLogin} className="modern-btn-primary">
+                <button onClick={handleLogin} className="modern-btn-primary text-center">
                   Sign in
                 </button>
               </>
@@ -674,6 +661,36 @@ useEffect(() => {
                 Sign up
               </Link>
             </p>
+
+          {/* Divider */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              margin: "10px 0",
+              gap: "10px",
+            }}
+          >
+            <div
+              style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}
+            ></div>
+            <span style={{ color: "#999", fontSize: "14px" }}>
+              Or continue with
+            </span>
+            <div
+              style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}
+            ></div>
+          </div>
+              {/* Google Sign-In Button */}
+          <div
+            ref={googleButtonRef}
+            style={{
+              marginBottom: "24px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          ></div>
+
           </div>
         </div>
       </div>

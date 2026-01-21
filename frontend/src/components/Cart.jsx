@@ -435,7 +435,7 @@ const Cart = () => {
           <table className="cart_table">
             <thead>
               <tr>
-                <th className="cart-col-image">Image</th>
+                {/* <th className="cart-col-image">Image</th> */}
                 <th className="cart-col-productname">Product Name</th>
                 <th className="cart-col-price">Price (incl. GST)</th>
                 <th className="cart-col-quantity">Quantity</th>
@@ -446,7 +446,7 @@ const Cart = () => {
             <tbody>
               {cartItems.map((item) => (
                 <tr className="cart_item" key={item.id}>
-                  <td data-title="Product">
+                  {/* <td data-title="Product">
                     <Link className="cart-productimage" >
                       <img
                         width={91}
@@ -455,7 +455,7 @@ const Cart = () => {
                         alt={item.part.product_name}
                       />
                     </Link>
-                  </td>
+                  </td> */}
                   <td data-title="Name">
                     <Link className="cart-productname">
                       {item.part.product_name}-{item.part.part_no}
@@ -760,7 +760,7 @@ const Cart = () => {
                 * All taxes are included in the displayed prices
               </div>
               <div className="wc-proceed-to-checkout mb-30">
-                <button onClick={handleCheckout} className="btn style2 btn-fw">
+                <button onClick={handleCheckout} className="btn-theme-admin">
                   Proceed to checkout
                 </button>
               </div>

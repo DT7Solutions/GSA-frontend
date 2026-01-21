@@ -802,7 +802,7 @@ const ShopArea = ({ id }) => {
                               </td>
                               <td className="text-center">
                                 <button
-                                  className="btn btn-primary btn-sm px-3"
+                                  className="btn-theme-admin py-3"
                                   onClick={() => handleAddToCart(product.id)}
                                   disabled={product.stock_count === 0}
                                   title={product.stock_count === 0 ? "Out of stock" : "Add to cart"}

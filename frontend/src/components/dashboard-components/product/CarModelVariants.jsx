@@ -194,7 +194,7 @@ const handleCarMakeChange = async (e) => {
                                     <td>{item.production_start_date} - {item.production_end_date}</td>
                                     <td>
                                         <button
-                                            className="btn btn-sm btn-primary"
+                                            className="btn-theme-admin py-3"
                                             onClick={() => handleEdit(item)}
                                         >
                                             <Icon icon="lucide:edit" />
