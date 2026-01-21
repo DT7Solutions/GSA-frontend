@@ -397,11 +397,11 @@ const Thankyou = () => {
 
         {/* Action Buttons */}
         <div className="text-center mt-4">
-          <Link to="/orders" className="btn btn-primary btn-lg me-3">
+          <Link to="/orders" className="btn-theme-admin btn-lg me-3">
             <i className="fas fa-list me-2"></i>
             View All Orders
           </Link>
-          <Link to="/" className="btn btn-outline-primary btn-lg">
+          <Link to="/" className="btn-theme-admin btn-lg">
             <i className="fas fa-home me-2"></i>
             Continue Shopping
           </Link>

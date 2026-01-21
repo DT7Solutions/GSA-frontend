@@ -102,11 +102,21 @@ const HeaderFive = () => {
     }
   };
 
-  const handlePartClick = (partId) => {
+  const handlePartClick = (part) => {
     setShowSearchResults(false);
     setSearchQuery("");
     setSearchResults([]);
-    navigate(`/shop-details/${partId}`);
+    
+    // Extract part_group_id from the search result
+    const part_group_id = part.part_group?.id || part.part_group_id;
+    
+    // Navigate to shop page with part_group_id as URL param
+    // Pass selectedPartId in route state for highlighting
+    if (part_group_id) {
+      navigate(`/shop/${part_group_id}`, { state: { selectedPartId: part.id } });
+    } else {
+      navigate(`/shop/${part.id}`);
+    }
   };
 
   // Handle dropdown open/close with hover and click
@@ -240,9 +250,9 @@ const HeaderFive = () => {
   };
 
   return (
-    <header className="nav-header header-layout4 header-container" >
+    <header className="nav-header header-layout4 header-container">
       <div className={`sticky-wrapper ${scroll && "sticky"} header-top bg-white`}>
-        <div className="container ">
+        <div className="container">
           <div className="row justify-content-around justify-content-md-between align-items-center gy-2">
             {/* Hamburger Menu Icon - Visible on mobile */}
             <div className="col-auto d-lg-none">
@@ -291,7 +301,7 @@ const HeaderFive = () => {
                     boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                   }}>
                     {searchResults.map((part) => (
-                      <div key={part.id} onClick={() => handlePartClick(part.id)}
+                      <div key={part.id} onClick={() => handlePartClick(part)}
                         style={{
                           padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0',
                           display: 'flex', alignItems: 'center', gap: '12px',
@@ -466,29 +476,29 @@ const HeaderFive = () => {
         </div>
       </div>
 
-     <div className={`sticky-wrapper ${scroll && "sticky"}`}>
-    <div className={`mobile-menu-wrapper ${active && "body-visible"}`}>
-      <div className="mobile-menu-area">
-        <div className="mobile-logo">
-          <Link to="/"><img src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`} alt="Fixturbo" /></Link>
-          <button className="menu-toggle" onClick={mobileMenu}><i className="fa fa-times" /></button>
-        </div>
-        <div className="mobile-menu">
-          <ul id="offcanvas-navigation">
-            <li className="menu-item-has-children submenu-item-has-children">
-              <Link to="/about-us" onClick={mobileMenu}>About</Link>
-            </li>
-            <li>
-              <NavLink to="/contact-us" className={(navData) => (navData.isActive ? "active" : "")} onClick={mobileMenu}>
-                Contact
-              </NavLink>
-            </li>
-          </ul>
+      <div className={`sticky-wrapper ${scroll && "sticky"}`}>
+        <div className={`mobile-menu-wrapper ${active && "body-visible"}`}>
+          <div className="mobile-menu-area">
+            <div className="mobile-logo">
+              <Link to="/"><img src={`${process.env.PUBLIC_URL}/assets/img/gowri-shankar-logo.png`} alt="Fixturbo" /></Link>
+              <button className="menu-toggle" onClick={mobileMenu}><i className="fa fa-times" /></button>
+            </div>
+            <div className="mobile-menu">
+              <ul id="offcanvas-navigation">
+                <li className="menu-item-has-children submenu-item-has-children">
+                  <Link to="/about-us" onClick={mobileMenu}>About</Link>
+                </li>
+                <li>
+                  <NavLink to="/contact-us" className={(navData) => (navData.isActive ? "active" : "")} onClick={mobileMenu}>
+                    Contact
+                  </NavLink>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</header>
+    </header>
   );
 };
 

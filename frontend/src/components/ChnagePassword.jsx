@@ -226,7 +226,7 @@ const ForgotPassword = () => {
     )}
   </div>
 </div>
-              <button type="submit" className="modern-btn-primary">
+              <button type="submit" className="modern-btn-primary text-center">
                 Send OTP
               </button>
             </form>
@@ -246,7 +246,7 @@ const ForgotPassword = () => {
                 />
               </div>
 
-              <button type="submit" className="modern-btn-primary">
+              <button type="submit" className="modern-btn-primary t">
                 Verify & Update Password
               </button>
 

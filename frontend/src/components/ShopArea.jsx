@@ -750,11 +750,11 @@ const ShopArea = ({ id }) => {
                       <table className="shadow-shop table table-striped table-hover align-middle mb-0 bg-white">
                         <thead className="table-light">
                           <tr>
-                            <th scope="col" style={{ width: "5%" }} className="text-center">SKU</th>
+                            <th scope="col" style={{ width: "10%" }} className="text-center">Fig No</th>
                             <th scope="col" style={{ width: "12%" }}>Part No</th>
                             <th scope="col" style={{ width: "35%" }}>Part Name</th>
                             <th scope="col" style={{ width: "12%" }}>Stock</th>
-                            <th scope="col" style={{ width: "15%" }}>Price</th>
+                            <th scope="col" style={{ width: "10%" }}>Price</th>
                             <th scope="col" style={{ width: "15%" }} className="text-center">Action</th>
                           </tr>
                         </thead>
@@ -762,7 +762,7 @@ const ShopArea = ({ id }) => {
                           {currentProducts.map((product) => (
                             <tr key={product.id}>
                               <td className="text-center fw-semibold text-muted">
-                                {product.sku || "N/A"}
+                                {product.fig_no || "N/A"}
                               </td>
                               <td>
                                 <span className="text-muted">
@@ -792,9 +792,9 @@ const ShopArea = ({ id }) => {
                               </td>
                               <td>
                                 <div className="d-flex flex-column">
-                                  <span className="text-muted text-decoration-line-through small">
+                                  {/* <span className="text-muted text-decoration-line-through small">
                                     ₹{product.price || "0"}
-                                  </span>
+                                  </span> */}
                                   <span className="fw-bold text-theme fs-6">
                                     ₹{product.sale_price || product.price || "0"}
                                   </span>

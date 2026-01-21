@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
@@ -16,8 +16,183 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showPassword2, setShowPassword2] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
     const navigate = useNavigate();
-    
+    const googleButtonRef = useRef(null);
+
+    // Check if user is already logged in
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+            navigate("/Dashboard");
+        }
+    }, [navigate]);
+
+    // Initialize Google Sign-In
+    useEffect(() => {
+        const initializeGoogle = () => {
+            if (window.google && googleButtonRef.current) {
+                try {
+                    window.google.accounts.id.initialize({
+                        client_id: '213344695442-ook0blqsmavr33kqser6i359lpcbvfau.apps.googleusercontent.com',
+                        callback: handleGoogleResponse,
+                    });
+                    
+                    window.google.accounts.id.renderButton(
+                        googleButtonRef.current,
+                        {
+                            theme: "outline",
+                            size: "large",
+                            text: "signup_with",
+                            shape: "rectangular",
+                            logo_alignment: "left",
+                        }
+                    );
+                } catch (error) {
+                    console.error("Google initialization error:", error);
+                }
+            }
+        };
+
+        // Load Google script
+        const script = document.createElement("script");
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+        script.onload = initializeGoogle;
+        document.head.appendChild(script);
+
+        return () => {
+            // Cleanup
+            if (window.google?.accounts?.id) {
+                window.google.accounts.id.cancel();
+            }
+            const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+            if (existingScript && document.head.contains(existingScript)) {
+                document.head.removeChild(existingScript);
+            }
+        };
+    }, []);
+
+    // Handle Google Response
+    const handleGoogleResponse = async (response) => {
+        if (!response.credential) {
+            console.error("No credential received from Google");
+            Swal.fire({
+                title: "Error",
+                text: "Failed to get Google credentials",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        setGoogleLoading(true);
+
+        try {
+            // Send token to backend (backend will auto-create account if it doesn't exist)
+            const backendResponse = await axios.post(
+                `${API_BASE_URL}api/auth/google_login/`,
+                {
+                    token: response.credential,
+                }
+            );
+
+            if (backendResponse.data.access) {
+                // Store tokens
+                localStorage.setItem("accessToken", backendResponse.data.access);
+                localStorage.setItem("refreshToken", backendResponse.data.refresh);
+                localStorage.setItem(
+                    "role",
+                    backendResponse.data.role?.toLowerCase() || ""
+                );
+
+                const userId = backendResponse.data.user_id;
+
+                // Fetch user data
+                try {
+                    const userResponse = await axios.get(
+                        `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${backendResponse.data.access}`,
+                            },
+                        }
+                    );
+
+                    // Check for redirect
+                    const redirectUrl = localStorage.getItem("redirectAfterLogin");
+                    if (redirectUrl) {
+                        localStorage.removeItem("redirectAfterLogin");
+                        window.location.href = redirectUrl;
+                        return;
+                    }
+
+                    // Navigate based on role
+                    const { role_id } = userResponse.data;
+                    if (role_id === 1) {
+                        navigate("/Dashboard");
+                    } else {
+                        navigate("/");
+                    }
+
+                    // Show success message
+                    const userName = backendResponse.data.user?.first_name || 
+                                    backendResponse.data.user?.username || 
+                                    "User";
+                    
+                    Swal.fire({
+                        title: "Registration Successful",
+                        text: `Welcome ${userName}!`,
+                        icon: "success",
+                        confirmButtonText: "OK",
+                        timer: 2000,
+                    });
+                } catch (userError) {
+                    console.error("Error fetching user data:", userError);
+                    // Still navigate to home even if user data fetch fails
+                    navigate("/");
+                    
+                    Swal.fire({
+                        title: "Registration Successful",
+                        text: "Welcome!",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                        timer: 2000,
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Google registration error:", error);
+
+            const errorData = error.response?.data;
+            let errorMessage = "Google registration failed. Please try again.";
+            let errorTitle = "Registration Failed";
+
+            // Handle specific errors
+            if (errorData?.error === "account_deactivated") {
+                errorTitle = "Account Deactivated";
+                errorMessage = "Your account has been deactivated. Please contact support.";
+            } else if (errorData?.error === "invalid_token") {
+                errorTitle = "Invalid Token";
+                errorMessage = "The Google token is invalid. Please try again.";
+            } else if (errorData?.error === "email_not_verified") {
+                errorTitle = "Email Not Verified";
+                errorMessage = "Please verify your email with Google first.";
+            } else if (errorData?.message) {
+                errorMessage = errorData.message;
+            }
+
+            Swal.fire({
+                title: errorTitle,
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -351,7 +526,8 @@ const Register = () => {
                         {/* Sign Up Button */}
                         <button
                             onClick={handleSubmit}
-                            className="modern-btn-primary"
+                            className="modern-btn-primary text-center"
+                            disabled={googleLoading}
                         >
                             Sign Up
                         </button>
@@ -363,6 +539,36 @@ const Register = () => {
                                 Sign in
                             </Link>
                         </p>
+
+                        {/* Divider */}
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: "10px 0",
+                                gap: "10px",
+                            }}
+                        >
+                            <div
+                                style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}
+                            ></div>
+                            <span style={{ color: "#999", fontSize: "14px" }}>
+                                Or sign up with
+                            </span>
+                            <div
+                                style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}
+                            ></div>
+                        </div>
+
+                        {/* Google Sign-In Button */}
+                        <div
+                            ref={googleButtonRef}
+                            style={{
+                                marginBottom: "24px",
+                                display: "flex",
+                                justifyContent: "center",
+                            }}
+                        ></div>
                     </div>
                 </div>
             </div>
@@ -424,7 +630,11 @@ input[type="password"]::-ms-clear {
 }
 
 /* Phone Input Group */
-
+.phone-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .phone-prefix {
   padding: 12px 14px;
