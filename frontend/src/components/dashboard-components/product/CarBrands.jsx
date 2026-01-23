@@ -180,7 +180,7 @@ const CarBrandDisplay = () => {
                                         <td>
                                             <button
                                                 onClick={() => handleEditClick(item)}
-                                                className="w-32-px h-32-px me-2 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                className="btn-theme-admin py-3"
                                                 title="Edit"
                                             >
                                                 <Icon icon="lucide:edit" />

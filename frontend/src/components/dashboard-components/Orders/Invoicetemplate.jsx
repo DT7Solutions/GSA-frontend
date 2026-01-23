@@ -259,13 +259,13 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
           <table style={styles.table}>
             <thead>
               <tr style={styles.focusBg}>
-                <th style={{ ...styles.thtd, width: '5%' }}>SL</th>
+                <th style={{ ...styles.thtd, width: '7%' }}>SL</th>
                 <th style={{ ...styles.thtd, width: '25%' }}>Product</th>
                 <th style={{ ...styles.thtd, width: '10%' }}>SKU</th>
                 <th style={{ ...styles.thtd, width: '10%' }}>HSN</th>
                 <th style={{ ...styles.thtd, width: '10%' }}>Rate (₹)<br/><span style={{fontSize: '11px', fontWeight: 'normal'}}>(incl. GST)</span></th>
                 <th style={{ ...styles.thtd, width: '8%' }}>Qty</th>
-                <th style={{ ...styles.thtd, width: '12%', textAlign: 'right' }}>Amount (₹)</th>
+                <th style={{ ...styles.thtd, width: '10%', textAlign: 'right' }}>Amount (₹)</th>
               </tr>
             </thead>
             <tbody>
@@ -289,13 +289,13 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                         <td style={styles.thtd}>{qty}</td>
                         <td style={{ ...styles.thtd, textAlign: 'right' }}>{amount.toFixed(2)}</td>
                       </tr>
-                      {it.remarks && (
+                      {/* {it.remarks && (
                         <tr style={i % 2 ? styles.focusBg : {}}>
                           <td colSpan="7" style={{ ...styles.thtd, ...styles.smallText, paddingTop: '5px', paddingBottom: '10px' }}>
                             <b>Remarks:</b> {it.remarks}
                           </td>
                         </tr>
-                      )}
+                      )} */}
                     </React.Fragment>
                   );
                 })

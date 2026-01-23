@@ -19,13 +19,17 @@ const MasterLayout = ({ children }) => {
     const [userName, setUserName] = useState("");
     const [userRole, setUserRole] = useState("");
     const [notificationCount, setNotificationCount] = useState(0);
-    const [hasShownNotifications, setHasShownNotifications] = useState(new Set());
     
     // Toast queue management
     const toastQueueRef = useRef([]);
     const activeToastsRef = useRef(0);
     const MAX_ACTIVE_TOASTS = 3;
     const isProcessingQueueRef = useRef(false);
+    
+    // Toast cooldown management - 5 minutes in milliseconds
+    const TOAST_COOLDOWN_DURATION = 5 * 60 * 1000; // 5 minutes
+    const lastToastTimeRef = useRef(0);
+    const readNotificationsRef = useRef(new Set());
 
     // Dropdown menu effect
     useEffect(() => {
@@ -138,19 +142,51 @@ const MasterLayout = ({ children }) => {
         }
     }, []);
 
+    // Function to check if cooldown period has passed
+    const canShowToast = () => {
+        const now = Date.now();
+        const timeSinceLastToast = now - lastToastTimeRef.current;
+        return timeSinceLastToast >= TOAST_COOLDOWN_DURATION;
+    };
+
+    // Function to mark notification as read
+    const markNotificationAsRead = (orderId) => {
+        readNotificationsRef.current.add(orderId);
+        console.log(`📖 Notification for order #${orderId} marked as read`);
+    };
+
     // Function to process toast queue
     const processToastQueue = () => {
         if (isProcessingQueueRef.current) return;
         if (toastQueueRef.current.length === 0) return;
         if (activeToastsRef.current >= MAX_ACTIVE_TOASTS) return;
 
+        // Check if cooldown period has passed
+        if (!canShowToast()) {
+            const remainingTime = TOAST_COOLDOWN_DURATION - (Date.now() - lastToastTimeRef.current);
+            const remainingMinutes = Math.ceil(remainingTime / 60000);
+            console.log(`⏳ Toast cooldown active. Next toast available in ${remainingMinutes} minute(s)`);
+            return;
+        }
+
         isProcessingQueueRef.current = true;
 
-        // Get next notification from queue
-        const notification = toastQueueRef.current.shift();
+        // Get next notification from queue that hasn't been read
+        let notification = null;
+        while (toastQueueRef.current.length > 0 && !notification) {
+            const nextNotification = toastQueueRef.current.shift();
+            
+            // Check if this notification has been marked as read
+            if (!readNotificationsRef.current.has(nextNotification.order_id)) {
+                notification = nextNotification;
+            } else {
+                console.log(`⏭️ Skipping already read notification for order #${nextNotification.order_id}`);
+            }
+        }
 
         if (notification) {
             activeToastsRef.current++;
+            lastToastTimeRef.current = Date.now(); // Update last toast time
 
             // Play notification sound
             const audio = new Audio('/notification-sound.mp3');
@@ -176,6 +212,8 @@ const MasterLayout = ({ children }) => {
                     onClose: () => {
                         // Decrease active toast count when this toast closes
                         activeToastsRef.current--;
+                        // Mark notification as read when toast is closed
+                        markNotificationAsRead(notification.order_id);
                         // Try to process next notification in queue after a small delay
                         setTimeout(() => {
                             isProcessingQueueRef.current = false;
@@ -184,13 +222,15 @@ const MasterLayout = ({ children }) => {
                     }
                 }
             );
+
+            console.log(`✅ Toast displayed for order #${notification.order_id}. Next toast available at ${new Date(Date.now() + TOAST_COOLDOWN_DURATION).toLocaleTimeString()}`);
         }
 
         isProcessingQueueRef.current = false;
 
-        // Try to show more toasts if we haven't reached the limit
+        // Try to show more toasts if we haven't reached the limit and cooldown allows
         setTimeout(() => {
-            if (activeToastsRef.current < MAX_ACTIVE_TOASTS && toastQueueRef.current.length > 0) {
+            if (activeToastsRef.current < MAX_ACTIVE_TOASTS && toastQueueRef.current.length > 0 && canShowToast()) {
                 processToastQueue();
             }
         }, 300);
@@ -205,11 +245,14 @@ const MasterLayout = ({ children }) => {
             // Handle incoming notifications
             const handleNotification = (notifications) => {
                 notifications.forEach(notification => {
-                    // Add notification to queue
-                    toastQueueRef.current.push(notification);
-                    
-                    // Update notification count
-                    setNotificationCount(prev => prev + 1);
+                    // Only add to queue if not already read
+                    if (!readNotificationsRef.current.has(notification.order_id)) {
+                        toastQueueRef.current.push(notification);
+                        setNotificationCount(prev => prev + 1);
+                        console.log(`📥 New notification queued for order #${notification.order_id}`);
+                    } else {
+                        console.log(`⏭️ Notification for order #${notification.order_id} already read, skipping`);
+                    }
                 });
 
                 // Start processing the queue
@@ -234,9 +277,11 @@ const MasterLayout = ({ children }) => {
         localStorage.removeItem("refreshToken");
         setIsLoggedIn(false);
         notificationService.stopPolling();
-        // Clear toast queue on logout
+        // Clear toast queue and read notifications on logout
         toastQueueRef.current = [];
         activeToastsRef.current = 0;
+        readNotificationsRef.current.clear();
+        lastToastTimeRef.current = 0;
         toast.dismiss(); // Dismiss all active toasts
         navigate("/login");
     };
@@ -538,6 +583,7 @@ const MasterLayout = ({ children }) => {
                                     <NotificationDropdown 
                                         notificationCount={notificationCount}
                                         setNotificationCount={setNotificationCount}
+                                        onNotificationRead={markNotificationAsRead}
                                     />
                                 )}
 

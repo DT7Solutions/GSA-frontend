@@ -699,7 +699,7 @@ const ShopArea = ({ id }) => {
                 {currentProducts.length > 0 ? (
                   <>
                   <div className="row">
-                    <div className="mb-3 d-flex justify-content-between align-items-center col-xl-12">
+                    <div className="py-3 d-flex justify-content-between align-items-center col-xl-12">
                       <p className="text-muted mb-0">
                         Showing <strong>{indexOfFirstProduct + 1}</strong> to <strong>{Math.min(indexOfLastProduct, filteredProducts.length)}</strong> of <strong>{filteredProducts.length}</strong> products
                       </p>
@@ -720,7 +720,7 @@ const ShopArea = ({ id }) => {
                     </div>
                     {partGroupDetails && (
                       <div className="mb-4 col-xl-4">
-                        <div className="card-body">
+                        <div className="card-body p-0">
                           <div className="row align-items-center">
                             <div className="col-md-12">
                               {partGroupDetails.image ? (

@@ -312,7 +312,7 @@ const UserProfile = () => {
                                             className="form-control"  
                                             value={userData.phone} 
                                             onChange={handleChange} 
-                                            disabled 
+                                            
                                             required 
                                         />
                                     </div>

@@ -440,7 +440,7 @@ const StaffList = () => {
                                 <div className="modal-footer">
                                     <button
                                         type="button"
-                                        className="btn btn-secondary"
+                                        className="btn-theme-admin"
                                         onClick={() => {
                                             setShowAddModal(false);
                                             setFormData({
@@ -456,7 +456,7 @@ const StaffList = () => {
                                     >
                                         Cancel
                                     </button>
-                                    <button type="submit" className="btn btn-primary">
+                                    <button type="submit" className="btn-theme-admin">
                                         Add Staff
                                     </button>
                                 </div>
