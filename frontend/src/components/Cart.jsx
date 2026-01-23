@@ -756,10 +756,10 @@ const Cart = () => {
                   </tr>
                 </tfoot>
               </table>
-              <div className="text-muted small mt-2 px-3">
+              <div className="text-muted small mt-2 mb-3 px-3">
                 * All taxes are included in the displayed prices
               </div>
-              <div className="wc-proceed-to-checkout mb-30">
+              <div className="wc-proceed-to-checkout mb-30 ">
                 <button onClick={handleCheckout} className="btn-theme-admin">
                   Proceed to checkout
                 </button>

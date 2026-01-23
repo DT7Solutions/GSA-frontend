@@ -90,12 +90,17 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       tableLayout: 'fixed',
     },
     thtd: {
-      lineHeight: '1.55em',
-      padding: '10px 15px',
+      lineHeight: '1.4em',
+      padding: '8px 10px',
       border: '1px solid #ccc',
       textAlign: 'left',
       wordBreak: 'break-word',
       whiteSpace: 'normal',
+      fontSize: '13px',
+    },
+    thHeader: {
+      fontSize: '13px',
+      fontWeight: 'bold',
     },
     focusBg: {
       background: '#f6f6f6',
@@ -103,20 +108,25 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
     textCenter: {
       textAlign: 'center',
     },
+    // ✅ FIXED: Changed from float to flexbox layout
+    totalsWrapper: {
+      display: 'flex',
+      justifyContent: 'flex-end',
+      marginTop: '20px',
+      clear: 'both', // Ensures it appears after table
+    },
     totalsBox: {
       border: '1px solid #ccc',
       borderRadius: '8px',
       padding: '15px 20px',
       width: '300px',
-      float: 'right',
-      marginTop: '20px',
       backgroundColor: '#fafafa',
     },
     totalsRow: {
       display: 'flex',
       justifyContent: 'space-between',
       marginBottom: '5px',
-      fontSize: '15px',
+      fontSize: '14px',
     },
     totalsLabel: {
       fontWeight: 'bold',
@@ -128,6 +138,7 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
     signature: {
       marginTop: '80px',
       textAlign: 'left',
+      clear: 'both', // Ensures it appears after totals
     },
     note: {
       textAlign: 'center',
@@ -145,8 +156,11 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
       color: '#555',
     },
     smallText: {
-      fontSize: '12px',
+      fontSize: '11px',
       color: '#666',
+    },
+    invoiceContainer: {
+      pageBreakInside: 'avoid',
     },
   };
 
@@ -259,13 +273,13 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
           <table style={styles.table}>
             <thead>
               <tr style={styles.focusBg}>
-                <th style={{ ...styles.thtd, width: '7%' }}>SL</th>
-                <th style={{ ...styles.thtd, width: '25%' }}>Product</th>
-                <th style={{ ...styles.thtd, width: '10%' }}>SKU</th>
-                <th style={{ ...styles.thtd, width: '10%' }}>HSN</th>
-                <th style={{ ...styles.thtd, width: '10%' }}>Rate (₹)<br/><span style={{fontSize: '11px', fontWeight: 'normal'}}>(incl. GST)</span></th>
-                <th style={{ ...styles.thtd, width: '8%' }}>Qty</th>
-                <th style={{ ...styles.thtd, width: '10%', textAlign: 'right' }}>Amount (₹)</th>
+                <th style={{ ...styles.thtd, ...styles.thHeader, width: '10%' }}>SL</th>
+                <th style={{ ...styles.thtd, ...styles.thHeader, width: '35%' }}>Product</th>
+                {/* <th style={{ ...styles.thtd, ...styles.thHeader, width: '12%' }}>SKU</th>
+                <th style={{ ...styles.thtd, ...styles.thHeader, width: '10%' }}>HSN</th> */}
+                <th style={{ ...styles.thtd, ...styles.thHeader, width: '12%' }}>Rate (₹)<br/><span style={{fontSize: '10px', fontWeight: 'normal'}}>(incl. GST)</span></th>
+                <th style={{ ...styles.thtd, ...styles.thHeader, width: '12%' }}>Qty</th>
+                <th style={{ ...styles.thtd, ...styles.thHeader, width: '15%', textAlign: 'right' }}>Amount (₹)</th>
               </tr>
             </thead>
             <tbody>
@@ -283,19 +297,12 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
                       <tr style={i % 2 ? styles.focusBg : {}}>
                         <td style={styles.thtd}>{String(i + 1).padStart(2, '0')}</td>
                         <td style={styles.thtd}>{productName}</td>
-                        <td style={styles.thtd}>{sku}</td>
-                        <td style={styles.thtd}>{hsn}</td>
+                        {/* <td style={styles.thtd}>{sku}</td>
+                        <td style={styles.thtd}>{hsn}</td> */}
                         <td style={styles.thtd}>{rateInclGst.toFixed(2)}</td>
                         <td style={styles.thtd}>{qty}</td>
                         <td style={{ ...styles.thtd, textAlign: 'right' }}>{amount.toFixed(2)}</td>
                       </tr>
-                      {/* {it.remarks && (
-                        <tr style={i % 2 ? styles.focusBg : {}}>
-                          <td colSpan="7" style={{ ...styles.thtd, ...styles.smallText, paddingTop: '5px', paddingBottom: '10px' }}>
-                            <b>Remarks:</b> {it.remarks}
-                          </td>
-                        </tr>
-                      )} */}
                     </React.Fragment>
                   );
                 })
@@ -310,22 +317,24 @@ const InvoiceTemplate = forwardRef(({ order = {}, company = {} }, ref) => {
           </table>
         </div>
 
-        {/* ✅ Totals Box - Now shows breakdown of GST inclusive pricing */}
-        <div style={styles.totalsBox}>
-          <div style={styles.totalsRow}>
-            <span style={styles.totalsLabel}>Taxable Amount:</span>
-            <span style={styles.totalsValue}>₹{subtotal.toFixed(2)}</span>
-          </div>
-          <div style={styles.totalsRow}>
-            <span style={styles.totalsLabel}>GST (18%):</span>
-            <span style={styles.totalsValue}>₹{taxAmount.toFixed(2)}</span>
-          </div>
-          <div style={{ ...styles.totalsRow, borderTop: '1px solid #ccc', paddingTop: '8px', marginTop: '8px' }}>
-            <span style={styles.totalsLabel}>Total Amount:</span>
-            <span style={{ ...styles.totalsValue, fontWeight: 'bold' }}>₹{grandTotal.toFixed(2)}</span>
-          </div>
-          <div style={{ fontSize: '11px', color: '#666', marginTop: '8px', fontStyle: 'italic' }}>
-            (All prices include GST)
+        {/* ✅ FIXED: Totals Box - Now uses wrapper div with flexbox instead of float */}
+        <div style={styles.totalsWrapper}>
+          <div style={styles.totalsBox}>
+            <div style={styles.totalsRow}>
+              <span style={styles.totalsLabel}>Taxable Amount:</span>
+              <span style={styles.totalsValue}>₹{subtotal.toFixed(2)}</span>
+            </div>
+            <div style={styles.totalsRow}>
+              <span style={styles.totalsLabel}>GST (18%):</span>
+              <span style={styles.totalsValue}>₹{taxAmount.toFixed(2)}</span>
+            </div>
+            <div style={{ ...styles.totalsRow, borderTop: '1px solid #ccc', paddingTop: '8px', marginTop: '8px' }}>
+              <span style={styles.totalsLabel}>Total Amount:</span>
+              <span style={{ ...styles.totalsValue, fontWeight: 'bold' }}>₹{grandTotal.toFixed(2)}</span>
+            </div>
+            <div style={{ fontSize: '11px', color: '#666', marginTop: '8px', fontStyle: 'italic' }}>
+              (All prices include GST)
+            </div>
           </div>
         </div>
 

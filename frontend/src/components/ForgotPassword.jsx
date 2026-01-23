@@ -235,44 +235,61 @@ const ForgotPassword = () => {
           )}
 
           {/* STEP 3 */}
-          {step === 3 && (
-            <form className="modern-auth-form" onSubmit={handleChangePassword}>
-              <div className="form-group-modern">
-                <label>New Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    className="modern-input"
-                    placeholder="Enter new password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                 
-                </div>
-              </div>
+         {step === 3 && (
+  <form className="modern-auth-form" onSubmit={handleChangePassword}>
+    <div className="form-group-modern">
+      <label>New Password</label>
+      <div className="password-input-wrapper">
+        <input
+          type={showPassword ? "text" : "password"}
+          className="modern-input password-input-field"
+          placeholder="Enter new password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        {password && (
+          <button
+            type="button"
+            className="password-toggle-btn"
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex="-1"
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        )}
+      </div>
+    </div>
 
-              <div className="form-group-modern">
-                <label>Confirm Password</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    className="modern-input"
-                    placeholder="Confirm password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                 
-                </div>
-              </div>
+    <div className="form-group-modern">
+      <label>Confirm Password</label>
+      <div className="password-input-wrapper">
+        <input
+          type={showConfirmPassword ? "text" : "password"}
+          className="modern-input password-input-field"
+          placeholder="Confirm password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+        {confirmPassword && (
+          <button
+            type="button"
+            className="password-toggle-btn"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            tabIndex="-1"
+          >
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        )}
+      </div>
+    </div>
 
-              <button className="modern-btn-primary text-center" type="submit">
-                Update Password
-              </button>
-            </form>
-          )}
-
+    <button className="modern-btn-primary text-center" type="submit">
+      Update Password
+    </button>
+  </form>
+)}
           {!isAuthenticated && (
             <p className="signin-text pt-3">
               Remember your password?{" "}
@@ -289,6 +306,54 @@ const ForgotPassword = () => {
 .modern-auth-left {
   position: relative;
   overflow: hidden;
+}
+ 
+/* Password Input Styling for Forgot Password */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-field {
+  width: 100%;
+  padding-right: 45px !important;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+  z-index: 10;
+}
+
+.password-toggle-btn:hover {
+  color: #0066cc;
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+}
+
+.password-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Prevent default password reveal buttons in Edge/IE */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
 }
 
 .auth-side-image {
