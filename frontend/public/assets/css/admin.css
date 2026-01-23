@@ -741,4 +741,8 @@
   justify-content: center;
 
 }
-
+@media screen and (max-width: 576px) {
+.table-name-sm{
+  font-size: 12px!important;
+}
+}

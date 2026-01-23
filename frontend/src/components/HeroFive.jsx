@@ -147,7 +147,7 @@ const HeroFive = () => {
             }
             
             .hero-slide-overlay .btn-group {
-              flex-direction: column;
+              
               gap: 10px;
             }
             

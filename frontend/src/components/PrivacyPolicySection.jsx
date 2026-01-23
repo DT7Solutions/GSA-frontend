@@ -4,17 +4,17 @@ const PrivacyPolicyPage = () => {
   return (
     <div className="privacy-policy-area space">
       <div className="container">
-        <h2 className="mb-4">Privacy Policy</h2>
+        <h4 className="mb-4">Privacy Policy</h4>
         <p>
           At Gowrisankar Agencies, we are committed to protecting your privacy. This Privacy Policy outlines how we collect, use, and safeguard your personal information when you visit our website or use our services.
         </p>
 
-        <h4>1. Information We Collect</h4>
+        <h6>1. Information We Collect</h6>
         <p>
           We may collect personal information such as your name, email address, phone number, and address when you contact us, make a purchase, or fill out a form on our website.
         </p>
 
-        <h4>2. How We Use Your Information</h4>
+        <h6>2. How We Use Your Information</h6>
         <p>
           The information we collect is used to:
           <ul>
@@ -25,27 +25,27 @@ const PrivacyPolicyPage = () => {
           </ul>
         </p>
 
-        <h4>3. Data Protection</h4>
+        <h6>3. Data Protection</h6>
         <p>
           We implement industry-standard security measures to protect your data. Your personal information is stored securely and is not shared with third parties except for order fulfillment or when required by law.
         </p>
 
-        <h4>4. Cookies</h4>
+        <h6>4. Cookies</h6>
         <p>
           Our website may use cookies to enhance user experience and analyze traffic. You can disable cookies in your browser settings.
         </p>
 
-        <h4>5. Third-Party Services</h4>
+        <h6>5. Third-Party Services</h6>
         <p>
           We may use third-party services like payment gateways or analytics tools. These providers have their own privacy policies, which we recommend reviewing.
         </p>
 
-        <h4>6. Your Rights</h4>
+        <h6>6. Your Rights</h6>
         <p>
           You have the right to access, modify, or delete your personal data at any time. Please contact us if you wish to make such a request.
         </p>
 
-        <h4>7. Contact Us</h4>
+        <h6>7. Contact Us</h6>
         <p>
           If you have any questions about this Privacy Policy, please contact us at:  
           <br />

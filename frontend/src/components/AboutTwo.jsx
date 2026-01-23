@@ -298,14 +298,14 @@ const AboutTwo = () => {
             {/* RIGHT SIDE - CONTENT */}
             <div className="content-wrapper">
               <span className="badge-blue">Meet Our Founder</span>
-              <h2>Sri Gowrisankar</h2>
+              <h4>Rajesh Katakam</h4>
               <p style={{ color: "#0284c7", fontWeight: 600, marginBottom: 15 }}>
                 Founder & Managing Director
               </p>
 
               <p>
                 With a vision to revolutionize the automotive spare parts
-                industry in Andhra Pradesh, Sri Gowrisankar founded Gowrisankar
+                industry in Andhra Pradesh, Rajesh Katakam founded Gowrisankar
                 Agencies in 1995. His deep understanding of the automotive
                 sector and commitment to quality has been the cornerstone of our
                 success.
@@ -331,7 +331,7 @@ const AboutTwo = () => {
                 <div className="quote-author">
                   <div className="author-avatar">GS</div>
                   <div className="author-info">
-                    <h4>Sri Gowrisankar</h4>
+                    <h4>Rajesh Katakam</h4>
                     <p>Founder, Gowrisankar Agencies</p>
                   </div>
                 </div>

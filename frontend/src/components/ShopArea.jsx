@@ -774,7 +774,7 @@ const ShopArea = ({ id }) => {
                                   // to={`/shop-details/${product.id}`}
                                   className="text-decoration-none text-dark fw-medium d-flex align-items-center"
                                 >
-                                  <span>{product.product_name || "Unnamed Product"}</span>
+                                  <span className="table-name-sm">{product.product_name || "Unnamed Product"}</span>
                                 </Link>
                               </td>
                               <td>
@@ -875,7 +875,7 @@ const ShopArea = ({ id }) => {
                         className="comment-form bg-light p-4 rounded card shadow-sm"
                         onSubmit={handleEnquirySubmit}
                       >
-                        <h5 className="mb-4 text-center">Submit Product Enquiry</h5>
+                        <h5 className="mb-4 text-center pt-3">Submit Product Enquiry</h5>
                         <div className="row p-lg-5 p-3">
                           <div className="col-md-6 form-group mb-3">
                             <input
@@ -952,7 +952,7 @@ const ShopArea = ({ id }) => {
                             ></textarea>
                           </div>
                           <div className="col-12 form-group mb-0">
-                            <button className="btn btn-primary w-100" type="submit">
+                            <button className="btn-theme-admin " type="submit">
                               Submit Enquiry
                             </button>
                           </div>
