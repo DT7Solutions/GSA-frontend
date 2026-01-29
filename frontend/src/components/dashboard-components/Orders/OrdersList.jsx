@@ -12,6 +12,7 @@ import autoTable from 'jspdf-autotable';
 import Invoicetemplate from '../Orders/Invoicetemplate';
 import PackingSlipTemplate from '../Orders/PackingSlipTemplate';
 import { createRoot } from 'react-dom/client';
+import "../../../../src/assets/css/Auth.css"
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
@@ -46,6 +47,8 @@ const OrdersList = () => {
       .catch((error) => console.error("Error fetching orders:", error));
     }
   }, [token]);
+
+
 
   // Separate useEffect for DataTable initialization
   useEffect(() => {
@@ -407,15 +410,30 @@ const OrdersList = () => {
                   </span>
                 </td>
                 <td>
-                  <Link to="#" onClick={() => handleEditClick(order)}>
+                  <Link 
+                    to="#" 
+                    onClick={() => handleEditClick(order)}
+                    className="action-icon"
+                    data-tooltip="Edit Order"
+                  >
                     <Icon icon="lucide:edit" />
                   </Link>
                   &nbsp;&nbsp;&nbsp;
-                  <Link to="#" onClick={() => handlePrint(order)}>
+                  <Link 
+                    to="#" 
+                    onClick={() => handlePrint(order)}
+                    className="action-icon"
+                    data-tooltip="Download Invoice"
+                  >
                     <Icon icon="mdi:file-document-outline" />
                   </Link>
                   &nbsp;&nbsp;&nbsp;
-                  <Link to="#" onClick={() => handlePackingSlipPrint(order)}>
+                  <Link 
+                    to="#" 
+                    onClick={() => handlePackingSlipPrint(order)}
+                    className="action-icon"
+                    data-tooltip="Download Packing Slip"
+                  >
                     <Icon icon="mdi:package-variant-closed" />
                   </Link>
                 </td>
@@ -455,14 +473,14 @@ const OrdersList = () => {
                   <div className="text-end">
                     <button 
                       type="button" 
-                      className="btn btn-secondary me-2" 
+                      className="btn-theme-admin me-5" 
                       onClick={handleClose}
                     >
                       Cancel
                     </button>
                     <button 
                       type="button" 
-                      className="btn btn-primary" 
+                      className="btn-theme-admin" 
                       onClick={handleSave}
                     >
                       Save Changes

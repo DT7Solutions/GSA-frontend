@@ -390,7 +390,7 @@ const Cart = () => {
             <i className="fas fa-shopping-cart" style={{ fontSize: "80px", color: "#0068a5", marginBottom: "20px" }}></i>
             <h5 className="mb-3">Your Cart is Empty</h5>
             <p className="mb-5">Looks like you haven't added any items to your cart yet.</p>
-            <Link to="/shop/121" className="btn style2">
+            <Link to="/shop/121" className="btn-theme-admin style2">
               Continue Shopping
             </Link>
           </div>

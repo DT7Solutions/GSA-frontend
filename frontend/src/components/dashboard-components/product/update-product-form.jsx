@@ -749,7 +749,7 @@ const UpdateProductsForm = () => {
                         </div>
 
                         <div className="col-12">
-                            <button className="btn btn-primary-600 style2" type="submit">
+                            <button className="btn-theme-admin" type="submit">
                                 Update Car Part
                             </button>
                         </div>

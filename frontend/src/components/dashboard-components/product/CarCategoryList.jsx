@@ -129,7 +129,7 @@ const CarCategoryList = () => {
       <div className="card-body">
         <div className="table-responsive">
           <table
-            className="table bordered-table mb-0 sm-table"
+            className="table table-striped table-hover align-middle"
             id="dataTable"
             data-page-length={10}
           >
@@ -240,7 +240,7 @@ const CarCategoryList = () => {
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn-theme-admin"
                       onClick={() => {
                         setShowPartGroupModal(false);
                         setIsEdit(false);
@@ -249,7 +249,7 @@ const CarCategoryList = () => {
                     >
                       Cancel
                     </button>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn-theme-admin">
                       {isEdit ? "Update" : "Add"}
                     </button>
                   </div>

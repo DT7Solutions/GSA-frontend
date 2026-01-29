@@ -436,7 +436,7 @@ const CarModelsDisplay = () => {
                                             />
                                         </div>
 
-                                        <button type="submit" className="btn btn-primary">
+                                        <button type="submit" className="btn-theme-admin">
                                             {isEdit ? "Update" : "Save"}
                                         </button>
                                     </form>

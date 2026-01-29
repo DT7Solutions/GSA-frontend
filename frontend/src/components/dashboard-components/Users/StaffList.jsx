@@ -269,7 +269,7 @@ const StaffList = () => {
                                             <td>{staff.email}</td>
                                             <td>{staff.phone || 'N/A'}</td>
                                             <td>
-                                                <span className={`badge text-sm fw-semibold ${
+                                                <span className={`badge-shop text-sm fw-semibold ${
                                                     staff.is_active 
                                                         ? 'text-success-600 bg-success-100' 
                                                         : 'text-danger-600 bg-danger-100'

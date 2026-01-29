@@ -153,7 +153,7 @@ const CarBrandDisplay = () => {
                 </div>
 
                 <div className="table-responsive">
-                    <table className="table bordered-table mb-0 sm-table">
+                    <table className="table table-striped table-hover align-middle">
                         <thead>
                             <tr>
                                 <th>S.L</th>
@@ -302,7 +302,7 @@ const CarBrandDisplay = () => {
                                                 required={!isEdit}
                                             />
                                         </div>
-                                        <button type="submit" className="btn btn-primary style2">
+                                        <button type="submit" className="btn-theme-admin">
                                             {isEdit ? "Update Car" : "Save Car"}
                                         </button>
                                     </form>

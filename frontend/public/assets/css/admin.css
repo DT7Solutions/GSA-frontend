@@ -745,4 +745,10 @@
 .table-name-sm{
   font-size: 12px!important;
 }
+
+.cart_table td:before {
+background: #0068a5;
+color: #fff!important;
+min-width: 150px;
+}
 }

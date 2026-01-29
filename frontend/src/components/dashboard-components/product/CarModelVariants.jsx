@@ -326,7 +326,7 @@ const handleCarMakeChange = async (e) => {
                                             }
                                         ></textarea>
                                     </div>
-                                    <button type="submit" className="btn btn-primary w-100">Update Car Variant</button>
+                                    <button type="submit" className="btn-theme-admin w-100">Update Car Variant</button>
                                 </form>
                             </div>
                         </div>

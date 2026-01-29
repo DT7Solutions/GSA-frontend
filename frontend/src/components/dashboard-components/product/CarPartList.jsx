@@ -102,7 +102,7 @@ const CarPartList = () => {
       </div> */}
       <div className="card-body">
         <div className="table-responsive">
-          <table className="table bordered-table mb-0 sm-table" id="dataTable" data-page-length={10}>
+          <table className="table table-striped table-hover align-middle" id="dataTable" data-page-length={10}>
             <thead>
               <tr>
                 <th>S.L</th>
@@ -181,8 +181,8 @@ const CarPartList = () => {
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="submit" className="btn btn-primary">Update</button>
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                  <button type="submit" className="btn-theme-admin">Update</button>
+                  <button type="button" className="btn-theme-admin" onClick={() => setShowModal(false)}>Cancel</button>
                 </div>
               </div>
             </form>

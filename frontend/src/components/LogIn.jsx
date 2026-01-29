@@ -511,6 +511,9 @@ const handleGoogleResponse = async (response) => {
       {/* Right Side - Login Form */}
       <div className="modern-auth-right">
         <div className="modern-auth-form-wrapper">
+          <Link to="/" className="back-to-home-link">
+            ← Back to Home
+          </Link>
           <div className="modern-auth-header">
             <h1>Welcome back</h1>
             <p>Please enter your details</p>
@@ -675,6 +678,23 @@ const handleGoogleResponse = async (response) => {
       </div>
 
       <style>{`
+        /* Back to Home Link */
+        .back-to-home-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: #666;
+          font-size: 14px;
+          font-weight: 500;
+          text-decoration: none;
+          margin-bottom: 24px;
+          transition: color 0.3s ease;
+        }
+
+        .back-to-home-link:hover {
+          color: #0066cc;
+        }
+
         /* Login Method Tabs */
         .login-method-tabs {
           display: flex;

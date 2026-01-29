@@ -11,6 +11,7 @@ const TwoBannerSection = () => {
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       buttonHoverColor: "#667eea",
       backgroundImage: "url('/assets/img/bg/Homepage-banner-one.png')",
+      
     },
     {
       id: 2,
@@ -21,6 +22,7 @@ const TwoBannerSection = () => {
       gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
       buttonHoverColor: "#f5576c",
       backgroundImage: "url('/assets/img/bg/Homepage-banner-two.png')",
+     
     }
   ];
 
@@ -47,6 +49,7 @@ const TwoBannerSection = () => {
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
       cursor: 'pointer',
+      backgroundSize: '100%',
     },
     bannerBackground: {
       position: 'absolute',
@@ -96,7 +99,60 @@ const TwoBannerSection = () => {
       cursor: 'pointer',
     },
   };
-
+const mediaQueryStyles = `
+  /* Extra Small Devices (max-width: 576px) */
+  @media (max-width: 576px) {
+    .banner-card {
+      height: 230px !important;
+    }
+    
+    .banner-content {
+      padding: 30px 20px !important;
+    }
+    
+    .banner-heading {
+      font-size: 16px !important;
+      margin-bottom: 12px !important;
+    }
+    
+    .banner-paragraph {
+      font-size: 13px !important;
+      margin-bottom: 15px !important;
+      max-width: 100%;
+    }
+    
+    .banner-button {
+      padding: 10px 20px !important;
+      font-size: 12px !important;
+    }
+  }
+  
+  /* Small Devices (577px - 768px) */
+  @media (min-width: 577px) and (max-width: 768px) {
+    .banner-card {
+      height: 260px !important;
+    }
+    
+    .banner-content {
+      padding: 40px 30px !important;
+    }
+    
+    .banner-heading {
+      font-size: 18px !important;
+      margin-bottom: 15px !important;
+    }
+    
+    .banner-paragraph {
+      font-size: 14px !important;
+      margin-bottom: 20px !important;
+    }
+    
+    .banner-button {
+      padding: 12px 28px !important;
+      font-size: 13px !important;
+    }
+  }
+`;
   const handleCardHover = (e, isHovering) => {
     if (isHovering) {
       e.currentTarget.style.transform = 'translateY(-5px)';
@@ -129,6 +185,7 @@ const TwoBannerSection = () => {
             <div
               style={{
                 ...styles.bannerCard,
+                ...mediaQueryStyles.bannerCard,
                 backgroundImage: banner.backgroundImage,
               }}
               onMouseEnter={(e) => handleCardHover(e, true)}
