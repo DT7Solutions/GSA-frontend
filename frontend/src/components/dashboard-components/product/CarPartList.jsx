@@ -130,6 +130,7 @@ const CarPartList = () => {
                       onClick={() => handleEditClick(item)}
                       className="btn-theme-admin py-3"
                       title="Edit"
+                      
                     >
                       <Icon icon="lucide:edit" />
                     </button>

@@ -18,6 +18,8 @@ const CustomerOrdersList = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [tableInitialized, setTableInitialized] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const CustomerOrdersList = () => {
     }
   }, [token, tableInitialized]);
 
-  const handleEditClick = (order) => {
+  const handleViewClick = (order) => {
     setSelectedOrder({ ...order });
     setShowModal(true);
   };
@@ -194,26 +196,154 @@ const CustomerOrdersList = () => {
     doc.save(`PackingSlip_${order.razorpay_order_id}.pdf`);
   };
 
+  // Filter orders based on search term and status
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = 
+      order.id.toString().includes(searchTerm.toLowerCase()) ||
+      order.razorpay_order_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.total_price.toString().includes(searchTerm) ||
+      new Date(order.created_at).toLocaleDateString().includes(searchTerm);
+    
+    const matchesStatus = filterStatus === "all" || order.status.toLowerCase() === filterStatus.toLowerCase();
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setFilterStatus("all");
+  };
+
   return (
     <>
-      <div className="card basic-data-table table-responsive">
-        <div className="card-header"><h5>Orders List</h5></div>
+      <div className="card basic-data-table">
+        <div className="card-header">
+          <h5>Orders List</h5>
+          <span className="orders-count">{orders.length} Orders</span>
+        </div>
         <div className="card-body">
-          <table className="display table table-striped table-bordered mb-0" id="dataTable">
-            <thead>
-              <tr><th>S.L</th><th>Order Id</th><th>Invoice Id</th><th>Order Date</th><th>Order Amount</th><th>Order Status</th><th>Action</th></tr>
-            </thead>
-            <tbody>
-              {orders.map((order, idx) => (
-                <tr key={order.id}>
-                  <td>{String(idx + 1).padStart(2, '0')}</td>
-                  <td>{order.id}</td>
-                  <td>#{order.razorpay_order_id}</td>
-                  <td>{new Date(order.created_at).toLocaleDateString()}</td>
-                  <td>₹{order.total_price}</td>
-                  <td>
+          {/* Desktop Table View */}
+          <div className="desktop-table-wrapper">
+            <div className="table-responsive">
+              <table className="display table table-striped table-bordered mb-0" id="dataTable">
+                <thead>
+                  <tr><th>S.L</th><th>Order Id</th><th>Invoice Id</th><th>Order Date</th><th>Order Amount</th><th>Order Status</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                  {orders.map((order, idx) => (
+                    <tr key={order.id}>
+                      <td>{String(idx + 1).padStart(2, '0')}</td>
+                      <td>{order.id}</td>
+                      <td>#{order.razorpay_order_id}</td>
+                      <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                      <td>₹{order.total_price}</td>
+                      <td>
+                        <span
+                          className={`badge ${order.status.toLowerCase() === 'pending'
+                            ? 'badge-yellow'
+                            : order.status.toLowerCase() === 'confirmed'
+                              ? 'badge-green'
+                              : order.status.toLowerCase() === 'progress'
+                                ? 'badge-blue'
+                                : ['failed', 'cancelled'].includes(order.status.toLowerCase())
+                                  ? 'badge-red'
+                                  : ''
+                            }`}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <Link 
+                            to="#" 
+                            onClick={() => handleViewClick(order)}
+                            className="action-btn"
+                            data-tooltip="View Order Details"
+                          >
+                            <Icon icon="mdi:eye-outline" />
+                          </Link>
+                          <Link 
+                            to="#" 
+                            onClick={() => handlePrint(order)}
+                            className="action-btn"
+                            data-tooltip="Download Invoice"
+                          >
+                            <Icon icon="mdi:file-document-outline" />
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="mobile-cards-wrapper">
+            {/* Mobile Search and Filter */}
+            <div className="mobile-filter-section">
+              <div className="search-box">
+                <Icon icon="mdi:magnify" className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search by Order ID, Invoice ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm("")} className="clear-search-btn">
+                    <Icon icon="mdi:close-circle" />
+                  </button>
+                )}
+              </div>
+
+              <div className="filter-row">
+                <select 
+                  value={filterStatus} 
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="status-filter"
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="progress">In Progress</option>
+                  <option value="failed">Failed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+
+                {(searchTerm || filterStatus !== "all") && (
+                  <button onClick={handleClearFilters} className="clear-filters-btn">
+                    <Icon icon="mdi:filter-remove" />
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+
+              <div className="results-info">
+                Showing {filteredOrders.length} of {orders.length} orders
+              </div>
+            </div>
+
+            {/* Order Cards */}
+            {filteredOrders.length === 0 ? (
+              <div className="no-results">
+                <Icon icon="mdi:package-variant-closed" className="no-results-icon" />
+                <h3>No Orders Found</h3>
+                <p>Try adjusting your search or filters</p>
+              </div>
+            ) : (
+              filteredOrders.map((order, idx) => (
+                <div key={order.id} className="mobile-order-card">
+                  <div className="mobile-card-header">
+                    <div className="order-number">
+                      <span className="order-label">Order #{String(idx + 1).padStart(2, '0')}</span>
+                      <span className="order-id">ID: {order.id}</span>
+                    </div>
                     <span
-                      className={`${order.status.toLowerCase() === 'pending'
+                      className={`badge ${order.status.toLowerCase() === 'pending'
                         ? 'badge-yellow'
                         : order.status.toLowerCase() === 'confirmed'
                           ? 'badge-green'
@@ -226,15 +356,43 @@ const CustomerOrdersList = () => {
                     >
                       {order.status}
                     </span>
-                  </td>
-                  <td>
-                    <Link to="#" onClick={() => handleEditClick(order)}><Icon icon="lucide:edit" /></Link>&nbsp;&nbsp;&nbsp;
-                    <Link to="#" onClick={() => handlePrint(order)}> <Icon icon="mdi:file-document-outline" /> </Link>&nbsp;&nbsp;&nbsp;
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+
+                  <div className="mobile-card-body">
+                    <div className="mobile-detail-row">
+                      <span className="mobile-label">Invoice ID:</span>
+                      <span className="mobile-value">#{order.razorpay_order_id}</span>
+                    </div>
+                    <div className="mobile-detail-row">
+                      <span className="mobile-label">Order Date:</span>
+                      <span className="mobile-value">{new Date(order.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="mobile-detail-row">
+                      <span className="mobile-label">Amount:</span>
+                      <span className="mobile-value mobile-amount">₹{order.total_price}</span>
+                    </div>
+                  </div>
+
+                  <div className="mobile-card-actions">
+                    <button 
+                      onClick={() => handleViewClick(order)}
+                      className="mobile-action-btn mobile-btn-primary"
+                    >
+                      <Icon icon="mdi:eye-outline" />
+                      View Details
+                    </button>
+                    <button 
+                      onClick={() => handlePrint(order)}
+                      className="mobile-action-btn mobile-btn-secondary"
+                    >
+                      <Icon icon="mdi:file-document-outline" />
+                      Download
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
@@ -323,6 +481,407 @@ const CustomerOrdersList = () => {
       )}
 
       <style jsx>{`
+        /* Card Header */
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1.25rem;
+          background-color: #f8f9fa;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .card-header h5 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #1f2937;
+        }
+
+        .orders-count {
+          background: #3b82f6;
+          color: white;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+
+        /* Desktop Table Wrapper */
+        .desktop-table-wrapper {
+          display: block;
+        }
+
+        .table-responsive {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* Mobile Cards Wrapper - Hidden by default */
+        .mobile-cards-wrapper {
+          display: none;
+        }
+
+        /* Mobile Filter Section */
+        .mobile-filter-section {
+          background: white;
+          padding: 16px;
+          border-radius: 12px;
+          margin-bottom: 16px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box {
+          position: relative;
+          margin-bottom: 12px;
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 20px;
+          color: #6b7280;
+          pointer-events: none;
+        }
+
+        .search-input {
+          width: 100%;
+          padding: 12px 44px 12px 44px;
+          border: 2px solid #e5e7eb;
+          border-radius: 10px;
+          font-size: 0.9rem;
+          transition: all 0.2s ease;
+          outline: none;
+        }
+
+        .search-input:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-input::placeholder {
+          color: #9ca3af;
+        }
+
+        .clear-search-btn {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: #6b7280;
+          cursor: pointer;
+          padding: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: color 0.2s;
+        }
+
+        .clear-search-btn:hover {
+          color: #ef4444;
+        }
+
+        .clear-search-btn svg {
+          font-size: 20px;
+        }
+
+        .filter-row {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .status-filter {
+          flex: 1;
+          padding: 10px 14px;
+          border: 2px solid #e5e7eb;
+          border-radius: 10px;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #374151;
+          background: white;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          outline: none;
+        }
+
+        .status-filter:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .clear-filters-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 10px 16px;
+          background: #fee2e2;
+          color: #991b1b;
+          border: none;
+          border-radius: 10px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .clear-filters-btn:hover {
+          background: #fecaca;
+          transform: translateY(-1px);
+        }
+
+        .clear-filters-btn svg {
+          font-size: 16px;
+        }
+
+        .results-info {
+          text-align: center;
+          color: #6b7280;
+          font-size: 0.85rem;
+          font-weight: 500;
+          padding: 8px;
+          background: #f9fafb;
+          border-radius: 8px;
+        }
+
+        /* No Results Message */
+        .no-results {
+          text-align: center;
+          padding: 60px 20px;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .no-results-icon {
+          font-size: 80px;
+          color: #d1d5db;
+          margin-bottom: 16px;
+        }
+
+        .no-results h3 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #374151;
+          margin-bottom: 8px;
+        }
+
+        .no-results p {
+          font-size: 0.95rem;
+          color: #6b7280;
+          margin: 0;
+        }
+
+        /* Action Buttons Container */
+        .action-buttons {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+         
+        }
+
+        /* Action Button Styling */
+        .action-btn {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 6px;
+          background-color: #f3f4f6;
+          color: #4b5563;
+          transition: all 0.2s ease;
+          text-decoration: none;
+        }
+
+        .action-btn:hover {
+          background-color: #3b82f6;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .action-btn svg {
+          font-size: 18px;
+        }
+
+        /* Tooltip Styling */
+        .action-btn::before {
+          content: attr(data-tooltip);
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%) translateY(-8px);
+          padding: 6px 12px;
+          background-color: #1f2937;
+          color: white;
+          font-size: 12px;
+          font-weight: 500;
+          white-space: nowrap;
+          border-radius: 6px;
+          opacity: 0;
+          pointer-events: none;
+          transition: all 0.2s ease;
+          z-index: 1000;
+        }
+
+        .action-btn::after {
+          content: '';
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%) translateY(-2px);
+          border: 5px solid transparent;
+          border-top-color: #1f2937;
+          opacity: 0;
+          pointer-events: none;
+          transition: all 0.2s ease;
+        }
+
+        .action-btn:hover::before,
+        .action-btn:hover::after {
+          opacity: 1;
+          transform: translateX(-50%) translateY(-4px);
+        }
+
+        /* Mobile Order Card Styles */
+        .mobile-order-card {
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          margin-bottom: 16px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          overflow: hidden;
+          transition: all 0.3s ease;
+        }
+
+        .mobile-order-card:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+
+        .mobile-card-header {
+          background: #0068a5;
+          padding: 16px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+        }
+
+        .order-number {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .order-label {
+          font-size: 0.875rem;
+          font-weight: 700;
+          color: white;
+          letter-spacing: 0.5px;
+        }
+
+        .order-id {
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .mobile-card-body {
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .mobile-detail-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-bottom: 8px;
+          border-bottom: 1px solid #f3f4f6;
+        }
+
+        .mobile-detail-row:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        .mobile-label {
+          font-size: 0.875rem;
+          color: #6b7280;
+          font-weight: 500;
+        }
+
+        .mobile-value {
+          font-size: 0.875rem;
+          color: #1f2937;
+          font-weight: 600;
+          text-align: right;
+        }
+
+        .mobile-amount {
+          color: #059669;
+          font-size: 1rem;
+        }
+
+        .mobile-card-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          padding: 16px;
+          background: #f9fafb;
+          border-top: 1px solid #e5e7eb;
+        }
+
+        .mobile-action-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 12px;
+          border: none;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-decoration: none;
+        }
+
+        .mobile-action-btn svg {
+          font-size: 18px;
+        }
+
+        .mobile-btn-primary {
+          background: #0068a5;
+          color: white;
+        }
+
+        .mobile-btn-primary:hover {
+          background: #005a8c;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .mobile-btn-secondary {
+          background: white;
+          color: #0068a5;
+          border: 2px solid #0068a5;
+        }
+
+        .mobile-btn-secondary:hover {
+          background: #eff6ff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+        }
+
         /* Modal Overlay */
         .custom-modal-overlay {
           position: fixed;
@@ -512,7 +1071,7 @@ const CustomerOrdersList = () => {
         /* Badge Styles */
         .badge {
           display: inline-block;
-          padding: 4px 12px;
+          padding: 8px 12px;
           border-radius: 20px;
           font-size: 0.85rem;
           font-weight: 600;
@@ -523,15 +1082,46 @@ const CustomerOrdersList = () => {
           color: #92400e;
         }
 
-   
+        .badge-green {
+          background: #d1fae5;
+          color: #065f46;
+        }
 
         .badge-blue {
           background: #dbeafe;
           color: #1e40af;
         }
 
+        .badge-red {
+          background: #fee2e2;
+          color: #991b1b;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
+          /* Hide desktop table on mobile */
+          .desktop-table-wrapper {
+            display: none;
+          }
+
+          /* Show mobile cards on mobile */
+          .mobile-cards-wrapper {
+            display: block;
+          }
+
+          .card-header {
+            padding: 1rem;
+          }
+
+          .card-header h5 {
+            font-size: 1.1rem;
+          }
+
+          .orders-count {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+          }
+
           .custom-modal-overlay {
             padding: 10px;
             align-items: flex-start;
@@ -577,9 +1167,160 @@ const CustomerOrdersList = () => {
           .item-price {
             font-size: 1rem;
           }
+
+          .action-buttons {
+            gap: 8px;
+          }
+
+          .action-btn {
+            width: 28px;
+            height: 28px;
+          }
+
+          .action-btn svg {
+            font-size: 16px;
+          }
+
+          /* Hide tooltips on mobile */
+          .action-btn::before,
+          .action-btn::after {
+            display: none;
+          }
         }
 
+        /* Tablet Responsive */
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .card-header h5 {
+            font-size: 1.15rem;
+          }
+
+          .table-responsive {
+            font-size: 0.9rem;
+          }
+
+          .action-btn {
+            width: 30px;
+            height: 30px;
+          }
+
+          .custom-modal-container {
+            max-width: 700px;
+          }
+
+          .order-details-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          }
+        }
+
+        /* Small Mobile Devices */
         @media (max-width: 480px) {
+          .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+          }
+
+           .filter-row select{
+            line-height: 40px!important;
+            
+          }
+
+          .card-header h5 {
+            font-size: 1rem;
+          }
+
+          .orders-count {
+            align-self: flex-end;
+          }
+
+          .mobile-filter-section {
+            padding: 12px;
+          }
+
+          .search-input {
+            padding: 10px 40px 10px 40px;
+            font-size: 0.85rem;
+          }
+
+          .search-icon {
+            font-size: 18px;
+            left: 12px;
+          }
+
+          .filter-row {
+            flex-direction: column;
+            gap: 8px;
+          }
+
+          .status-filter,
+          .clear-filters-btn {
+            width: 100%;
+          }
+
+          .clear-filters-btn {
+            justify-content: center;
+          }
+
+          .results-info {
+            font-size: 0.8rem;
+          }
+
+          .no-results {
+            padding: 40px 16px;
+          }
+
+          .no-results-icon {
+            font-size: 60px;
+          }
+
+          .no-results h3 {
+            font-size: 1.1rem;
+          }
+
+          .no-results p {
+            font-size: 0.875rem;
+          }
+
+          .mobile-card-header {
+            padding: 12px;
+          }
+
+          .order-label {
+            font-size: 0.8rem;
+          }
+
+          .order-id {
+            font-size: 0.7rem;
+          }
+
+          .mobile-card-body {
+            padding: 12px;
+          }
+
+          .mobile-detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+          }
+
+          .mobile-value {
+            text-align: left;
+          }
+
+          .mobile-card-actions {
+            padding: 12px;
+            gap: 8px;
+          }
+
+          .mobile-action-btn {
+            padding: 10px;
+            font-size: 0.8rem;
+          }
+
+          .mobile-action-btn svg {
+            font-size: 16px;
+          }
+
           .custom-modal-header h5 {
             font-size: 1rem;
           }
@@ -590,6 +1331,41 @@ const CustomerOrdersList = () => {
 
           .detail-value {
             font-size: 0.9rem;
+          }
+
+          .badge {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+          }
+        }
+
+        /* Extra Small Mobile Devices */
+        @media (max-width: 360px) {
+          .mobile-card-actions {
+            grid-template-columns: 1fr;
+          }
+         
+          .mobile-action-btn {
+            width: 100%;
+          }
+        }
+
+        /* Landscape Mobile Orientation */
+        @media (max-height: 600px) and (orientation: landscape) {
+          .custom-modal-container {
+            max-height: 85vh;
+          }
+
+          .custom-modal-body {
+            padding: 10px 15px;
+          }
+
+          .order-details-grid {
+            gap: 8px;
+          }
+
+          .detail-item {
+            padding: 8px 10px;
           }
         }
       `}</style>

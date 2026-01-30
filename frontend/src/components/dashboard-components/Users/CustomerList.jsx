@@ -320,12 +320,14 @@ const CustomerList = () => {
                                                     {customer.role_name?.toLowerCase() !== 'admin' && (
                                                         <button
                                                             type="button"
-                                                            className="badge text-sm fw-semibold bg-danger-600 px-20 py-9 radius-4 text-white d-flex align-items-center gap-1"
+                                                            className="badge text-sm fw-semibold bg-danger-600 px-20 py-9 radius-4 text-white d-flex align-items-center gap-1 action-icon"
                                                             onClick={() => setDeleteModal({
                                                                 show: true,
                                                                 customerId: customer.id,
                                                                 customerName: customer.username
                                                             })}
+                                                            data-tooltip="Delete User"
+
                                                         >
                                                             <Icon icon="mdi:delete-outline" className="text-lg" />
                                                            

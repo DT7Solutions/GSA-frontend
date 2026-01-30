@@ -98,6 +98,127 @@ const AddProductsForm = () => {
     const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validation for required fields
+    if (!formData.carMakeId) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please select a car",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.carModelId) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please select a car model",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.carVariantId) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please select a car variant",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.partCategoryId) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please select a part category",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.partId) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please select a part",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.partName) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please enter part name",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.partNumber) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please enter part number",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.figureNumber) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please enter figure number",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.salePrice) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please enter sale price",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.qty) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please enter quantity",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.sku) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please enter SKU",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
+    if (!formData.remarks) {
+        Swal.fire({
+            title: "Validation Error",
+            text: "Please enter HSN code",
+            icon: "warning",
+            confirmButtonText: "OK",
+        });
+        return;
+    }
+    
     // 🐛 DEBUG: Print form data before sending
     console.log("\n" + "=".repeat(80));
     console.log("🚀 SUBMITTING FORM - Form Data:");
@@ -662,7 +783,7 @@ const AddProductsForm = () => {
                         {/* Car Brand Selection */}
                        <div className="col-md-4">
     <label className="form-label fw-semibold">
-        Select Car 
+        Select Car <span className="text-danger">*</span>
     </label>
 
     <div className="d-flex align-items-center ">
@@ -711,13 +832,13 @@ const AddProductsForm = () => {
 
                         {/* Car Model Selection */}
                         <div className="col-md-4">
-                            <label className="form-label">Select Car Model</label>
+                            <label className="form-label">Select Car Model <span className="text-danger">*</span></label>
                             <div className="addproduct-select input-group has-validation">
-                                <select className="form-select form-select input-g" onChange={handleCarModelChange}>
+                                <select className="form-select form-select input-g" onChange={handleCarModelChange} required>
                                     
-                                    <option >-- select car model --</option>
+                                    <option value="">-- select car model --</option>
                                     {carModels.map((model) => (
-                                        <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
+                                        <option key={model.id} value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
                                         </option>
                                     ))}
                                 </select>
@@ -732,12 +853,12 @@ const AddProductsForm = () => {
                         </div>
                         {/* Car Variant Selection */}
                         <div className="col-md-4">
-                            <label className="form-label">Select Car Variant</label>
+                            <label className="form-label">Select Car Variant <span className="text-danger">*</span></label>
                             <div className="addproduct-select input-group has-validation">
-                                <select className="form-select form-select input-g" onChange={handleCarVariantChange}>
-                                    <option >-- select Car Variant --</option>
+                                <select className="form-select form-select input-g" onChange={handleCarVariantChange} required>
+                                    <option value="">-- select Car Variant --</option>
                                     {carVariant.map((varient) => (
-                                        <option value={varient.id}>{varient.car_model_name}-{varient.name}({new Date(varient.production_start_date).getFullYear()} - {new Date(varient.production_end_date).getFullYear()})</option>
+                                        <option key={varient.id} value={varient.id}>{varient.car_model_name}-{varient.name}({new Date(varient.production_start_date).getFullYear()} - {new Date(varient.production_end_date).getFullYear()})</option>
                                     ))}
                                 </select>
                                 <button
@@ -752,12 +873,12 @@ const AddProductsForm = () => {
 
                         {/* Part Selection */}
                         <div className="col-md-4">
-                            <label className="form-label">Select Part category</label>
+                            <label className="form-label">Select Part category <span className="text-danger">*</span></label>
                             <div className="addproduct-select input-group has-validation">
-                                <select className="form-select form-select input-g" onChange={handleCarcategorytChange}>
-                                    <option >-- select car  part category --  </option>
+                                <select className="form-select form-select input-g" onChange={handleCarcategorytChange} required>
+                                    <option value="">-- select car  part category --  </option>
                                     {carPartCat.map((item) => (
-                                        <option value={item.id}>{item.name}</option>
+                                        <option key={item.id} value={item.id}>{item.name}</option>
                                     ))}
 
                                 </select>
@@ -773,12 +894,12 @@ const AddProductsForm = () => {
 
                         {/* Part */}
                         <div className="col-md-4">
-                            <label className="form-label">Select Part </label>
+                            <label className="form-label">Select Part <span className="text-danger">*</span></label>
                             <div className="addproduct-select input-group has-validation">
-                                <select className="form-select form-select input-g" onChange={handleCarpartitemChange}>
-                                    <option >-- select car  part  --  </option>
+                                <select className="form-select form-select input-g" onChange={handleCarpartitemChange} required>
+                                    <option value="">-- select car  part  --  </option>
                                     {carcatGroup.map((item) => (
-                                        <option value={item.id}>{item.name}</option>
+                                        <option key={item.id} value={item.id}>{item.name}</option>
                                     ))}
 
                                 </select>
@@ -793,7 +914,7 @@ const AddProductsForm = () => {
                         </div>
 
                         <div className="col-md-4">
-                            <label className="form-label">Part Name</label>
+                            <label className="form-label">Part Name <span className="text-danger">*</span></label>
                             <input
                                 type="text"
                                 name="#0"
@@ -805,27 +926,11 @@ const AddProductsForm = () => {
                                 required
                             />
 
-                            <div className="invalid-feedback">Please part name</div>
+                            <div className="invalid-feedback">Please enter part name</div>
                         </div>
 
                         <div className="col-md-4">
-                            <label className="form-label">Part Image</label>
-                            <input
-                                type="file"
-                                name="partImage"
-                                className="form-control"
-                                placeholder="Select product image,"
-                                onChange={(e) =>
-                                    setFormData({ ...formData, partImage: e.target.files[0] })
-                                }
-                                required
-                            />
-                            <div className="invalid-feedback">Please part name</div>
-                        </div>
-
-
-                        <div className="col-md-4">
-                            <label className="form-label">Part Number</label>
+                            <label className="form-label">Part Number <span className="text-danger">*</span></label>
                             <input
                                 type="text"
                                 name="#0"
@@ -836,10 +941,10 @@ const AddProductsForm = () => {
                                 }
                                 required
                             />
-                            <div className="invalid-feedback">Please part number</div>
+                            <div className="invalid-feedback">Please enter part number</div>
                         </div>
                         <div className="col-md-4">
-                            <label className="form-label">Part figure Number</label>
+                            <label className="form-label">Part figure Number <span className="text-danger">*</span></label>
                             <input
                                 type="text"
                                 name="#0"
@@ -850,10 +955,10 @@ const AddProductsForm = () => {
                                 }
                                 required
                             />
-                            <div className="invalid-feedback">Please figure number</div>
+                            <div className="invalid-feedback">Please enter figure number</div>
                         </div>
                         <div className="col-md-4">
-                            <label className="form-label">Price</label>
+                            <label className="form-label">Price<span className="text-danger">*</span></label>
                             <input
                                 type="number"
                                 name="#0"
@@ -862,12 +967,11 @@ const AddProductsForm = () => {
                                 onChange={(e) =>
                                     setFormData({ ...formData, price: e.target.value })
                                 }
-                                required
                             />
-                            <div className="invalid-feedback">Please part price</div>
+                            <div className="invalid-feedback">Please enter part price</div>
                         </div>
                         <div className="col-md-4">
-                            <label className="form-label">Sale Price</label>
+                            <label className="form-label">Sale Price <span className="text-danger">*</span></label>
                             <input
                                 type="number"
                                 name="#0"
@@ -878,7 +982,7 @@ const AddProductsForm = () => {
                                 }
                                 required
                             />
-                            <div className="invalid-feedback">Please part sale price</div>
+                            <div className="invalid-feedback">Please enter part sale price</div>
                         </div>
                         <div className="col-md-4">
                             <label className="form-label">Part discount</label>
@@ -890,12 +994,11 @@ const AddProductsForm = () => {
                                 onChange={(e) =>
                                     setFormData({ ...formData, discount: e.target.value })
                                 }
-                                required
                             />
-                            <div className="invalid-feedback">Please discount.</div>
+                            <div className="invalid-feedback">Please enter discount.</div>
                         </div>
                         <div className="col-md-4">
-                            <label className="form-label">Part QTY</label>
+                            <label className="form-label">Part QTY <span className="text-danger">*</span></label>
                             <input
                                 type="number"
                                 name="#0"
@@ -909,7 +1012,7 @@ const AddProductsForm = () => {
                             <div className="invalid-feedback">Please provide qty.</div>
                         </div>
                         <div className="col-md-4">
-                            <label className="form-label">Part SKU</label>
+                            <label className="form-label">Part SKU <span className="text-danger">*</span></label>
                             <input
                                 type="text"
                                 name="#0"
@@ -924,7 +1027,7 @@ const AddProductsForm = () => {
                         </div>
 
                         <div className="col-md-4">
-                            <label className="form-label">HSN</label>
+                            <label className="form-label">HSN <span className="text-danger">*</span></label>
                             <input
                                 type="text"
                                 name="#0"
@@ -935,6 +1038,7 @@ const AddProductsForm = () => {
                                 }
                                 required
                             />
+                            <div className="invalid-feedback">Please enter HSN code</div>
                         </div>
                         {/* Part Compatibility */}
                         <div className="col-md-6">
@@ -949,14 +1053,14 @@ const AddProductsForm = () => {
                             </div>
                         </div>
 
-                        <div class="col-lg-6 was-validated">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control" rows="4" cols="50" placeholder="Enter a description..."
+                        <div className="col-lg-6 was-validated">
+                            <label className="form-label">Description</label>
+                            <textarea className="form-control" rows="4" cols="50" placeholder="Enter a description..."
                                 onChange={(e) =>
                                     setFormData({ ...formData, description: e.target.value })
                                 }>
                             </textarea>
-                            <div class="invalid-feedback">Please enter a message in the textarea.</div>
+                            <div className="invalid-feedback">Please enter a message in the textarea.</div>
                         </div>
 
 
@@ -1042,7 +1146,7 @@ const AddProductsForm = () => {
                                         >
                                             <option value=""> -- Select Car Brand-- </option>
                                             {carMakes.map((make) => (
-                                                <option value={make.id}>{make.name}</option>
+                                                <option key={make.id} value={make.id}>{make.name}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -1173,7 +1277,7 @@ const AddProductsForm = () => {
                                         >
                                             <option value=""> -- Select Car Brand-- </option>
                                             {carMakes.map((make) => (
-                                                <option value={make.id}>{make.name}</option>
+                                                <option key={make.id} value={make.id}>{make.name}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -1189,7 +1293,7 @@ const AddProductsForm = () => {
                                         >
                                             <option value="">Select Model</option>
                                             {carVariantModel.map((model) => (
-                                                <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
+                                                <option key={model.id} value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
                                                 </option>
                                             ))}
                                             {/* {carModelList.map((model) => (
@@ -1329,7 +1433,7 @@ const AddProductsForm = () => {
                                         >
                                             <option value=""> -- Select Car Brand-- </option>
                                             {carMakes.map((make) => (
-                                                <option value={make.id}>{make.name}</option>
+                                                <option key={make.id} value={make.id}>{make.name}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -1344,7 +1448,7 @@ const AddProductsForm = () => {
                                         >
                                             <option value="">Select Model</option>
                                             {carVariantModel.map((model) => (
-                                                <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
+                                                <option key={model.id} value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
                                                 </option>
                                             ))}
                                             {/* {carModelList.map((model) => (
@@ -1369,7 +1473,7 @@ const AddProductsForm = () => {
                                     ))} */}
                                             
                                             {carModelPoupData.map((item) => (
-                                                <option value={item.id}>{item.name}</option>
+                                                <option key={item.id} value={item.id}>{item.name}</option>
                                             ))}
                                              
                                         </select>
@@ -1432,7 +1536,7 @@ const AddProductsForm = () => {
                                         >
                                             <option value=""> -- Select Car Brand-- </option>
                                             {carMakes.map((make) => (
-                                                <option value={make.id}>{make.name}</option>
+                                                <option key={make.id} value={make.id}>{make.name}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -1447,7 +1551,7 @@ const AddProductsForm = () => {
                                         >
                                             <option value="">Select Model</option>
                                             {carVariantModel.map((model) => (
-                                                <option value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
+                                                <option key={model.id} value={model.id}>{model.name}{model.generation}({new Date(model.production_start_date).getFullYear()} - {new Date(model.production_end_date).getFullYear()})
                                                 </option>
                                             ))}
                                             
@@ -1469,7 +1573,7 @@ const AddProductsForm = () => {
                                     ))} */}
                                             
                                             {carModelPoupData.map((item) => (
-                                                <option value={item.id}>{item.name}</option>
+                                                <option key={item.id} value={item.id}>{item.name}</option>
                                             ))}
                                              
                                         </select>
@@ -1486,7 +1590,7 @@ const AddProductsForm = () => {
                                         >
                                             <option value="">-- Select Part Category -- </option>
                                             {carcatGroups.map((item) => (
-                                                <option value={item.id}>{item.name}</option>
+                                                <option key={item.id} value={item.id}>{item.name}</option>
                                             ))}
                                         </select>
                                     </div>
