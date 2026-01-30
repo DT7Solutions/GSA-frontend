@@ -402,74 +402,465 @@ const Cart = () => {
   return (
     <div className="space-top space-extra-bottom">
       <div className="container">
-        <form action="#" className="woocommerce-cart-form">
-          <style>{`
+        <style>{`
+          /* ===== MODERN CART STYLING ===== */
+          
+          /* Desktop Table View */
+          @media (min-width: 992px) {
+            .cart-items-container {
+              display: block;
+            }
+            
+            .cart-items-mobile {
+              display: none;
+            }
+            
+            .cart_table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 30px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+              border-radius: 8px;
+              overflow: hidden;
+              background: white;
+            }
+
             .cart_table thead th {
-              background-color: #0068a5;
+              background: linear-gradient(135deg, #0068a5 0%, #004d7a 100%);
               color: white;
               text-align: center;
               vertical-align: middle;
-              padding: 15px 10px;
+              padding: 18px 15px;
+              font-weight: 600;
+              font-size: 0.95rem;
+              letter-spacing: 0.3px;
+              border: none;
             }
+
             .cart_table tbody td {
               text-align: center;
               vertical-align: middle;
-              padding: 15px 10px;
+              padding: 18px 15px;
+              border-bottom: 1px solid #f0f0f0;
+              font-size: 0.95rem;
             }
-            .cart-productimage img {
-              margin: 0 auto;
-              display: block;
+
+            .cart_table tbody tr {
+              transition: all 0.3s ease;
             }
+
+            .cart_table tbody tr:hover {
+              background-color: #f8fbfd;
+              box-shadow: inset 0 0 0 1px rgba(0, 104, 165, 0.1);
+            }
+
+            .cart_table tbody tr:last-child td {
+              border-bottom: none;
+            }
+
+            .cart-productname {
+              color: #0068a5;
+              font-weight: 500;
+              text-decoration: none;
+              transition: color 0.2s;
+            }
+
+            .cart-productname:hover {
+              color: #004d7a;
+            }
+
+            .amount {
+              font-weight: 600;
+              color: #1a1a1a;
+              font-size: 1rem;
+            }
+
             .quantity {
               display: flex;
               align-items: center;
               justify-content: center;
+              gap: 8px;
             }
-            .gst-info {
+
+            .qty-btn {
+              width: 32px;
+              height: 32px;
+              border: 1px solid #e0e0e0;
+              background: #0068a5!important;
+              color: #fff!important;
+              cursor: pointer;
+              border-radius: 4px;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 0.9rem;
+            }
+
+            .qty-btn:hover {
+              background: #0068a5;
+              color: white;
+              border-color: #0068a5;
+            }
+
+            .qty-input {
+              width: 45px;
+              text-align: center;
+              border: 1px solid #e0e0e0;
+              padding: 6px;
+              border-radius: 4px;
+              font-weight: 600;
+              color: #1a1a1a;
+            }
+
+            .remove {
+              background: #f6f6f6;
+              color: white;
+              border: none;
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              cursor: pointer;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin:auto;
+            }
+
+            .remove:hover {
+              background: #ff3838;
+              transform: scale(1.1);
+            }
+          }
+
+          /* Mobile Card View */
+          @media (max-width: 991px) {
+            .cart-items-container {
+              display: none;
+            }
+            
+            .cart-items-mobile {
+              display: block;
+            }
+            
+            .cart_table {
+              display: none;
+            }
+
+            .cart-item-card {
+              background: white;
+              border-radius: 12px;
+              padding: 16px;
+              margin-bottom: 16px;
+              box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+              border: 1px solid #f0f0f0;
+              transition: all 0.3s ease;
+              animation: slideIn 0.4s ease-out;
+            }
+
+            @keyframes slideIn {
+              from {
+                opacity: 0;
+                transform: translateY(10px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+
+            .cart-item-card:active {
+              transform: scale(0.98);
+            }
+
+            .cart-item-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              margin-bottom: 14px;
+              padding-bottom: 12px;
+              border-bottom: 2px solid #f5f5f5;
+            }
+
+            .cart-item-title {
+              flex: 1;
+              color: #0068a5;
+              font-weight: 600;
+              font-size: 0.95rem;
+              line-height: 1.4;
+              margin-right: 10px;
+            }
+
+            .cart-item-remove-btn {
+              background: #0068a5;
+              color: white;
+              border: none;
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              cursor: pointer;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+            }
+
+            .cart-item-remove-btn:active {
+              background: #f6f6f6;
+              transform: scale(0.9);
+            }
+
+            .cart-item-body {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 12px;
+              margin-bottom: 14px;
+            }
+
+            .item-detail {
+              display: flex;
+              flex-direction: column;
+            }
+
+            .detail-label {
+              font-size: 0.75rem;
+              color: #999;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.3px;
+              margin-bottom: 4px;
+            }
+
+            .detail-value {
+              font-size: 0.95rem;
+              font-weight: 600;
+              color: #1a1a1a;
+            }
+
+            .detail-price {
+              color: #0068a5;
+              font-size: 1.05rem;
+            }
+
+            .cart-item-footer {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding-top: 12px;
+              border-top: 1px solid #f5f5f5;
+            }
+
+            .cart-item-total {
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+            }
+
+            .total-label {
+              font-size: 0.75rem;
+              color: #999;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.3px;
+            }
+
+            .total-value {
+              font-size: 1.1rem;
+              font-weight: 700;
+              color: #0068a5;
+            }
+
+            .quantity-control {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              background: #f8f9fa;
+              padding: 6px 8px;
+              border-radius: 6px;
+            }
+
+            .qty-btn-mobile {
+              width: 28px;
+              height: 28px;
+              border: none;
+              background: white;
+              color: #0068a5;
+              cursor: pointer;
+              border-radius: 4px;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
               font-size: 0.85rem;
+              font-weight: bold;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            }
+
+            .qty-btn-mobile:active {
+              background: #0068a5;
+              color: white;
+            }
+
+            .qty-input-mobile {
+              width: 40px;
+              text-align: center;
+              border: none;
+              background: transparent;
+              padding: 4px;
+              font-weight: 700;
+              color: #1a1a1a;
+              font-size: 0.95rem;
+            }
+
+            .gst-info {
+              font-size: 0.8rem;
               color: #666;
               font-style: italic;
-              margin-top: 5px;
+              margin-top: 10px;
+              padding: 10px;
+              background: #f8f9fa;
+              border-left: 3px solid #0068a5;
+              border-radius: 4px;
             }
-          `}</style>
-          <table className="cart_table">
-            <thead>
-              <tr>
-                {/* <th className="cart-col-image">Image</th> */}
-                <th className="cart-col-productname">Product Name</th>
-                <th className="cart-col-price">Price (incl. GST)</th>
-                <th className="cart-col-quantity">Quantity</th>
-                <th className="cart-col-total">Total (incl. GST)</th>
-                <th className="cart-col-remove">Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cartItems.map((item) => (
-                <tr className="cart_item" key={item.id}>
-                  {/* <td data-title="Product">
-                    <Link className="cart-productimage" >
-                      <img
-                        width={91}
-                        height={91}
-                        src={item.part.product_image}
-                        alt={item.part.product_name}
-                      />
-                    </Link>
-                  </td> */}
-                  <td data-title="Name">
-                    <Link className="cart-productname">
-                      {item.part.product_name}-{item.part.part_no}
-                    </Link>
-                  </td>
-                  <td data-title="Price">
-                    <span className="amount">
-                      <bdi>₹{item.part.sale_price}</bdi>
-                    </span>
-                  </td>
-                  <td data-title="Quantity">
-                    <div className="quantity">
+          }
+
+          /* Shared Styles */
+          .gst-info {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 15px;
+          }
+
+          .cart-section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #0068a5;
+            display: inline-block;
+          }
+        `}</style>
+
+        {/* DESKTOP TABLE VIEW */}
+        <div className="cart-items-container">
+          <h4 className="cart-section-title">Cart Items</h4>
+          <form action="#" className="woocommerce-cart-form">
+            <table className="cart_table">
+              <thead>
+                <tr>
+                  <th className="cart-col-productname">Product Name</th>
+                  <th className="cart-col-price">Price (incl. GST)</th>
+                  <th className="cart-col-quantity">Quantity</th>
+                  <th className="cart-col-total">Total (incl. GST)</th>
+                  <th className="cart-col-remove">Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cartItems.map((item) => (
+                  <tr className="cart_item" key={item.id}>
+                    <td data-title="Name">
+                      <Link className="cart-productname">
+                        {item.part.product_name}-{item.part.part_no}
+                      </Link>
+                    </td>
+                    <td data-title="Price">
+                      <span className="amount">
+                        <bdi>₹{item.part.sale_price}</bdi>
+                      </span>
+                    </td>
+                    <td data-title="Quantity">
+                      <div className="quantity">
+                        <button
+                          className="quantity-minus qty-btn"
+                          onClick={() => {
+                            if (item.quantity > 1) {
+                              updateQuantity(item.id, item.quantity - 1);
+                            }
+                          }}
+                          type="button"
+                        >
+                          <i className="fas fa-minus" />
+                        </button>
+                        <input
+                          type="number"
+                          className="qty-input"
+                          value={item.quantity}
+                          min={1}
+                          max={item.part.stock_count}
+                          readOnly
+                        />
+                        <button
+                          className="quantity-plus qty-btn"
+                          onClick={() => {
+                            if (item.quantity < item.part.stock_count) {
+                              updateQuantity(item.id, item.quantity + 1);
+                            }
+                          }}
+                          type="button"
+                        >
+                          <i className="fas fa-plus" />
+                        </button>
+                      </div>
+                    </td>
+                    <td data-title="Total">
+                      <span className="amount">
+                        <bdi>₹{item.total_price}</bdi>
+                      </span>
+                    </td>
+                    <td data-title="Remove">
                       <button
-                        className="quantity-minus qty-btn"
+                        onClick={(e) => handleRemoveItem(item.id, e)}
+                        className="remove"
+                        type="button"
+                      >
+                        <i className="fas fa-trash-alt" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="gst-info text-end">
+              * All prices include GST (18% - CGST 9% + SGST 9%)
+            </div>
+          </form>
+        </div>
+
+        {/* MOBILE CARD VIEW */}
+        <div className="cart-items-mobile">
+          <h2 className="cart-section-title">Cart Items</h2>
+          <div className="cart-items-list">
+            {cartItems.map((item) => (
+              <div className="cart-item-card" key={item.id}>
+                <div className="cart-item-header">
+                  <div className="cart-item-title">
+                    {item.part.product_name}-{item.part.part_no}
+                  </div>
+                  <button
+                    onClick={(e) => handleRemoveItem(item.id, e)}
+                    className="cart-item-remove-btn"
+                    type="button"
+                  >
+                    <i className="fas fa-trash-alt" />
+                  </button>
+                </div>
+
+                <div className="cart-item-body">
+                  <div className="item-detail">
+                    <span className="detail-label">Unit Price</span>
+                    <span className="detail-value detail-price">
+                      ₹{item.part.sale_price}
+                    </span>
+                  </div>
+                  <div className="item-detail">
+                    <span className="detail-label">Qty</span>
+                    <div className="quantity-control">
+                      <button
+                        className="qty-btn-mobile"
                         onClick={() => {
                           if (item.quantity > 1) {
                             updateQuantity(item.id, item.quantity - 1);
@@ -477,18 +868,18 @@ const Cart = () => {
                         }}
                         type="button"
                       >
-                        <i className="fas fa-minus" />
+                        −
                       </button>
                       <input
                         type="number"
-                        className="qty-input"
+                        className="qty-input-mobile"
                         value={item.quantity}
                         min={1}
                         max={item.part.stock_count}
                         readOnly
                       />
                       <button
-                        className="quantity-plus qty-btn"
+                        className="qty-btn-mobile"
                         onClick={() => {
                           if (item.quantity < item.part.stock_count) {
                             updateQuantity(item.id, item.quantity + 1);
@@ -496,32 +887,25 @@ const Cart = () => {
                         }}
                         type="button"
                       >
-                        <i className="fas fa-plus" />
+                        +
                       </button>
                     </div>
-                  </td>
-                  <td data-title="Total">
-                    <span className="amount">
-                      <bdi>₹{item.total_price}</bdi>
-                    </span>
-                  </td>
-                  <td data-title="Remove">
-                    <button
-                      onClick={(e) => handleRemoveItem(item.id, e)}
-                      className="remove"
-                      type="button"
-                    >
-                      <i className="fas fa-trash-alt" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="gst-info text-end mt-2">
+                  </div>
+                </div>
+
+                <div className="cart-item-footer">
+                  <div className="cart-item-total">
+                    <span className="total-label">Total</span>
+                    <span className="total-value">₹{item.total_price}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="gst-info">
             * All prices include GST (18% - CGST 9% + SGST 9%)
           </div>
-        </form>
+        </div>
 
         <div className="row cart-page">
           {/* Billing Address */}

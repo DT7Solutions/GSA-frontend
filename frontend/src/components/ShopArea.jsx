@@ -264,7 +264,7 @@ const ShopArea = ({ id }) => {
 
     if (!token || !isTokenValid(token)) {
       Swal.fire({
-        title: "Your session has expired. Please login again",
+        title: "Session expired. Please log in to place your order.",
         icon: "error",
         confirmButtonText: "OK",
       });

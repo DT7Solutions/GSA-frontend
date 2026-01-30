@@ -457,7 +457,7 @@ const AddProductsForm = () => {
 
                 const options = response.data.map(item => ({
                     value: item.id,
-                    label: `${item.name} (${item.fuel_type})(${item.production_start_date} - ${item.production_end_date})`
+                    label: `${item.name} (${item.production_start_date} - ${item.production_end_date})`
                 }));
 
                 setPartOptions(options);
