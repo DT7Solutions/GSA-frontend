@@ -15,8 +15,24 @@ const CarModelVariants = () => {
     const [showCarVariantModal, setShowCarVariantModal] = useState(false);
     const [editingVariantId, setEditingVariantId] = useState(null);
 
+    const TRANSMISSION_CHOICES = [
+        { value: "MT", label: "Manual Transmission" },
+        { value: "AT", label: "Automatic Transmission" },
+        { value: "DCT", label: "Dual Clutch Transmission" },
+        { value: "CVT", label: "Continuously Variable Transmission" },
+        { value: "AMT", label: "Automated Manual Transmission" },
+        { value: "IMT", label: "Intelligent Manual Transmission" },
+        { value: "EV", label: "Single Speed (Electric)" },
+    ];
 
-
+    const FUEL_TYPE_CHOICES = [
+        { value: "Petrol", label: "Petrol" },
+        { value: "Diesel", label: "Diesel" },
+        { value: "Electric", label: "Electric" },
+        { value: "Hybrid", label: "Hybrid" },
+        { value: "CNG", label: "CNG" },
+        
+    ];
 
     const [carVariantData, setCarVariantData] = useState({
         carModel: "",
@@ -25,6 +41,8 @@ const CarModelVariants = () => {
         productionEnd: "",
         chassisType: "",
         engine: "",
+        fuelType: "Diesel",
+        transmissionType: "MT",
         description: ""
     });
 
@@ -103,6 +121,8 @@ const fetchCarModelDetails = async (carModels_id) => {
             productionEnd: variant.production_end_date,
             chassisType: variant.chassis_type,
             engine: variant.engine,
+            fuelType: variant.fuel_type || "Diesel",
+            transmissionType: variant.transmission_type || "MT",
             description: variant.description || "",
         });
 
@@ -148,6 +168,8 @@ const handleCarMakeChange = async (e) => {
                 production_end_date: carVariantData.productionEnd,
                 chassis_type: carVariantData.chassisType,
                 engine: carVariantData.engine,
+                fuel_type: carVariantData.fuelType,
+                transmission_type: carVariantData.transmissionType,
                 description: carVariantData.description,
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -178,6 +200,8 @@ const handleCarMakeChange = async (e) => {
                                 <th>Region</th>
                                 <th>Engine</th>
                                 <th>Chassis Type</th>
+                                <th>Fuel Type</th>
+                                <th>Transmission Type</th>
                                 <th>Production (start - end)</th>
                                 <th>Actions</th>
                             </tr>
@@ -191,6 +215,8 @@ const handleCarMakeChange = async (e) => {
                                     <td>{item.region}</td>
                                     <td>{item.engine}</td>
                                     <td>{item.chassis_type}</td>
+                                    <td>{item.fuel_type}</td>
+                                    <td>{item.transmission_type}</td>
                                     <td>{item.production_start_date} - {item.production_end_date}</td>
                                     <td>
                                         <button
@@ -261,6 +287,42 @@ const handleCarMakeChange = async (e) => {
                                             required
                                         />
                                     </div>
+
+                                    <div className="row mb-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label">Fuel Type</label>
+                                            <select
+                                                className="form-select"
+                                                value={carVariantData.fuelType}
+                                                onChange={(e) =>
+                                                    setCarVariantData({ ...carVariantData, fuelType: e.target.value })
+                                                }
+                                                required
+                                            >
+                                                <option value="">-- Select Fuel Type --</option>
+                                                {FUEL_TYPE_CHOICES.map((fuel) => (
+                                                    <option key={fuel.value} value={fuel.value}>{fuel.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label">Transmission Type</label>
+                                            <select
+                                                className="form-select"
+                                                value={carVariantData.transmissionType}
+                                                onChange={(e) =>
+                                                    setCarVariantData({ ...carVariantData, transmissionType: e.target.value })
+                                                }
+                                                required
+                                            >
+                                                <option value="">-- Select Transmission --</option>
+                                                {TRANSMISSION_CHOICES.map((trans) => (
+                                                    <option key={trans.value} value={trans.value}>{trans.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
                                     <div className="row mb-3">
                                         <div className="col-md-6">
                                             <label className="form-label">Production Start</label>

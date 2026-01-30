@@ -232,7 +232,7 @@ const CarModelsDisplay = () => {
                                 <th>Model Name</th>
                                 <th>Generation</th>
                                 <th>Body Type</th>
-                                <th>Fuel Type</th>
+                                {/* <th>Fuel Type</th> */}
                                 <th>Production (start-end)</th>
                                 <th>Actions</th>
                             </tr>
@@ -255,7 +255,7 @@ const CarModelsDisplay = () => {
                                         <td>{item.name}</td>
                                         <td>{item.generation}</td>
                                         <td>{item.body_type}</td>
-                                        <td>{item.fuel_type}</td>
+                                        {/* <td>{item.fuel_type}</td> */}
                                         <td>{item.production_start_date} - {item.production_end_date}</td>
                                         <td>
                                             <button
