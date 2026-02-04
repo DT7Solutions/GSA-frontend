@@ -25,7 +25,7 @@ const WhyChooseUs = () => {
     },
     {
       icon: <BadgeCheck className="w-10 h-10" />,
-      title: "Trusted Since 1995",
+      title: "Trusted Since 1985",
       description: "Three decades of excellence and integrity.",
     },
   ];
@@ -113,7 +113,7 @@ const WhyChooseUs = () => {
           </h5>
           <p style={{ fontSize: '1.125rem', color: '#6b7280', maxWidth: '700px', margin: '0 auto' }}>
             Experience excellence in every aspect of our service. We're committed
-            to providing you with the best auto parts and support.
+            to providing you with the best Car Spare  parts and support.
           </p>
         </div>
 

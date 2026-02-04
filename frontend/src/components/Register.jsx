@@ -345,7 +345,7 @@ const Register = () => {
             />
         </div>
         <h5 className="overlay-title">Join Our Family</h5>
-        <p className="overlay-subtitle">Create your account & unlock exclusive benefits</p>
+        <p className="overlay-subtitle">Create your account </p>
     </div>
 
     {/* Features Section */}

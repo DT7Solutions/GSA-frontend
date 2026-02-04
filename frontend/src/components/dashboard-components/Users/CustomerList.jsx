@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import axios from "axios";
 import API_BASE_URL from "../../../config";
+import * as XLSX from "xlsx";
 
 const CustomerList = () => {
     const [customers, setCustomers] = useState([]);
@@ -64,7 +65,6 @@ const CustomerList = () => {
                 }
             );
             
-            // Update customer status in the list
             setCustomers(customers.map(c => 
                 c.id === toggleModal.customerId 
                     ? { ...c, is_active: !toggleModal.isActive }
@@ -72,8 +72,6 @@ const CustomerList = () => {
             ));
             
             setToggleModal({ show: false, customerId: null, customerName: "", isActive: false });
-            
-            // Show success message
             alert(response.data.message || `Customer ${toggleModal.isActive ? 'deactivated' : 'activated'} successfully`);
         } catch (err) {
             console.error("Error toggling customer status:", err);
@@ -93,11 +91,8 @@ const CustomerList = () => {
                 }
             );
             
-            // Remove customer from list
             setCustomers(customers.filter(c => c.id !== deleteModal.customerId));
             setDeleteModal({ show: false, customerId: null, customerName: "" });
-            
-            // Show success message
             alert(response.data.message || "Customer deleted successfully");
         } catch (err) {
             console.error("Error deleting customer:", err);
@@ -105,7 +100,76 @@ const CustomerList = () => {
         }
     };
 
-    // Filter customers based on search term and role
+    const prepareExportData = () => {
+        return filteredCustomers.map((customer, index) => ({
+            'S.No': index + 1,
+            'Username': customer.username || 'N/A',
+            'Email': customer.email || 'N/A',
+            'Phone': customer.phone || 'N/A',
+            'City': customer.city || 'N/A',
+            'State': customer.state || 'N/A',
+            'Address': customer.address || 'N/A',
+            'Role': customer.role_name || 'N/A',
+            'Joined Date': customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A',
+            'Status': customer.is_active ? 'Active' : 'Inactive'
+        }));
+    };
+
+    const handleExportCSV = () => {
+        try {
+            const data = prepareExportData();
+            const headers = Object.keys(data[0]);
+            
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row =>
+                    headers.map(header => {
+                        const value = row[header];
+                        return typeof value === 'string' && value.includes(',')
+                            ? `"${value}"`
+                            : value;
+                    }).join(',')
+                )
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `customers_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('Customers exported to CSV successfully!');
+        } catch (err) {
+            console.error('Error exporting CSV:', err);
+            alert('Failed to export CSV');
+        }
+    };
+
+    const handleExportExcel = () => {
+        try {
+            const data = prepareExportData();
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Customers');
+            
+            ws['!cols'] = [
+                { wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 15 },
+                { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 12 },
+                { wch: 15 }, { wch: 12 }
+            ];
+
+            XLSX.writeFile(wb, `customers_${new Date().toISOString().split('T')[0]}.xlsx`);
+            alert('Customers exported to Excel successfully!');
+        } catch (err) {
+            console.error('Error exporting Excel:', err);
+            alert('Failed to export Excel');
+        }
+    };
+
     const filteredCustomers = customers.filter((customer) => {
         const matchesSearch = 
             customer.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -120,7 +184,6 @@ const CustomerList = () => {
         return matchesSearch && matchesRole;
     });
 
-    // Pagination
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentCustomers = filteredCustomers.slice(indexOfFirstItem, indexOfLastItem);
@@ -164,27 +227,93 @@ const CustomerList = () => {
     return (
         <>
             <div className="card h-100 p-0 radius-12">
-                <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
-                    <div className="d-flex align-items-center flex-wrap gap-3">
-                        <span className="text-md fw-medium text-secondary-light mb-0">
-                            Show
-                        </span>
-                        <select 
-                            className="form-select form-select-sm w-auto ps-12  radius-12 h-40-px"
-                            value={itemsPerPage}
-                            disabled  style={{lineHeight:"28px"}}
-                        >
-                            <option>10</option>
-                            <option>20</option>
-                            <option>50</option>
-                        </select>
-                        <span className="text-secondary-light fw-medium">Entries</span>
-                        
-                        {/* Role Filter */}
-                        <div className="d-flex align-items-center gap-2 ms-3">
-                            <span className="text-md fw-medium text-secondary-light mb-0">Role:</span>
-                            <select style={{lineHeight:"28px"}} 
-                                className="form-select form-select-sm w-auto ps-12  radius-12 h-40-px" 
+                {/* Header Section - Mobile Optimized */}
+                <div className="card-header border-bottom bg-base py-16 px-24">
+                    {/* Desktop Filters - Hidden on Mobile */}
+                    <div className="d-none d-lg-flex align-items-center flex-wrap gap-3 justify-content-between mb-3">
+                        <div className="d-flex align-items-center flex-wrap gap-3">
+                            <span className="text-md fw-medium text-secondary-light mb-0">Show</span>
+                            <select 
+                                className="form-select form-select-sm w-auto ps-12 radius-12 h-40-px"
+                                value={itemsPerPage}
+                                disabled
+                                style={{lineHeight:"28px"}}
+                            >
+                                <option>10</option>
+                            </select>
+                            <span className="text-secondary-light fw-medium">Entries</span>
+                            
+                            <div className="d-flex align-items-center gap-2 ms-3">
+                                <span className="text-md fw-medium text-secondary-light mb-0">Role:</span>
+                                <select 
+                                    style={{lineHeight:"28px"}} 
+                                    className="form-select form-select-sm w-auto ps-12 radius-12 h-40-px" 
+                                    value={selectedRole}
+                                    onChange={(e) => {
+                                        setSelectedRole(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    <option value="all">All Roles</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="staff">Staff</option>
+                                    <option value="customer">Customer</option>
+                                </select>
+                            </div>
+
+                            <div className="d-flex align-items-center gap-2 ms-3">
+                                <span className="text-md fw-medium text-secondary-light mb-0">Export:</span>
+                                <button
+                                    type="button"
+                                    className="btn-theme-admin d-flex align-items-center gap-1"
+                                    onClick={handleExportCSV}
+                                    title="Export to CSV"
+                                >
+                                    <Icon icon="mdi:download-outline" className="text-lg" />
+                                    CSV
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn-theme-admin d-flex align-items-center gap-1"
+                                    onClick={handleExportExcel}
+                                    title="Export to Excel"
+                                >
+                                    <Icon icon="mdi:download-outline" className="text-lg" />
+                                    Excel
+                                </button>
+                            </div>
+                        </div>
+                        <div className="navbar-search">
+                            <Icon icon="ion:search-outline" className="icon" />
+                            <input
+                                type="text"
+                                className="bg-base"
+                                placeholder="Search customers..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Mobile Filters - Stacked Layout */}
+                    <div className="d-lg-none">
+                        {/* Search Bar */}
+                        <div className="navbar-search mb-3 w-100">
+                            <Icon icon="ion:search-outline" className="icon" />
+                            <input
+                                type="text"
+                                className="bg-base w-100"
+                                placeholder="Search customers..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Filters Row */}
+                        <div className="d-flex flex-wrap gap-2 mb-3">
+                            <select 
+                                className="form-select form-select-sm flex-grow-1"
+                                style={{lineHeight:"28px", minWidth: "120px"}} 
                                 value={selectedRole}
                                 onChange={(e) => {
                                     setSelectedRole(e.target.value);
@@ -197,24 +326,45 @@ const CustomerList = () => {
                                 <option value="customer">Customer</option>
                             </select>
                         </div>
-                    </div>
-                    <div className="navbar-search">
-                        <Icon icon="ion:search-outline" className="icon" />
-                        <input
-                            type="text"
-                            className="bg-base"
-                            placeholder="Search customers..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+
+                        {/* Export Buttons */}
+                        <div className="d-flex gap-2">
+                            <button
+                                type="button"
+                                className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 flex-grow-1 justify-content-center"
+                                onClick={handleExportCSV}
+                            >
+                                <Icon icon="mdi:download-outline" />
+                                CSV
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 flex-grow-1 justify-content-center"
+                                onClick={handleExportExcel}
+                            >
+                                <Icon icon="mdi:download-outline" />
+                                Excel
+                            </button>
+                        </div>
                     </div>
                 </div>
+
                 <div className="card-body p-24">
-                    <div className="table-responsive scroll-sm">
+                    {/* Results Count */}
+                    {searchTerm && (
+                        <div className="mb-3">
+                            <small className="text-muted">
+                                Showing {filteredCustomers.length} result{filteredCustomers.length !== 1 ? 's' : ''}
+                            </small>
+                        </div>
+                    )}
+
+                    {/* Desktop Table View */}
+                    <div className="table-responsive scroll-sm d-none d-lg-block">
                         <table className="table bordered-table sm-table mb-0">
-                            <thead >
+                            <thead>
                                 <tr>
-                                    <th scope="col" >S.No</th>
+                                    <th scope="col">S.No</th>
                                     <th scope="col">Username</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Phone</th>
@@ -263,7 +413,7 @@ const CustomerList = () => {
                                             </td>
                                             <td>
                                                 <span
-                                                    className={`badge text-sm fw-semibold ${getRoleBadgeColor(customer.role_name)}  px-20 py-9 radius-4`}
+                                                    className={`badge text-sm fw-semibold ${getRoleBadgeColor(customer.role_name)} px-20 py-9 radius-4`}
                                                 >
                                                     {customer.role_name || "N/A"}
                                                 </span>
@@ -316,7 +466,6 @@ const CustomerList = () => {
                                                         </button>
                                                     )}
                                                     
-                                                    {/* Delete Button - Only show for non-admin users */}
                                                     {customer.role_name?.toLowerCase() !== 'admin' && (
                                                         <button
                                                             type="button"
@@ -327,10 +476,8 @@ const CustomerList = () => {
                                                                 customerName: customer.username
                                                             })}
                                                             data-tooltip="Delete User"
-
                                                         >
                                                             <Icon icon="mdi:delete-outline" className="text-lg" />
-                                                           
                                                         </button>
                                                     )}
                                                 </div>
@@ -355,15 +502,180 @@ const CustomerList = () => {
                         </table>
                     </div>
 
+                    {/* Mobile Card View */}
+                    <div className="d-lg-none">
+                        {currentCustomers.length > 0 ? (
+                            currentCustomers.map((customer, index) => (
+                                <div key={customer.id} className="card mb-3 shadow-sm border">
+                                    <div className="card-body p-3">
+                                        {/* Header with Avatar and Name */}
+                                        <div className="d-flex align-items-center mb-3 pb-3 border-bottom">
+                                            <div className="w-50-px h-50-px rounded-circle bg-primary-50 d-flex align-items-center justify-content-center flex-shrink-0">
+                                                <span className="text-primary-600 fw-bold fs-5">
+                                                    {customer.username?.charAt(0).toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <div className="ms-3 flex-grow-1">
+                                                <h6 className="mb-1 fw-semibold">{customer.username || "N/A"}</h6>
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <span className={`badge ${getRoleBadgeColor(customer.role_name)} px-2 py-1 text-xs`}>
+                                                        {customer.role_name || "N/A"}
+                                                    </span>
+                                                    <span className={`badge ${
+                                                        customer.is_active
+                                                            ? "text-success-600 bg-success-100"
+                                                            : "text-danger-600 bg-danger-100"
+                                                    } px-2 py-1 text-xs`}>
+                                                        {customer.is_active ? "Active" : "Inactive"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Contact Information */}
+                                        <div className="row g-2 mb-3">
+                                            <div className="col-12">
+                                                <div className="d-flex align-items-start">
+                                                    <Icon icon="mdi:email-outline" className="text-muted mt-1 me-2" />
+                                                    <div className="flex-grow-1">
+                                                        <small className="text-muted d-block">Email</small>
+                                                        <span className="text-sm fw-medium" style={{wordBreak: "break-all"}}>
+                                                            {customer.email || "N/A"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="d-flex align-items-start">
+                                                    <Icon icon="mdi:phone-outline" className="text-muted mt-1 me-2" />
+                                                    <div>
+                                                        <small className="text-muted d-block">Phone</small>
+                                                        <span className="text-sm fw-medium">{customer.phone || "N/A"}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="d-flex align-items-start">
+                                                    <Icon icon="mdi:calendar-outline" className="text-muted mt-1 me-2" />
+                                                    <div>
+                                                        <small className="text-muted d-block">Joined</small>
+                                                        <span className="text-sm fw-medium">
+                                                            {customer.created_at
+                                                                ? new Date(customer.created_at).toLocaleDateString()
+                                                                : "N/A"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Location Information */}
+                                        <div className="row g-2 mb-3">
+                                            <div className="col-6">
+                                                <div className="d-flex align-items-start">
+                                                    <Icon icon="mdi:map-marker-outline" className="text-muted mt-1 me-2" />
+                                                    <div>
+                                                        <small className="text-muted d-block">City</small>
+                                                        <span className="text-sm fw-medium">{customer.city || "N/A"}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="d-flex align-items-start">
+                                                    <Icon icon="mdi:map-outline" className="text-muted mt-1 me-2" />
+                                                    <div>
+                                                        <small className="text-muted d-block">State</small>
+                                                        <span className="text-sm fw-medium">{customer.state || "N/A"}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Address */}
+                                        {customer.address && (
+                                            <div className="mb-3">
+                                                <div className="d-flex align-items-start">
+                                                    <Icon icon="mdi:home-outline" className="text-muted mt-1 me-2" />
+                                                    <div>
+                                                        <small className="text-muted d-block">Address</small>
+                                                        <span className="text-sm">{customer.address}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Action Buttons */}
+                                        <div className="d-flex gap-2 pt-2 border-top">
+                                            {customer.is_active ? (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-theme-admin  btn-outline-danger d-flex align-items-center gap-1 flex-grow-1 justify-content-center"
+                                                    onClick={() => setToggleModal({
+                                                        show: true,
+                                                        customerId: customer.id,
+                                                        customerName: customer.username,
+                                                        isActive: true
+                                                    })}
+                                                >
+                                                    <Icon icon="mdi:account-off-outline" />
+                                                    Deactivate
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-theme-admin btn-primary d-flex align-items-center gap-1 flex-grow-1 justify-content-center"
+                                                    onClick={() => setToggleModal({
+                                                        show: true,
+                                                        customerId: customer.id,
+                                                        customerName: customer.username,
+                                                        isActive: false
+                                                    })}
+                                                >
+                                                    <Icon icon="mdi:account-check-outline" />
+                                                    Activate
+                                                </button>
+                                            )}
+                                            
+                                            {customer.role_name?.toLowerCase() !== 'admin' && (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-theme-admin btn-danger d-flex align-items-center gap-1"
+                                                    onClick={() => setDeleteModal({
+                                                        show: true,
+                                                        customerId: customer.id,
+                                                        customerName: customer.username
+                                                    })}
+                                                >
+                                                    <Icon icon="mdi:delete-outline" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-5">
+                                <Icon
+                                    icon="solar:users-group-rounded-outline"
+                                    className="text-secondary-light"
+                                    style={{ fontSize: "64px" }}
+                                />
+                                <p className="text-secondary-light mt-3 mb-0">
+                                    {searchTerm ? "No matching customers found" : "No customers found"}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
                     {/* Pagination */}
                     {filteredCustomers.length > itemsPerPage && (
                         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-24">
-                            <span className="text-secondary-light">
+                            <span className="text-secondary-light small">
                                 Showing {indexOfFirstItem + 1} to{" "}
                                 {Math.min(indexOfLastItem, filteredCustomers.length)} of{" "}
                                 {filteredCustomers.length} entries
                             </span>
-                            <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
+                            <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center mb-0">
                                 <li className="page-item">
                                     <button
                                         className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
@@ -373,20 +685,28 @@ const CustomerList = () => {
                                         <Icon icon="ep:d-arrow-left" />
                                     </button>
                                 </li>
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <li key={i} className="page-item">
-                                        <button
-                                            className={`page-link fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px ${
-                                                currentPage === i + 1
-                                                    ? "bg-primary-600 text-white"
-                                                    : "bg-neutral-200 text-secondary-light"
-                                            }`}
-                                            onClick={() => handlePageChange(i + 1)}
-                                        >
-                                            {i + 1}
-                                        </button>
-                                    </li>
-                                ))}
+                                {/* Show limited page numbers on mobile */}
+                                {[...Array(totalPages)].map((_, i) => {
+                                    // On mobile, show only current page and adjacent pages
+                                    const isMobile = window.innerWidth < 768;
+                                    if (isMobile && Math.abs(currentPage - (i + 1)) > 1) {
+                                        return null;
+                                    }
+                                    return (
+                                        <li key={i} className="page-item">
+                                            <button
+                                                className={`page-link fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px ${
+                                                    currentPage === i + 1
+                                                        ? "bg-primary-600 text-white"
+                                                        : "bg-neutral-200 text-secondary-light"
+                                                }`}
+                                                onClick={() => handlePageChange(i + 1)}
+                                            >
+                                                {i + 1}
+                                            </button>
+                                        </li>
+                                    );
+                                })}
                                 <li className="page-item">
                                     <button
                                         className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
@@ -513,6 +833,47 @@ const CustomerList = () => {
                     </div>
                 </>
             )}
+
+            {/* Mobile Responsive Styles */}
+            <style jsx>{`
+                @media (max-width: 991px) {
+                    .card-header {
+                        padding: 12px 16px !important;
+                    }
+                    
+                    .card-body {
+                        padding: 16px !important;
+                    }
+                    
+                    .navbar-search {
+                        width: 100%;
+                    }
+                    
+                    .navbar-search input {
+                        width: 100%;
+                    }
+                }
+                
+                @media (max-width: 576px) {
+                    .pagination {
+                        gap: 4px !important;
+                    }
+                    
+                    .page-link {
+                        height: 28px !important;
+                        width: 28px !important;
+                        font-size: 0.75rem;
+                    }
+                    
+                    .modal-dialog {
+                        margin: 0.5rem;
+                    }
+                    
+                    .modal-body {
+                        padding: 1rem;
+                    }
+                }
+            `}</style>
         </>
     );
 };

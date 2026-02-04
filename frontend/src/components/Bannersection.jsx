@@ -12,6 +12,7 @@ const TwoBannerSection = () => {
       buttonHoverColor: "#667eea",
       backgroundImage: "url('/assets/img/bg/Homepage-banner-one.png')",
       
+      
     },
     {
       id: 2,
@@ -50,6 +51,7 @@ const TwoBannerSection = () => {
       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
       cursor: 'pointer',
       backgroundSize: '100%',
+      backgroundRepeat: 'no-repeat',
     },
     bannerBackground: {
       position: 'absolute',
@@ -98,12 +100,14 @@ const TwoBannerSection = () => {
       border: 'none',
       cursor: 'pointer',
     },
+    
   };
 const mediaQueryStyles = `
   /* Extra Small Devices (max-width: 576px) */
   @media (max-width: 576px) {
     .banner-card {
       height: 230px !important;
+      
     }
     
     .banner-content {
@@ -178,14 +182,15 @@ const mediaQueryStyles = `
   };
 
   return (
+    <><style>{mediaQueryStyles}</style>
     <div  className='col-12' style={{background:"#f0f2f5"}}>
       <div className='container' style={styles.bannerRow}>
         {banners.map((banner) => (
           <div key={banner.id} style={styles.bannerCol}>
             <div
+              className="banner-card"
               style={{
                 ...styles.bannerCard,
-                ...mediaQueryStyles.bannerCard,
                 backgroundImage: banner.backgroundImage,
               }}
               onMouseEnter={(e) => handleCardHover(e, true)}
@@ -193,10 +198,10 @@ const mediaQueryStyles = `
             >
                 
               <div style={styles.bannerBackground}></div>
-              <div style={styles.bannerContent}>
-                <h2 className="text-white  heading-banner-section" style={styles.bannerHeading}>{banner.heading}</h2>
-                <p  className="text-white" style={styles.bannerParagraph}>{banner.paragraph}</p>
-                {/* <a
+              <div className="banner-content" style={styles.bannerContent}>
+                <h2 className="text-white banner-heading heading-banner-section" style={styles.bannerHeading}>{banner.heading}</h2>
+                <p  className="text-white banner-paragraph" style={styles.bannerParagraph}>{banner.paragraph}</p>
+                {/* 
                   href={banner.buttonLink}
                   style={styles.bannerButton}
                   onMouseEnter={(e) => handleButtonHover(e, true, banner.buttonHoverColor)}
@@ -222,6 +227,7 @@ const mediaQueryStyles = `
         }
       `}</style>
     </div>
+    </>
   );
 };
 

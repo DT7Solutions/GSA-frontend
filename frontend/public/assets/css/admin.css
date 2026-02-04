@@ -752,3 +752,37 @@ color: #fff!important;
 min-width: 150px;
 }
 }
+
+@media (max-width: 576px) {
+    .banner-card {
+      height: 230px !important;
+      
+    }
+    .sticky-wrapper .container .row{
+      --bs-gutter-x: 0.5rem!important;
+    }
+
+    
+  }
+
+  @media (max-width: 576px) {
+    .cart_totals td:first-child{
+       
+        width: 35%!important;
+    }
+}
+
+.badge-table {
+    position: absolute;
+    width: fit-content;
+    display: inline-block;
+    text-align: center;
+    background-color: var(--theme-color);
+    color: var(--white-color);
+    padding: 0.2em 0.45em;
+    font-size: 0.6em;
+    border-radius: 50%;
+    top: 7px;
+    font-weight: 400;
+    transition: 0.3s ease-in-out;
+}

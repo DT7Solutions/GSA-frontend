@@ -14,6 +14,7 @@ const CarModelVariants = () => {
     const [carVariantModel, setCarVariantModel] = useState([]);
     const [showCarVariantModal, setShowCarVariantModal] = useState(false);
     const [editingVariantId, setEditingVariantId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const TRANSMISSION_CHOICES = [
         { value: "MT", label: "Manual Transmission" },
@@ -31,7 +32,6 @@ const CarModelVariants = () => {
         { value: "Electric", label: "Electric" },
         { value: "Hybrid", label: "Hybrid" },
         { value: "CNG", label: "CNG" },
-        
     ];
 
     const [carVariantData, setCarVariantData] = useState({
@@ -85,30 +85,19 @@ const CarModelVariants = () => {
         } catch (error) {
             console.error("Error fetching car makes:", error);
         }
-
-        
-
-
     };
 
-
-    // 2. Fetch a single car model's details using ID
-const fetchCarModelDetails = async (carModels_id) => {
-       debugger;
-    try {
-        const response = await axios.get(`${API_BASE_URL}api/home/car-model/${carModels_id}/`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        debugger;
-        setGetCarBrand(response.data);
-        debugger;
-
-    } catch (error) {
-        console.error("Error fetching car model details:", error);
-    }
-};
-
-
+    // Fetch a single car model's details using ID
+    const fetchCarModelDetails = async (carModels_id) => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}api/home/car-model/${carModels_id}/`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setGetCarBrand(response.data);
+        } catch (error) {
+            console.error("Error fetching car model details:", error);
+        }
+    };
 
     const handleEdit = async (variant) => {
         setEditingVariantId(variant.id);
@@ -129,34 +118,30 @@ const fetchCarModelDetails = async (carModels_id) => {
         setShowCarVariantModal(true);
     };
 
+    const handleCarMakeChange = async (e) => {
+        const selectedMakeId = e.target.value;
 
+        // Set selected brand temporarily (optional, if needed)
+        setGetCarBrand({ car_make: selectedMakeId });
 
-const handleCarMakeChange = async (e) => {
-    const selectedMakeId = e.target.value;
+        // Clear selected model first
+        setCarVariantData((prevData) => ({
+            ...prevData,
+            carModel: "", // Clear previous selection
+        }));
 
-    // Set selected brand temporarily (optional, if needed)
-    setGetCarBrand({ car_make: selectedMakeId });
+        // Fetch models for selected brand
+        try {
+            const response = await axios.get(`${API_BASE_URL}api/home/car_model_list/${selectedMakeId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
-    // Clear selected model first
-    setCarVariantData((prevData) => ({
-        ...prevData,
-        carModel: "", // Clear previous selection
-    }));
-
-    // Fetch models for selected brand
-    try {
-        const response = await axios.get(`${API_BASE_URL}api/home/car_model_list/${selectedMakeId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setCarModels(response.data); 
-    } catch (error) {
-        console.error("Error fetching car models:", error);
-        setCarModels([]); 
-    }
-};
-
-
+            setCarModels(response.data); 
+        } catch (error) {
+            console.error("Error fetching car models:", error);
+            setCarModels([]); 
+        }
+    };
 
     const handleUpdateCarVariant = async (e) => {
         e.preventDefault();
@@ -184,14 +169,45 @@ const handleCarMakeChange = async (e) => {
         }
     };
 
+    // Filter variants based on search term
+    const filteredVariants = carVariants.filter((item) => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+            item.name?.toLowerCase().includes(searchLower) ||
+            item.car_model_name?.toLowerCase().includes(searchLower) ||
+            item.engine?.toLowerCase().includes(searchLower) ||
+            item.fuel_type?.toLowerCase().includes(searchLower) ||
+            item.chassis_type?.toLowerCase().includes(searchLower)
+        );
+    });
+
     return (
         <div className="card basic-data-table">
-            {/* <div className="card-header">
-                <h5 className="card-title mb-0">Car Variants List</h5>
-            </div> */}
             <div className="card-body">
-                <div className="table-responsive">
-                    <table className="table bordered-table mb-0 sm-table ">
+                {/* Mobile Search */}
+                <div className="d-lg-none mb-3">
+                    <div className="position-relative">
+                        <input
+                            type="text"
+                            className="form-control ps-5"
+                            placeholder="Search variants..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <span className="position-absolute top-50 translate-middle-y ms-2">
+                            <Icon icon="ion:search-outline" />
+                        </span>
+                    </div>
+                    {searchTerm && (
+                        <small className="text-muted d-block mt-2">
+                            Showing {filteredVariants.length} of {carVariants.length} variants
+                        </small>
+                    )}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="table-responsive d-none d-lg-block">
+                    <table className="table bordered-table mb-0 sm-table">
                         <thead>
                             <tr>
                                 <th>S.L</th>
@@ -231,20 +247,144 @@ const handleCarMakeChange = async (e) => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Mobile Card View */}
+                <div className="d-lg-none">
+                    {filteredVariants.length > 0 ? (
+                        filteredVariants.map((item, index) => (
+                            <div key={item.id} className="card mb-3 shadow-sm border">
+                                <div className="card-body p-3">
+                                    {/* Header */}
+                                    <div className="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                                        <div>
+                                            <h6 className="mb-1 fw-bold text-primary">{item.name}</h6>
+                                            <small className="text-muted">{item.car_model_name}</small>
+                                        </div>
+                                        <span className="badge bg-primary text-white">#{index + 1}</span>
+                                    </div>
+
+                                    {/* Specifications Grid */}
+                                    <div className="row g-2 mb-3">
+                                        {/* Engine */}
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-start">
+                                                <Icon icon="mdi:engine-outline" className="text-muted mt-1 me-2 flex-shrink-0" />
+                                                <div>
+                                                    <small className="text-muted d-block">Engine</small>
+                                                    <span className="text-sm fw-medium">{item.engine}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Fuel Type */}
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-start">
+                                                <Icon icon="mdi:fuel" className="text-muted mt-1 me-2 flex-shrink-0" />
+                                                <div>
+                                                    <small className="text-muted d-block">Fuel</small>
+                                                    <span className="text-sm fw-medium">{item.fuel_type}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Transmission */}
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-start">
+                                                <Icon icon="mdi:car-shift-pattern" className="text-muted mt-1 me-2 flex-shrink-0" />
+                                                <div>
+                                                    <small className="text-muted d-block">Transmission</small>
+                                                    <span className="text-sm fw-medium">{item.transmission_type}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Chassis */}
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-start">
+                                                <Icon icon="mdi:car-info" className="text-muted mt-1 me-2 flex-shrink-0" />
+                                                <div>
+                                                    <small className="text-muted d-block">Chassis</small>
+                                                    <span className="text-sm fw-medium">{item.chassis_type}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Region */}
+                                        {item.region && (
+                                            <div className="col-6">
+                                                <div className="d-flex align-items-start">
+                                                    <Icon icon="mdi:map-marker-outline" className="text-muted mt-1 me-2 flex-shrink-0" />
+                                                    <div>
+                                                        <small className="text-muted d-block">Region</small>
+                                                        <span className="text-sm fw-medium">{item.region}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Production Period */}
+                                        <div className="col-12">
+                                            <div className="d-flex align-items-start">
+                                                <Icon icon="mdi:calendar-range" className="text-muted mt-1 me-2 flex-shrink-0" />
+                                                <div>
+                                                    <small className="text-muted d-block">Production Period</small>
+                                                    <span className="text-sm fw-medium">
+                                                        {item.production_start_date} - {item.production_end_date}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Button */}
+                                    <div className="pt-2 border-top">
+                                        <button
+                                            onClick={() => handleEdit(item)}
+                                            className="btn btn-sm btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-1"
+                                        >
+                                            <Icon icon="lucide:edit" />
+                                            <span>Edit Variant</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-5">
+                            <Icon 
+                                icon="mdi:car-off" 
+                                className="text-secondary-light" 
+                                style={{ fontSize: '64px' }} 
+                            />
+                            <p className="text-secondary-light mt-3 mb-0">
+                                {searchTerm ? "No matching variants found" : "No car variants found"}
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
 
+            {/* Edit Modal - Mobile Optimized */}
             {showCarVariantModal && (
                 <div className="modal d-block" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-                    <div className="modal-dialog">
+                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">Update Car Variant</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowCarVariantModal(false)}>X</button>
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={() => setShowCarVariantModal(false)}
+                                >
+                                </button>
                             </div>
                             <div className="modal-body">
                                 <form onSubmit={handleUpdateCarVariant} className="input-style">
+                                    {/* Car Brand Selection */}
                                     <div className="mb-3">
-                                        <label className="form-label">Select Car Brand</label>
+                                        <label className="form-label fw-medium">
+                                            Select Car Brand <span className="text-danger">*</span>
+                                        </label>
                                         <select
                                             className="form-select"
                                             value={getCarMake.car_make}
@@ -257,8 +397,11 @@ const handleCarMakeChange = async (e) => {
                                         </select>
                                     </div>
 
+                                    {/* Car Model Selection */}
                                     <div className="mb-3">
-                                        <label className="form-label">Select Car Model</label>
+                                        <label className="form-label fw-medium">
+                                            Select Car Model <span className="text-danger">*</span>
+                                        </label>
                                         <select
                                             className="form-select"
                                             value={carVariantData.carModel}
@@ -274,8 +417,11 @@ const handleCarMakeChange = async (e) => {
                                         </select>
                                     </div>
 
+                                    {/* Variant Name */}
                                     <div className="mb-3">
-                                        <label className="form-label">Variant Name</label>
+                                        <label className="form-label fw-medium">
+                                            Variant Name <span className="text-danger">*</span>
+                                        </label>
                                         <input
                                             type="text"
                                             className="form-control"
@@ -288,9 +434,12 @@ const handleCarMakeChange = async (e) => {
                                         />
                                     </div>
 
+                                    {/* Fuel and Transmission */}
                                     <div className="row mb-3">
-                                        <div className="col-md-6">
-                                            <label className="form-label">Fuel Type</label>
+                                        <div className="col-md-6 col-12 mb-3 mb-md-0">
+                                            <label className="form-label fw-medium">
+                                                Fuel Type <span className="text-danger">*</span>
+                                            </label>
                                             <select
                                                 className="form-select"
                                                 value={carVariantData.fuelType}
@@ -305,8 +454,10 @@ const handleCarMakeChange = async (e) => {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">Transmission Type</label>
+                                        <div className="col-md-6 col-12">
+                                            <label className="form-label fw-medium">
+                                                Transmission Type <span className="text-danger">*</span>
+                                            </label>
                                             <select
                                                 className="form-select"
                                                 value={carVariantData.transmissionType}
@@ -323,9 +474,12 @@ const handleCarMakeChange = async (e) => {
                                         </div>
                                     </div>
 
+                                    {/* Production Dates */}
                                     <div className="row mb-3">
-                                        <div className="col-md-6">
-                                            <label className="form-label">Production Start</label>
+                                        <div className="col-md-6 col-12 mb-3 mb-md-0">
+                                            <label className="form-label fw-medium">
+                                                Production Start <span className="text-danger">*</span>
+                                            </label>
                                             <input
                                                 type="date"
                                                 className="form-control"
@@ -336,8 +490,10 @@ const handleCarMakeChange = async (e) => {
                                                 required
                                             />
                                         </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">Production End</label>
+                                        <div className="col-md-6 col-12">
+                                            <label className="form-label fw-medium">
+                                                Production End <span className="text-danger">*</span>
+                                            </label>
                                             <input
                                                 type="date"
                                                 className="form-control"
@@ -349,9 +505,13 @@ const handleCarMakeChange = async (e) => {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Chassis and Engine */}
                                     <div className="row mb-3">
-                                        <div className="col-md-6">
-                                            <label className="form-label">Chassis Type</label>
+                                        <div className="col-md-6 col-12 mb-3 mb-md-0">
+                                            <label className="form-label fw-medium">
+                                                Chassis Type <span className="text-danger">*</span>
+                                            </label>
                                             <input
                                                 type="text"
                                                 className="form-control"
@@ -363,8 +523,10 @@ const handleCarMakeChange = async (e) => {
                                                 required
                                             />
                                         </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">Engine</label>
+                                        <div className="col-md-6 col-12">
+                                            <label className="form-label fw-medium">
+                                                Engine <span className="text-danger">*</span>
+                                            </label>
                                             <input
                                                 type="text"
                                                 className="form-control"
@@ -377,24 +539,93 @@ const handleCarMakeChange = async (e) => {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Description */}
                                     <div className="mb-3">
-                                        <label className="form-label">Description</label>
+                                        <label className="form-label fw-medium">Description</label>
                                         <textarea
                                             className="form-control"
                                             placeholder="Enter description..."
+                                            rows="3"
                                             value={carVariantData.description}
                                             onChange={(e) =>
                                                 setCarVariantData({ ...carVariantData, description: e.target.value })
                                             }
                                         ></textarea>
                                     </div>
-                                    <button type="submit" className="btn-theme-admin w-100">Update Car Variant</button>
+
+                                    {/* Submit Button - Desktop */}
+                                    <div className="d-none d-sm-block">
+                                        <button type="submit" className="btn-theme-admin w-100">
+                                            Update Car Variant
+                                        </button>
+                                    </div>
+
+                                    {/* Submit Button - Mobile */}
+                                    <div className="d-sm-none">
+                                        <button type="submit" className="btn-theme-admin w-100 mb-2">
+                                            Update Car Variant
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            className="btn-theme-admin w-100"
+                                            onClick={() => setShowCarVariantModal(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Mobile Responsive Styles */}
+            <style jsx>{`
+                @media (max-width: 991px) {
+                    .card-body {
+                        padding: 16px !important;
+                    }
+                }
+
+                @media (max-width: 576px) {
+                    .modal-dialog {
+                        margin: 0.5rem;
+                    }
+
+                    .modal-body {
+                        max-height: calc(100vh - 120px);
+                        overflow-y: auto;
+                    }
+
+                    .modal-header h5 {
+                        font-size: 1rem;
+                    }
+
+                    .card.shadow-sm {
+                        transition: transform 0.2s ease;
+                    }
+
+                    .card.shadow-sm:active {
+                        transform: scale(0.98);
+                    }
+                }
+
+                /* Touch-friendly inputs */
+                @media (max-width: 991px) {
+                    .btn,
+                    .form-control,
+                    .form-select {
+                        min-height: 44px;
+                    }
+                }
+
+                /* Search input styling */
+                .position-relative input {
+                    padding-left: 2.5rem;
+                }
+            `}</style>
         </div>
     );
 };

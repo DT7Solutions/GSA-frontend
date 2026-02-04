@@ -83,3 +83,9 @@
 }
 
 
+@media (max-width: 576px) {
+    .banner-card {
+      height: 230px !important;
+      
+    }
+  }

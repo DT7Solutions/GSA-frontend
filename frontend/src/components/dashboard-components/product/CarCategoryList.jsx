@@ -12,6 +12,7 @@ const CarCategoryList = () => {
   const [showPartGroupModal, setShowPartGroupModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [carModelVariant, setCarModelVariant] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("accessToken");
 
   // Fetch Category List
@@ -49,10 +50,19 @@ const CarCategoryList = () => {
 
   // DataTable initialization and cleanup on data change
   useEffect(() => {
-    if (carCategory.length > 0) {
-      const table = $("#dataTable").DataTable();
+    if (carCategory.length > 0 && window.innerWidth >= 992) {
+      // Only initialize DataTable on desktop
+      if ($.fn.DataTable.isDataTable("#dataTable")) {
+        $("#dataTable").DataTable().destroy();
+      }
+      const table = $("#dataTable").DataTable({
+        pageLength: 10,
+        destroy: true,
+      });
       return () => {
-        table.destroy();
+        if ($.fn.DataTable.isDataTable("#dataTable")) {
+          table.destroy();
+        }
       };
     }
   }, [carCategory]);
@@ -89,7 +99,7 @@ const CarCategoryList = () => {
         name: selectedItem.name,
         variant_id: selectedItem.variant_id?.id || null,
       };
-      debugger;
+
       if (isEdit && selectedItem?.id) {
         await axios.put(
           `${API_BASE_URL}api/home/car_update_parts_category/${selectedItem.id}/`,
@@ -120,14 +130,49 @@ const CarCategoryList = () => {
     }
   };
 
+  // Filter categories based on search term
+  const filteredCategories = carCategory.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(searchLower) ||
+      item.variant_name?.toLowerCase().includes(searchLower) ||
+      item.variant?.name?.toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
     <div className="card basic-data-table">
-      {/* <div className="card-header d-flex justify-content-between align-items-center">
-        <h5 className="card-title mb-0">Car Part Category List</h5>
-      
-      </div> */}
       <div className="card-body">
-        <div className="table-responsive">
+        {/* Mobile Search and Add Button */}
+        <div className="d-lg-none mb-3">
+          <div className="position-relative mb-2">
+            <input
+              type="text"
+              className="form-control ps-5"
+              placeholder="Search categories..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <span className="position-absolute top-50 translate-middle-y ms-2">
+              <Icon icon="ion:search-outline" />
+            </span>
+          </div>
+          {searchTerm && (
+            <small className="text-muted d-block mb-2">
+              Showing {filteredCategories.length} of {carCategory.length} categories
+            </small>
+          )}
+          <button
+            onClick={handleAddClick}
+            className="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
+          >
+            <Icon icon="ic:baseline-plus" />
+            <span>Add New Category</span>
+          </button>
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="table-responsive d-none d-lg-block">
           <table
             className="table table-striped table-hover align-middle"
             id="dataTable"
@@ -138,7 +183,7 @@ const CarCategoryList = () => {
                 <th>S.L</th>
                 <th>Image</th>
                 <th>Variant Name</th>
-                <th>Category Name</th>               
+                <th>Category Name</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -172,13 +217,107 @@ const CarCategoryList = () => {
           </table>
         </div>
 
-        {/* Modal */}
+        {/* Mobile Card View */}
+        <div className="d-lg-none">
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map((item, index) => (
+              <div key={item.id} className="card mb-3 shadow-sm border">
+                <div className="card-body p-3">
+                  <div className="d-flex gap-3">
+                    {/* Image Section */}
+                    <div className="flex-shrink-0">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="rounded"
+                          style={{
+                            width: "120px",
+                            height: "80px",
+                            objectFit: "cover",
+                            border: "2px solid #e0e0e0",
+                          }}
+                        />
+                      ) : (
+                        <div
+                          className="rounded bg-light d-flex align-items-center justify-content-center"
+                          style={{
+                            width: "120px",
+                            height: "80px",
+                            border: "2px solid #e0e0e0",
+                          }}
+                        >
+                          <Icon
+                            icon="mdi:image-off-outline"
+                            className="text-muted"
+                            style={{ fontSize: "32px" }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="flex-grow-1">
+                      {/* Category Name */}
+                      <h6 className="mb-2 fw-semibold">{item.name}</h6>
+
+                      {/* Variant Info */}
+                      <div className="d-flex align-items-center mb-2">
+                        <Icon
+                          icon="mdi:car-outline"
+                          className="text-muted me-2"
+                        />
+                        <div>
+                          <small className="text-muted d-block">Variant</small>
+                          <span className="text-sm fw-medium">
+                            {item.variant_name || item.variant?.name || "N/A"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Category Number */}
+                      <small className="text-muted">
+                        Category #{index + 1}
+                      </small>
+
+                      {/* Action Button */}
+                      <div className="mt-2">
+                        <button
+                          onClick={() => handleEditClick(item)}
+                          className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+                        >
+                          <Icon icon="lucide:edit" />
+                          <span>Edit</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-5">
+              <Icon
+                icon="mdi:package-variant-closed-remove"
+                className="text-secondary-light"
+                style={{ fontSize: "64px" }}
+              />
+              <p className="text-secondary-light mt-3 mb-0">
+                {searchTerm
+                  ? "No matching categories found"
+                  : "No categories found"}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Add/Edit Modal - Mobile Optimized */}
         {showPartGroupModal && (
           <div
             className="modal d-block"
             style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           >
-            <div className="modal-dialog">
+            <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
               <form onSubmit={handleAddOrUpdate}>
                 <div className="modal-content">
                   <div className="modal-header">
@@ -196,8 +335,11 @@ const CarCategoryList = () => {
                     />
                   </div>
                   <div className="modal-body">
+                    {/* Variant Selection */}
                     <div className="mb-3">
-                      <label className="form-label">Variant</label>
+                      <label className="form-label fw-medium">
+                        Variant <span className="text-danger">*</span>
+                      </label>
                       <select
                         className="form-select"
                         value={selectedItem?.variant_id?.id || ""}
@@ -221,11 +363,15 @@ const CarCategoryList = () => {
                       </select>
                     </div>
 
+                    {/* Category Name */}
                     <div className="mb-3">
-                      <label className="form-label">Category Name</label>
+                      <label className="form-label fw-medium">
+                        Category Name <span className="text-danger">*</span>
+                      </label>
                       <input
                         type="text"
                         className="form-control"
+                        placeholder="Enter category name"
                         value={selectedItem?.name || ""}
                         onChange={(e) =>
                           setSelectedItem((prev) => ({
@@ -237,7 +383,9 @@ const CarCategoryList = () => {
                       />
                     </div>
                   </div>
-                  <div className="modal-footer">
+
+                  {/* Modal Footer - Desktop */}
+                  <div className="modal-footer d-none d-sm-flex">
                     <button
                       type="button"
                       className="btn-theme-admin"
@@ -253,12 +401,88 @@ const CarCategoryList = () => {
                       {isEdit ? "Update" : "Add"}
                     </button>
                   </div>
+
+                  {/* Modal Footer - Mobile (Full Width Buttons) */}
+                  <div className="modal-footer d-sm-none d-flex flex-column gap-2">
+                    <button type="submit" className="btn-theme-admin w-100">
+                      {isEdit ? "Update Category" : "Add Category"}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-theme-admin w-100"
+                      onClick={() => {
+                        setShowPartGroupModal(false);
+                        setIsEdit(false);
+                        setSelectedItem(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>
           </div>
         )}
       </div>
+
+      {/* Mobile Responsive Styles */}
+      <style jsx>{`
+        @media (max-width: 991px) {
+          .card-body {
+            padding: 16px !important;
+          }
+
+          .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .modal-dialog {
+            margin: 0.5rem;
+          }
+
+          .modal-body {
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
+          }
+
+          .modal-header h5 {
+            font-size: 1rem;
+          }
+
+          .card.shadow-sm {
+            transition: transform 0.2s ease;
+          }
+
+          .card.shadow-sm:active {
+            transform: scale(0.98);
+          }
+        }
+
+        /* Improve touch targets on mobile */
+        @media (max-width: 991px) {
+          .btn {
+            min-height: 44px;
+          }
+
+          .form-control,
+          .form-select {
+            min-height: 44px;
+          }
+        }
+
+        /* Search input styling */
+        .position-relative input {
+          padding-left: 2.5rem;
+        }
+
+        .position-relative .icon {
+          pointer-events: none;
+        }
+      `}</style>
     </div>
   );
 };

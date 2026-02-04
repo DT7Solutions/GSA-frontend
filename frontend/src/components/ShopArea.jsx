@@ -562,413 +562,433 @@ const ShopArea = ({ id }) => {
   };
 
   return (
-    <section className="space-top space-extra-bottom shop-sec">
-      <div className="container">
-       <div className="row g-3 align-items-end bg-white p-3 rounded shadow-sm mb-4">
+    <>
+      <style>{`
+        .btn-theme-admin.out-of-stock {
+          background-color: #6c757d !important;
+          border-color: #6c757d !important;
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+        
+        .btn-theme-admin.out-of-stock:hover {
+          background-color: #6c757d !important;
+          border-color: #6c757d !important;
+        }
+        
+        .btn-theme-admin.out-of-stock i {
+          color: #fff;
+        }
+      `}</style>
+      
+      <section className="space-top space-extra-bottom shop-sec">
+        <div className="container">
+          <div className="row g-3 align-items-end bg-white p-3 rounded shadow-sm mb-4">
 
-  {/* 1) Search by Car */}
-  <div className="col-12 col-md">
-    <label className="form-label fw-semibold">
-      Search by Car
-    </label>
-    <select
-      className="form-select"
-      value={selectedBrand}
-      onChange={(e) => {
-        const selectedId = e.target.value;
-        const selectedMake = carMakes.find(
-          (make) => make.id.toString() === selectedId
-        );
-        handleCarMakeChange(selectedId, selectedMake ? selectedMake.name : "");
-      }}
-    >
-      <option value="">Car Brand</option>
-      {carMakes.map((make) => (
-        <option key={make.id} value={make.id}>
-          {make.name}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  {/* 2) Search by Model */}
-  <div className="col-12 col-md">
-    <label className="form-label fw-semibold">
-      Search by Model
-    </label>
-    <select
-      className="form-select"
-      value={selectedModel}
-      onChange={(e) => handleCarModelChange(e.target.value)}
-      disabled={!selectedBrand}
-    >
-      <option value="">Model</option>
-      {carModels.map((model) => (
-        <option key={model.id} value={model.id}>
-          {model.name}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  {/* 3) Search by Variant */}
-  <div className="col-12 col-md">
-    <label className="form-label fw-semibold">
-      Search by Variant
-    </label>
-    <select
-      className="form-select"
-      value={selectedVariant}
-      onChange={(e) => handleVariantChange(e.target.value)}
-      disabled={!selectedModel}
-    >
-      <option value="">Variant</option>
-      {modelVariant.map((variant) => (
-        <option key={variant.id} value={variant.id}>
-          {variant.name}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  {/* 4) Search by Part Category */}
-  <div className="col-12 col-md">
-    <label className="form-label fw-semibold">
-      Search by Part Category
-    </label>
-    <select
-      className="form-select"
-      value={selectedCategory}
-      onChange={(e) => handleCategoryChange(e.target.value)}
-      disabled={!selectedVariant}
-    >
-      <option value="">Part Section</option>
-      {categories.map((category) => (
-        <option key={category.id} value={category.id}>
-          {category.name}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  {/* 5) Search by Part Group */}
-  <div className="col-12 col-md">
-    <label className="form-label fw-semibold">
-      Search by Part Group
-    </label>
-    <select
-      className="form-select"
-      value={selectedPartGroup}
-      onChange={(e) => handlePartGroupChange(e.target.value)}
-      disabled={!selectedCategory}
-    >
-      <option value="">Part Group</option>
-      {partGroups.map((group) => (
-        <option key={group.id} value={group.id}>
-          {group.name}
-        </option>
-      ))}
-    </select>
-  </div>
-
-</div>
-
-
-        <div className="row flex-row-reverse--">
-          <div className="col-xl-12 col-lg-12 order-lg-1 order-2 mb-5">
-            {isLoadingProducts ? (
-              <div
-                className="text-center my-5"
-                style={{
-                  minHeight: "300px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+            {/* 1) Search by Car */}
+            <div className="col-12 col-md">
+              <label className="form-label fw-semibold">
+                Search by Car
+              </label>
+              <select
+                className="form-select"
+                value={selectedBrand}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  const selectedMake = carMakes.find(
+                    (make) => make.id.toString() === selectedId
+                  );
+                  handleCarMakeChange(selectedId, selectedMake ? selectedMake.name : "");
                 }}
               >
-                <div
-                  className="spinner-border text-primary"
-                  role="status"
-                  style={{ width: "3rem", height: "3rem" }}
-                >
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              </div>
-            ) : (
-              <>
-                {currentProducts.length > 0 ? (
-                  <>
-                  <div className="row">
-                    <div className="py-3 d-flex justify-content-between align-items-center col-xl-12">
-                      <p className="text-muted mb-0">
-                        Showing <strong>{indexOfFirstProduct + 1}</strong> to <strong>{Math.min(indexOfLastProduct, filteredProducts.length)}</strong> of <strong>{filteredProducts.length}</strong> products
-                      </p>
-                      <div className="d-flex gap-2 align-items-center">
-                        <label className="mb-0 me-2">Items per page:</label>
-                        <select 
-                          value={productsPerPage}
-                          onChange={handleProductsPerPageChange}
-                          className="form-select form-select-sm"
-                          style={{ width: "80px" }}
-                        >
-                          <option value={9}>9</option>
-                          <option value={12}>12</option>
-                          <option value={25}>25</option>
-                          <option value={50}>50</option>
-                        </select>
-                      </div>
-                    </div>
-                    {partGroupDetails && (
-                      <div className="mb-4 col-xl-4">
-                        <div className="card-body p-0">
-                          <div className="row align-items-center">
-                            <div className="col-md-12">
-                              {partGroupDetails.image ? (
-                                <img 
-                                  src={partGroupDetails.image} 
-                                  alt={partGroupDetails.name}
-                                  className="img-fluid rounded shadow-sm"
-                                  style={{ maxHeight: "500px", objectFit: "cover", width: "100%" }}
-                                />
-                              ) : (
-                                <div 
-                                  className="bg-light rounded d-flex align-items-center justify-content-center"
-                                  style={{ height: "200px" }}
-                                >
-                                  <i className="fas fa-image fa-3x text-muted"></i>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                <option value="">Car Brand</option>
+                {carMakes.map((make) => (
+                  <option key={make.id} value={make.id}>
+                    {make.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                    
+            {/* 2) Search by Model */}
+            <div className="col-12 col-md">
+              <label className="form-label fw-semibold">
+                Search by Model
+              </label>
+              <select
+                className="form-select"
+                value={selectedModel}
+                onChange={(e) => handleCarModelChange(e.target.value)}
+                disabled={!selectedBrand}
+              >
+                <option value="">Model</option>
+                {carModels.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                    <div className="col-xl-8 table-responsive  rounded">
-                      <table className="shadow-shop table table-striped table-hover align-middle mb-0 bg-white">
-                        <thead className="table-light">
-                          <tr>
-                            <th scope="col" style={{ width: "10%" }} className="text-center">Fig No</th>
-                            <th scope="col" style={{ width: "12%" }}>Part No</th>
-                            <th scope="col" style={{ width: "35%" }}>Part Name</th>
-                            <th scope="col" style={{ width: "12%" }}>Stock</th>
-                            <th scope="col" style={{ width: "10%" }}>Price</th>
-                            <th scope="col" style={{ width: "15%" }} className="text-center">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {currentProducts.map((product) => (
-                            <tr key={product.id}>
-                              <td className="text-center fw-semibold text-muted">
-                                {product.fig_no || "N/A"}
-                              </td>
-                              <td>
-                                <span className="text-muted">
-                                  {product.part_no || product.product_code || "N/A"}
-                                </span>
-                              </td>
-                              <td>
-                                <Link 
-                                  // to={`/shop-details/${product.id}`}
-                                  className="text-decoration-none text-dark fw-medium d-flex align-items-center"
-                                >
-                                  <span className="table-name-sm">{product.product_name || "Unnamed Product"}</span>
-                                </Link>
-                              </td>
-                              <td>
-                                <span 
-                                  className={`badge-shop ${
-                                    product.stock_count > 10 
-                                      ? "bg-success" 
-                                      : product.stock_count > 0 
-                                      ? "bg-warning text-dark" 
-                                      : "bg-danger"
-                                  }`}
-                                >
-                                  {product.stock_count > 0 ? `${product.stock_count} Available` : "Out of Stock"}
-                                </span>
-                              </td>
-                              <td>
-                                <div className="d-flex flex-column">
-                                  {/* <span className="text-muted text-decoration-line-through small">
-                                    ₹{product.price || "0"}
-                                  </span> */}
-                                  <span className="fw-bold text-theme fs-6">
-                                    ₹{product.sale_price || product.price || "0"}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="text-center">
-                                <button
-                                  className="btn-theme-admin py-3"
-                                  onClick={() => handleAddToCart(product.id)}
-                                  disabled={product.stock_count === 0}
-                                  title={product.stock_count === 0 ? "Out of stock" : "Add to cart"}
-                                >
-                                  <i className="fas fa-shopping-cart me-1" />
-                                 
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-</div>
-                    {totalPages > 1 && (
-                      <nav className="mt-4 d-flex justify-content-center" aria-label="Page navigation">
-                        <ul className="pagination">
-                          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                            <button 
-                              className="page-link" 
-                              onClick={() => handlePageChange(1)}
-                              disabled={currentPage === 1}
-                            >
-                              First
-                            </button>
-                          </li>
-                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <li 
-                              key={page} 
-                              className={`page-item ${currentPage === page ? 'active' : ''}`}
-                            >
-                              <button 
-                                className="page-link" 
-                                onClick={() => handlePageChange(page)}
-                              >
-                                {page}
-                              </button>
-                            </li>
-                          ))}
-                          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                            <button 
-                              className="page-link" 
-                              onClick={() => handlePageChange(totalPages)}
-                              disabled={currentPage === totalPages}
-                            >
-                              Last
-                            </button>
-                          </li>
-                        </ul>
-                      </nav>
-                    )}
-                  </>
-                ) : (
-                  <div className="">
-                    <div className="card-body p-4">
-                      <div className="text-center mb-5">
-                        <i
-                          className="fas fa-search"
-                          style={{ fontSize: "3rem", color: "#6c757d" }}
-                        ></i>
-                        <h4 className="mt-3">No Products Found</h4>
-                        <p className="text-muted">
-                          We couldn't find any car parts matching your search.
-                          Please submit an enquiry and we'll help you find what
-                          you need.
-                        </p>
-                      </div>
+            {/* 3) Search by Variant */}
+            <div className="col-12 col-md">
+              <label className="form-label fw-semibold">
+                Search by Variant
+              </label>
+              <select
+                className="form-select"
+                value={selectedVariant}
+                onChange={(e) => handleVariantChange(e.target.value)}
+                disabled={!selectedModel}
+              >
+                <option value="">Variant</option>
+                {modelVariant.map((variant) => (
+                  <option key={variant.id} value={variant.id}>
+                    {variant.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                      <form
-                        className="comment-form bg-light p-4 rounded card shadow-sm"
-                        onSubmit={handleEnquirySubmit}
-                      >
-                        <h5 className="mb-4 text-center pt-3">Submit Product Enquiry</h5>
-                        <div className="row p-lg-5 p-3">
-                          <div className="col-md-6 form-group mb-3">
-                            <input
-                              type="text"
-                              placeholder="Your Name *"
-                              name="name"
-                              required
-                              className="form-control"
-                              value={enquiryFormData.name}
-                              onChange={handleEnquiryChange}
-                            />
-                          </div>
-                          <div className="col-md-6 form-group mb-3">
-                            <input
-                              type="text"
-                              name="phone"
-                              placeholder="Phone Number *"
-                              className="form-control"
-                              required
-                              value={enquiryFormData.phone}
-                              onChange={handleEnquiryChange}
-                            />
-                          </div>
-                          <div className="col-md-6 form-group mb-3">
-                            <input
-                              type="text"
-                              name="carBrand"
-                              placeholder="Car Brand *"
-                              className="form-control"
-                              required
-                              value={enquiryFormData.carBrand}
-                              onChange={handleEnquiryChange}
-                            />
-                          </div>
-                          <div className="col-md-6 form-group mb-3">
-                            <input
-                              type="text"
-                              name="carModel"
-                              placeholder="Car Model *"
-                              className="form-control"
-                              required
-                              value={enquiryFormData.carModel}
-                              onChange={handleEnquiryChange}
-                            />
-                          </div>
-                          <div className="col-md-6 form-group mb-3">
-                            <input
-                              type="text"
-                              name="modelYear"
-                              placeholder="Model Year / Variant"
-                              className="form-control"
-                              value={enquiryFormData.modelYear}
-                              onChange={handleEnquiryChange}
-                            />
-                          </div>
-                          <div className="col-md-6 form-group mb-3">
-                            <input
-                              type="text"
-                              name="chassisNumber"
-                              placeholder="Chassis Number (Optional)"
-                              className="form-control"
-                              value={enquiryFormData.chassisNumber}
-                              onChange={handleEnquiryChange}
-                            />
-                          </div>
-                          <div className="col-12 form-group mb-3">
-                            <textarea
-                              placeholder="Tell us what car part you're looking for..."
-                              name="message"
-                              className="form-control"
-                              rows="4"
-                              value={enquiryFormData.message}
-                              onChange={handleEnquiryChange}
-                            ></textarea>
-                          </div>
-                          <div className="col-12 form-group mb-0">
-                            <button className="btn-theme-admin " type="submit">
-                              Submit Enquiry
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+            {/* 4) Search by Part Category */}
+            <div className="col-12 col-md">
+              <label className="form-label fw-semibold">
+                Search by Part Category
+              </label>
+              <select
+                className="form-select"
+                value={selectedCategory}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                disabled={!selectedVariant}
+              >
+                <option value="">Part Section</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 5) Search by Part Group */}
+            <div className="col-12 col-md">
+              <label className="form-label fw-semibold">
+                Search by Part Group
+              </label>
+              <select
+                className="form-select"
+                value={selectedPartGroup}
+                onChange={(e) => handlePartGroupChange(e.target.value)}
+                disabled={!selectedCategory}
+              >
+                <option value="">Part Group</option>
+                {partGroups.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
           </div>
 
-         {/*  */}
+
+          <div className="row flex-row-reverse--">
+            <div className="col-xl-12 col-lg-12 order-lg-1 order-2 mb-5">
+              {isLoadingProducts ? (
+                <div
+                  className="text-center my-5"
+                  style={{
+                    minHeight: "300px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <div
+                    className="spinner-border text-primary"
+                    role="status"
+                    style={{ width: "3rem", height: "3rem" }}
+                  >
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {currentProducts.length > 0 ? (
+                    <>
+                      <div className="row">
+                        <div className="py-3 d-flex justify-content-between align-items-center col-xl-12">
+                          <p className="text-muted mb-0">
+                            Showing <strong>{indexOfFirstProduct + 1}</strong> to <strong>{Math.min(indexOfLastProduct, filteredProducts.length)}</strong> of <strong>{filteredProducts.length}</strong> products
+                          </p>
+                          <div className="d-flex gap-2 align-items-center">
+                            <label className="mb-0 me-2">Items per page:</label>
+                            <select 
+                              value={productsPerPage}
+                              onChange={handleProductsPerPageChange}
+                              className="form-select form-select-sm"
+                              style={{ width: "80px" }}
+                            >
+                              <option value={9}>9</option>
+                              <option value={12}>12</option>
+                              <option value={25}>25</option>
+                              <option value={50}>50</option>
+                            </select>
+                          </div>
+                        </div>
+                        {partGroupDetails && (
+                          <div className="mb-4 col-xl-4">
+                            <div className="card-body p-0">
+                              <div className="row align-items-center">
+                                <div className="col-md-12">
+                                  {partGroupDetails.image ? (
+                                    <img 
+                                      src={partGroupDetails.image} 
+                                      alt={partGroupDetails.name}
+                                      className="img-fluid rounded shadow-sm"
+                                      style={{ maxHeight: "500px", objectFit: "cover", width: "100%" }}
+                                    />
+                                  ) : (
+                                    <div 
+                                      className="bg-light rounded d-flex align-items-center justify-content-center"
+                                      style={{ height: "200px" }}
+                                    >
+                                      <i className="fas fa-image fa-3x text-muted"></i>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        
+
+                        <div className="col-xl-8 table-responsive  rounded">
+                          <table className="shadow-shop table table-striped table-hover align-middle mb-0 bg-white">
+                            <thead className="table-light">
+                              <tr>
+                                <th scope="col" style={{ width: "10%" }} className="text-center">Fig No</th>
+                                <th scope="col" style={{ width: "12%" }}>Part No</th>
+                                <th scope="col" style={{ width: "35%" }}>Part Name</th>
+                                <th scope="col" style={{ width: "12%" }}>Stock</th>
+                                <th scope="col" style={{ width: "10%" }}>Price</th>
+                                <th scope="col" style={{ width: "15%" }} className="text-center">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {currentProducts.map((product) => (
+                                <tr key={product.id}>
+                                  <td className="text-center fw-semibold text-muted">
+                                    {product.fig_no || "N/A"}
+                                  </td>
+                                  <td>
+                                    <span className="text-muted">
+                                      {product.part_no || product.product_code || "N/A"}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <Link 
+                                      // to={`/shop-details/${product.id}`}
+                                      className="text-decoration-none text-dark fw-medium d-flex align-items-center"
+                                    >
+                                      <span className="table-name-sm">{product.product_name || "Unnamed Product"}</span>
+                                    </Link>
+                                  </td>
+                                  <td>
+                                    <span 
+                                      className={`badge-shop ${
+                                        product.stock_count > 10 
+                                          ? "bg-success" 
+                                          : product.stock_count > 0 
+                                          ? "bg-warning text-dark" 
+                                          : "bg-danger"
+                                      }`}
+                                    >
+                                      {product.stock_count > 0 ? `${product.stock_count} Available` : "Out of Stock"}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <div className="d-flex flex-column">
+                                      {/* <span className="text-muted text-decoration-line-through small">
+                                        ₹{product.price || "0"}
+                                      </span> */}
+                                      <span className="fw-bold text-theme fs-6">
+                                        ₹{product.sale_price || product.price || "0"}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td className="text-center">
+                                    <button
+                                      className={`btn-theme-admin py-3 ${product.stock_count === 0 ? 'out-of-stock' : ''}`}
+                                      onClick={() => handleAddToCart(product.id)}
+                                      disabled={product.stock_count === 0}
+                                      title={product.stock_count === 0 ? "Out of stock" : "Add to cart"}
+                                    >
+                                      <i className="fas fa-shopping-cart me-1" />
+                                    
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                      {totalPages > 1 && (
+                        <nav className="mt-4 d-flex justify-content-center" aria-label="Page navigation">
+                          <ul className="pagination">
+                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                              <button 
+                                className="page-link" 
+                                onClick={() => handlePageChange(1)}
+                                disabled={currentPage === 1}
+                              >
+                                First
+                              </button>
+                            </li>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                              <li 
+                                key={page} 
+                                className={`page-item ${currentPage === page ? 'active' : ''}`}
+                              >
+                                <button 
+                                  className="page-link" 
+                                  onClick={() => handlePageChange(page)}
+                                >
+                                  {page}
+                                </button>
+                              </li>
+                            ))}
+                            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                              <button 
+                                className="page-link" 
+                                onClick={() => handlePageChange(totalPages)}
+                                disabled={currentPage === totalPages}
+                              >
+                                Last
+                              </button>
+                            </li>
+                          </ul>
+                        </nav>
+                      )}
+                    </>
+                  ) : (
+                    <div className="">
+                      <div className="card-body p-4">
+                        <div className="text-center mb-5">
+                          <i
+                            className="fas fa-search"
+                            style={{ fontSize: "3rem", color: "#6c757d" }}
+                          ></i>
+                          <h4 className="mt-3">No Products Found</h4>
+                          <p className="text-muted">
+                            We couldn't find any car parts matching your search.
+                            Please submit an enquiry and we'll help you find what
+                            you need.
+                          </p>
+                        </div>
+
+                        <form
+                          className="comment-form bg-light p-4 rounded card shadow-sm"
+                          onSubmit={handleEnquirySubmit}
+                        >
+                          <h5 className="mb-4 text-center pt-3">Submit Product Enquiry</h5>
+                          <div className="row p-lg-5 p-3">
+                            <div className="col-md-6 form-group mb-3">
+                              <input
+                                type="text"
+                                placeholder="Your Name *"
+                                name="name"
+                                required
+                                className="form-control"
+                                value={enquiryFormData.name}
+                                onChange={handleEnquiryChange}
+                              />
+                            </div>
+                            <div className="col-md-6 form-group mb-3">
+                              <input
+                                type="text"
+                                name="phone"
+                                placeholder="Phone Number *"
+                                className="form-control"
+                                required
+                                value={enquiryFormData.phone}
+                                onChange={handleEnquiryChange}
+                              />
+                            </div>
+                            <div className="col-md-6 form-group mb-3">
+                              <input
+                                type="text"
+                                name="carBrand"
+                                placeholder="Car Brand *"
+                                className="form-control"
+                                required
+                                value={enquiryFormData.carBrand}
+                                onChange={handleEnquiryChange}
+                              />
+                            </div>
+                            <div className="col-md-6 form-group mb-3">
+                              <input
+                                type="text"
+                                name="carModel"
+                                placeholder="Car Model *"
+                                className="form-control"
+                                required
+                                value={enquiryFormData.carModel}
+                                onChange={handleEnquiryChange}
+                              />
+                            </div>
+                            <div className="col-md-6 form-group mb-3">
+                              <input
+                                type="text"
+                                name="modelYear"
+                                placeholder="Model Year / Variant"
+                                className="form-control"
+                                value={enquiryFormData.modelYear}
+                                onChange={handleEnquiryChange}
+                              />
+                            </div>
+                            <div className="col-md-6 form-group mb-3">
+                              <input
+                                type="text"
+                                name="chassisNumber"
+                                placeholder="Chassis Number (Optional)"
+                                className="form-control"
+                                value={enquiryFormData.chassisNumber}
+                                onChange={handleEnquiryChange}
+                              />
+                            </div>
+                            <div className="col-12 form-group mb-3">
+                              <textarea
+                                placeholder="Tell us what car part you're looking for..."
+                                name="message"
+                                className="form-control"
+                                rows="4"
+                                value={enquiryFormData.message}
+                                onChange={handleEnquiryChange}
+                              ></textarea>
+                            </div>
+                            <div className="col-12 form-group mb-0">
+                              <button className="btn-theme-admin " type="submit">
+                                Submit Enquiry
+                              </button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/*  */}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
