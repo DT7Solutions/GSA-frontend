@@ -609,7 +609,7 @@ const CustomerList = () => {
                                             {customer.is_active ? (
                                                 <button
                                                     type="button"
-                                                    className="btn btn-theme-admin  btn-outline-danger d-flex align-items-center gap-1 flex-grow-1 justify-content-center"
+                                                    className="btn-theme-admin  btn-outline-danger d-flex align-items-center gap-1 flex-grow-1 justify-content-center"
                                                     onClick={() => setToggleModal({
                                                         show: true,
                                                         customerId: customer.id,
@@ -623,7 +623,7 @@ const CustomerList = () => {
                                             ) : (
                                                 <button
                                                     type="button"
-                                                    className="btn btn-theme-admin btn-primary d-flex align-items-center gap-1 flex-grow-1 justify-content-center"
+                                                    className="btn-theme-admin btn-primary d-flex align-items-center gap-1 flex-grow-1 justify-content-center"
                                                     onClick={() => setToggleModal({
                                                         show: true,
                                                         customerId: customer.id,
@@ -639,7 +639,7 @@ const CustomerList = () => {
                                             {customer.role_name?.toLowerCase() !== 'admin' && (
                                                 <button
                                                     type="button"
-                                                    className="btn btn-theme-admin btn-danger d-flex align-items-center gap-1"
+                                                    className="btn-theme-admin btn-danger d-flex align-items-center gap-1"
                                                     onClick={() => setDeleteModal({
                                                         show: true,
                                                         customerId: customer.id,

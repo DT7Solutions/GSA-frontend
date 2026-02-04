@@ -257,10 +257,10 @@ const CarModelVariants = () => {
                                     {/* Header */}
                                     <div className="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
                                         <div>
-                                            <h6 className="mb-1 fw-bold text-primary">{item.name}</h6>
+                                            <h6 className="mb-1 fw-bold text-theme">{item.name}</h6>
                                             <small className="text-muted">{item.car_model_name}</small>
                                         </div>
-                                        <span className="badge bg-primary text-white">#{index + 1}</span>
+                                        <span className="badge bg-theme text-white">#{index + 1}</span>
                                     </div>
 
                                     {/* Specifications Grid */}
@@ -340,7 +340,7 @@ const CarModelVariants = () => {
                                     <div className="pt-2 border-top">
                                         <button
                                             onClick={() => handleEdit(item)}
-                                            className="btn btn-sm btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-1"
+                                            className="btn-theme-admin btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-1"
                                         >
                                             <Icon icon="lucide:edit" />
                                             <span>Edit Variant</span>

@@ -184,17 +184,161 @@ const CarModelsDisplay = () => {
         setCurrentPage(1);
     };
 
+    // Generate page numbers for mobile pagination
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisible = 3; // Show max 3 page numbers on mobile
+        
+        if (totalPages <= maxVisible + 2) {
+            // Show all pages if total is small
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            // Always show first page
+            pages.push(1);
+            
+            if (currentPage > 3) {
+                pages.push('...');
+            }
+            
+            // Show current page and neighbors
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            
+            for (let i = start; i <= end; i++) {
+                if (!pages.includes(i)) {
+                    pages.push(i);
+                }
+            }
+            
+            if (currentPage < totalPages - 2) {
+                pages.push('...');
+            }
+            
+            // Always show last page
+            if (!pages.includes(totalPages)) {
+                pages.push(totalPages);
+            }
+        }
+        
+        return pages;
+    };
+
+    // Inline Styles
+    const styles = {
+        mobileCard: {
+            background: '#fff',
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+            transition: 'box-shadow 0.3s ease',
+            marginBottom: '1rem'
+        },
+        mobileCardHeader: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 15px',
+            background: '#f8f9fa',
+            borderBottom: '1px solid #e0e0e0'
+        },
+        mobileCardImage: {
+            width: '100%',
+            height: '180px',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#f5f5f5'
+        },
+        mobileCardImageImg: {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover'
+        },
+        mobileCardBody: {
+            padding: '15px'
+        },
+        mobileCardRow: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            padding: '8px 0',
+            borderBottom: '1px solid #f0f0f0'
+        },
+        mobileCardRowLast: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            padding: '8px 0',
+            borderBottom: 'none'
+        },
+        mobileCardLabel: {
+            fontWeight: 600,
+            color: '#555',
+            fontSize: '0.9rem',
+            minWidth: '100px'
+        },
+        mobileCardValue: {
+            color: '#333',
+            fontSize: '0.9rem',
+            textAlign: 'right',
+            flex: 1,
+            wordBreak: 'break-word'
+        },
+        pageLinkMobile: {
+            padding: '6px 12px',
+            fontSize: '0.9rem',
+            minWidth: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        modalOverlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1050,
+            overflowY: 'auto',
+            padding: '15px'
+        },
+        badge: {
+            fontSize: '0.85rem',
+            padding: '6px 12px'
+        },
+        closeButton: {
+            background: 'transparent',
+            border: 'none',
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            lineHeight: '1',
+            color: '#000',
+            opacity: '0.5',
+            cursor: 'pointer',
+            padding: '0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'opacity 0.2s ease'
+        }
+    };
+
     return (
         <div className="card basic-data-table">
             <div className="card-body">
                 {/* Search Bar and Items Per Page */}
-                <div className="row mb-3 align-items-center">
-                    <div className="col-md-6">
-                        <div className="d-flex align-items-center gap-2">
-                            <span>Show</span>
+                <div className="row mb-3 align-items-center g-2">
+                    <div className="col-12 col-md-6">
+                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                            <span style={{ whiteSpace: 'nowrap' }}>Show</span>
                             <select 
-                                className="form-select" 
-                                style={{ width: 'auto' }}
+                                className="form-select form-select-sm" 
+                                style={{ width: 'auto', minWidth: '70px' }}
                                 value={itemsPerPage}
                                 onChange={handleItemsPerPageChange}
                             >
@@ -204,15 +348,15 @@ const CarModelsDisplay = () => {
                                 <option value={50}>50</option>
                                 <option value={100}>100</option>
                             </select>
-                            <span>entries</span>
+                            <span style={{ whiteSpace: 'nowrap' }}>entries</span>
                         </div>
                     </div>
-                    <div className="col-md-6">
-                        <div className="d-flex justify-content-end align-items-center gap-2">
-                            <span>Search:</span>
+                    <div className="col-12 col-md-6">
+                        <div className="d-flex justify-content-md-end align-items-center gap-2">
+                            <span style={{ whiteSpace: 'nowrap' }}>Search:</span>
                             <input
                                 type="text"
-                                className="form-control"
+                                className="form-control form-control-sm"
                                 placeholder="car model..."
                                 style={{ maxWidth: '250px' }}
                                 value={searchTerm}
@@ -222,7 +366,8 @@ const CarModelsDisplay = () => {
                     </div>
                 </div>
 
-                <div className="table-responsive">
+                {/* Desktop Table View */}
+                <div className="table-responsive d-none d-lg-block">
                     <table className="table bordered-table mb-0 sm-table">
                         <thead>
                             <tr>
@@ -232,7 +377,6 @@ const CarModelsDisplay = () => {
                                 <th>Model Name</th>
                                 <th>Generation</th>
                                 <th>Body Type</th>
-                                {/* <th>Fuel Type</th> */}
                                 <th>Production (start-end)</th>
                                 <th>Actions</th>
                             </tr>
@@ -255,7 +399,6 @@ const CarModelsDisplay = () => {
                                         <td>{item.name}</td>
                                         <td>{item.generation}</td>
                                         <td>{item.body_type}</td>
-                                        {/* <td>{item.fuel_type}</td> */}
                                         <td>{item.production_start_date} - {item.production_end_date}</td>
                                         <td>
                                             <button
@@ -270,25 +413,88 @@ const CarModelsDisplay = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="9" className="text-center">No matching records found</td>
+                                    <td colSpan="8" className="text-center">No matching records found</td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
 
+                {/* Mobile Card View */}
+                <div className="d-lg-none">
+                    {currentItems.length > 0 ? (
+                        currentItems.map((item, index) => (
+                            <div key={item.id} style={styles.mobileCard}>
+                                <div style={styles.mobileCardHeader}>
+                                    <span className="badge bg-theme-text" style={styles.badge}>
+                                        #{indexOfFirstItem + index + 1}
+                                    </span>
+                                    <button
+                                        onClick={() => handleEditClick(item)}
+                                        className=" btn-theme-admin gap-2"
+                                        title="Edit"
+                                        style={{ minHeight: '36px' }}
+                                    >
+                                        <Icon icon="lucide:edit" /> Edit
+                                    </button>
+                                </div>
+                                
+                                {item.image && (
+                                    <div style={styles.mobileCardImage}>
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                            style={styles.mobileCardImageImg}
+                                        />
+                                    </div>
+                                )}
+                                
+                                <div style={styles.mobileCardBody}>
+                                    <div style={styles.mobileCardRow}>
+                                        <span style={styles.mobileCardLabel}>Brand:</span>
+                                        <span style={styles.mobileCardValue}>{item.car_make_name}</span>
+                                    </div>
+                                    <div style={styles.mobileCardRow}>
+                                        <span style={styles.mobileCardLabel}>Model:</span>
+                                        <span style={styles.mobileCardValue}>{item.name}</span>
+                                    </div>
+                                    <div style={styles.mobileCardRow}>
+                                        <span style={styles.mobileCardLabel}>Generation:</span>
+                                        <span style={styles.mobileCardValue}>{item.generation || 'N/A'}</span>
+                                    </div>
+                                    <div style={styles.mobileCardRow}>
+                                        <span style={styles.mobileCardLabel}>Body Type:</span>
+                                        <span style={styles.mobileCardValue}>{item.body_type}</span>
+                                    </div>
+                                    <div style={styles.mobileCardRowLast}>
+                                        <span style={styles.mobileCardLabel}>Production:</span>
+                                        <span style={styles.mobileCardValue}>
+                                            {item.production_start_date} - {item.production_end_date}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-4">
+                            <p className="text-muted">No matching records found</p>
+                        </div>
+                    )}
+                </div>
+
                 {/* Pagination Info and Controls */}
-                <div className="row mt-3 align-items-center">
-                    <div className="col-md-6">
-                        <p className="mb-0">
+                <div className="row mt-3 align-items-center g-2">
+                    <div className="col-12 col-md-6">
+                        <p className="mb-0 small">
                             Showing {filteredData.length > 0 ? indexOfFirstItem + 1 : 0} to{' '}
                             {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} entries
                             {searchTerm && ` (filtered from ${carbrands.length} total entries)`}
                         </p>
                     </div>
-                    <div className="col-md-6">
-                        <nav>
-                            <ul className="pagination justify-content-end mb-0 mt-3">
+                    <div className="col-12 col-md-6">
+                        {/* Desktop Pagination */}
+                        <nav className="d-none d-md-block">
+                            <ul className="pagination justify-content-md-end mb-0">
                                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                                     <button
                                         className="page-link"
@@ -301,7 +507,6 @@ const CarModelsDisplay = () => {
                                 
                                 {[...Array(totalPages)].map((_, index) => {
                                     const pageNumber = index + 1;
-                                    // Show first page, last page, current page, and pages around current
                                     if (
                                         pageNumber === 1 ||
                                         pageNumber === totalPages ||
@@ -344,21 +549,78 @@ const CarModelsDisplay = () => {
                                 </li>
                             </ul>
                         </nav>
+
+                        {/* Mobile Pagination */}
+                        <nav className="d-md-none">
+                            <ul className="pagination justify-content-center mb-0 flex-wrap" style={{ gap: '4px' }}>
+                                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                    <button
+                                        className="page-link"
+                                        style={styles.pageLinkMobile}
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    >
+                                        <Icon icon="lucide:chevron-left" />
+                                    </button>
+                                </li>
+                                
+                                {getPageNumbers().map((pageNum, idx) => (
+                                    pageNum === '...' ? (
+                                        <li key={`ellipsis-${idx}`} className="page-item disabled">
+                                            <span className="page-link" style={styles.pageLinkMobile}>...</span>
+                                        </li>
+                                    ) : (
+                                        <li
+                                            key={pageNum}
+                                            className={`page-item ${currentPage === pageNum ? 'active' : ''}`}
+                                        >
+                                            <button
+                                                className="page-link"
+                                                style={styles.pageLinkMobile}
+                                                onClick={() => handlePageChange(pageNum)}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        </li>
+                                    )
+                                ))}
+
+                                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                                    <button
+                                        className="page-link"
+                                        style={styles.pageLinkMobile}
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                    >
+                                        <Icon icon="lucide:chevron-right" />
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
 
+                {/* Modal */}
                 {showModal && (
-                    <div className="modal d-block" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-                        <div className="modal-dialog">
+                    <div style={styles.modalOverlay} onClick={handleCloseModal}>
+                        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h5 className="modal-title">{isEdit ? "Edit Car Model" : "Add Car Model"}</h5>
-                                    <button type="button" className="btn-close" onClick={handleCloseModal}>X</button>
+                                    <button 
+                                        type="button" 
+                                        className="btn-close" 
+                                        onClick={handleCloseModal}
+                                        aria-label="Close"
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <Icon icon="lucide:x" width="20" height="20" />
+                                    </button>
                                 </div>
-                                <div className="modal-body">
+                                <div className="modal-body" style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
                                     <form onSubmit={handleSubmit}>
                                         <div className="mb-3">
-                                            <label>Select Car Brand</label>
+                                            <label className="form-label">Select Car Brand</label>
                                             <select
                                                 name="car"
                                                 className="form-control"
@@ -376,7 +638,7 @@ const CarModelsDisplay = () => {
                                         </div>
 
                                         <div className="mb-3">
-                                            <label>Model Name</label>
+                                            <label className="form-label">Model Name</label>
                                             <input
                                                 type="text"
                                                 name="modelName"
@@ -388,7 +650,7 @@ const CarModelsDisplay = () => {
                                         </div>
 
                                         <div className="mb-3">
-                                            <label>Body Type</label>
+                                            <label className="form-label">Body Type</label>
                                             <input
                                                 type="text"
                                                 name="bodyType"
@@ -400,19 +662,18 @@ const CarModelsDisplay = () => {
                                         </div>
 
                                         <div className="mb-3">
-                                            <label>Generation</label>
+                                            <label className="form-label">Generation</label>
                                             <input
                                                 type="text"
                                                 name="generation"
                                                 className="form-control"
                                                 value={carModelData.generation ?? ""}
                                                 onChange={handleInputChange}
-                                                
                                             />
                                         </div>
 
-                                        <div className="mb-3">
-                                            <label>Fuel Type</label>
+                                        {/* <div className="mb-3">
+                                            <label className="form-label">Fuel Type</label>
                                             <select
                                                 name="fuelType"
                                                 className="form-control"
@@ -425,20 +686,37 @@ const CarModelsDisplay = () => {
                                                 <option value="diesel">Diesel</option>
                                                 <option value="electric">Electric</option>
                                             </select>
-                                        </div>
+                                        </div> */}
 
                                         <div className="mb-3">
-                                            <label>Image</label>
+                                            <label className="form-label">Image</label>
                                             <input
                                                 type="file"
                                                 className="form-control"
                                                 onChange={handleFileChange}
+                                                accept="image/*"
                                             />
                                         </div>
 
-                                        <button type="submit" className="btn-theme-admin">
-                                            {isEdit ? "Update" : "Save"}
-                                        </button>
+                                        <div className="d-flex gap-2 mt-4">
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-secondary flex-fill" 
+                                                onClick={handleCloseModal}
+                                                style={{ minHeight: '44px' }}
+                                            >
+                                                <Icon icon="lucide:x" className="me-1" />
+                                                Cancel
+                                            </button>
+                                            <button 
+                                                type="submit" 
+                                                className="btn btn-theme-admin flex-fill" 
+                                                style={{ minHeight: '44px' }}
+                                            >
+                                                <Icon icon={isEdit ? "lucide:check" : "lucide:save"} className="me-1" />
+                                                {isEdit ? "Update" : "Save"}
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -446,6 +724,40 @@ const CarModelsDisplay = () => {
                     </div>
                 )}
             </div>
+
+            {/* Inline CSS for additional responsive adjustments */}
+            <style>{`
+                @media (max-width: 575.98px) {
+                    .modal-dialog {
+                        margin: 10px;
+                    }
+                    .col-12.col-md-6 input[type="text"] {
+                        max-width: 100% !important;
+                        width: 100%;
+                    }
+                }
+                @media (max-width: 991.98px) {
+                    .card-body {
+                        padding: 15px;
+                    }
+                }
+                .btn-close:hover {
+                    opacity: 1 !important;
+                }
+                .btn-secondary {
+                    background-color: #6c757d;
+                    border-color: #6c757d;
+                    color: #fff;
+                }
+                .btn-secondary:hover {
+                    background-color: #5a6268;
+                    border-color: #545b62;
+                }
+                .modal-header .btn-close {
+                    padding: 0.5rem;
+                    margin: -0.5rem -0.5rem -0.5rem auto;
+                }
+            `}</style>
         </div>
     );
 };

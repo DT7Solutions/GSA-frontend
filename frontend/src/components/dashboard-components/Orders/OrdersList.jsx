@@ -324,10 +324,10 @@ const OrdersList = () => {
     <div className="card basic-data-table">
       <div className="card-body">
         {/* Date Filter Form - Mobile Optimized */}
-        <div className="mb-4 p-3 border rounded bg-light">
+        <div className="mb-5 p-3 border rounded bg-light">
           <h6 className="mb-3">Filter Orders by Date</h6>
 
-          <form onSubmit={handleFilterSubmit}>
+          <form onSubmit={handleFilterSubmit} >
             <div className="row g-3">
               {/* Date Inputs */}
               <div className="col-md-4 col-12">
@@ -527,10 +527,10 @@ const OrdersList = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="d-flex gap-2 pt-2 border-top">
+                  <div className="d-flex gap-2 py-4 border-top">
                     <button
                       type="button"
-                      className="btn btn-theme-admin btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center gap-1"
+                      className=" btn-theme-admin btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center gap-1"
                       onClick={() => handleEditClick(order)}
                     >
                       <Icon icon="lucide:edit" />
@@ -539,7 +539,7 @@ const OrdersList = () => {
                     
                     <button
                       type="button"
-                      className="btn btn-theme-admin d-flex align-items-center justify-content-center"
+                      className=" btn-theme-admin d-flex align-items-center justify-content-center"
                       onClick={() => handlePrint(order)}
                       title="Download Invoice"
                     >
@@ -548,7 +548,7 @@ const OrdersList = () => {
                     
                     <button
                       type="button"
-                      className="btn btn-theme-admin btn-outline-info d-flex align-items-center justify-content-center"
+                      className=" btn-theme-admin btn-outline-info d-flex align-items-center justify-content-center"
                       onClick={() => handlePackingSlipPrint(order)}
                       title="Download Packing Slip"
                     >
