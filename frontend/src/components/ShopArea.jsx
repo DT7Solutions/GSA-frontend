@@ -765,8 +765,8 @@ const ShopArea = ({ id }) => {
 
                         
 
-                        <div className="col-xl-8 table-responsive  rounded">
-                          <table className="shadow-shop table table-striped table-hover align-middle mb-0 bg-white">
+                        <div className="col-xl-8 table-responsive  rounded pt-lg-0 pt-5" >
+                          <table className="shadow-shop table table-striped table-hover align-middle mb-0 bg-white ">
                             <thead className="table-light">
                               <tr>
                                 <th scope="col" style={{ width: "10%" }} className="text-center">Fig No</th>

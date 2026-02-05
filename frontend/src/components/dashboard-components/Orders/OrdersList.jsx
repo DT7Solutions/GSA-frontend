@@ -729,57 +729,65 @@ const OrdersList = () => {
 
               {/* Mobile Pagination */}
               {totalPages > 1 && (
-                <div className="d-flex flex-column align-items-center mt-4 mb-3">
-                  {/* Page Info */}
-                  <div className="mb-3 text-center">
-                    <small className="text-muted">
-                      Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, mobileFilteredCount)} of {mobileFilteredCount} orders
-                    </small>
-                  </div>
-
+                <div className="pagination-container">
                   {/* Pagination Controls */}
-                  <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center">
-                    {/* Previous Button */}
-                    <button
-                      className="btn btn-sm btn-outline-secondary d-flex align-items-center"
-                      onClick={handlePrevPage}
-                      disabled={currentPage === 1}
-                      style={{ minWidth: '80px' }}
-                    >
-                      <Icon icon="mdi:chevron-left" className="me-1" />
-                      <span>Prev</span>
-                    </button>
+                  <nav aria-label="Page navigation">
+                    <ul className="pagination-list">
+                      {/* Previous Button */}
+                      <li className="pagination-item">
+                        <button
+                          className={`pagination-btn pagination-prev ${currentPage === 1 ? 'disabled' : ''}`}
+                          onClick={handlePrevPage}
+                          disabled={currentPage === 1}
+                          aria-label="Previous page"
+                        >
+                          <Icon icon="mdi:chevron-left" />
+                        </button>
+                      </li>
 
-                    {/* Page Numbers */}
-                    <div className="d-flex gap-1">
+                      {/* Page Numbers */}
                       {getPageNumbers().map((pageNum, idx) => (
                         pageNum === '...' ? (
-                          <span key={`ellipsis-${idx}`} className="px-2 py-1">
-                            ...
-                          </span>
+                          <li key={`ellipsis-${idx}`} className="pagination-item pagination-ellipsis">
+                            <span>...</span>
+                          </li>
                         ) : (
-                          <button
-                            key={pageNum}
-                            className={`btn btn-sm ${currentPage === pageNum ? 'btn-primary' : 'btn-outline-secondary'}`}
-                            onClick={() => handlePageChange(pageNum)}
-                            style={{ minWidth: '40px' }}
-                          >
-                            {pageNum}
-                          </button>
+                          <li key={pageNum} className="pagination-item">
+                            <button
+                              className={`pagination-btn pagination-number ${currentPage === pageNum ? 'active' : ''}`}
+                              onClick={() => handlePageChange(pageNum)}
+                              aria-label={`Page ${pageNum}`}
+                              aria-current={currentPage === pageNum ? 'page' : undefined}
+                            >
+                              {pageNum}
+                            </button>
+                          </li>
                         )
                       ))}
-                    </div>
 
-                    {/* Next Button */}
-                    <button
-                      className="btn btn-sm btn-outline-secondary d-flex align-items-center"
-                      onClick={handleNextPage}
-                      disabled={currentPage === totalPages}
-                      style={{ minWidth: '80px' }}
-                    >
-                      <span>Next</span>
-                      <Icon icon="mdi:chevron-right" className="ms-1" />
-                    </button>
+                      {/* Next Button */}
+                      <li className="pagination-item">
+                        <button
+                          className={`pagination-btn pagination-next ${currentPage === totalPages ? 'disabled' : ''}`}
+                          onClick={handleNextPage}
+                          disabled={currentPage === totalPages}
+                          aria-label="Next page"
+                        >
+                          <Icon icon="mdi:chevron-right" />
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+
+                  {/* Page Info */}
+                  <div className="pagination-info">
+                    <span className="pagination-text">
+                      Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+                    </span>
+                    <span className="pagination-separator">•</span>
+                    <span className="pagination-text">
+                      <strong>{mobileFilteredCount}</strong> total orders
+                    </span>
                   </div>
                 </div>
               )}
@@ -911,16 +919,6 @@ const OrdersList = () => {
             padding: 4px 8px;
             border-radius: 4px;
           }
-
-          .btn-sm {
-            font-size: 0.875rem;
-            padding: 0.375rem 0.75rem;
-          }
-
-          .pagination-btn {
-            min-width: 36px;
-            height: 36px;
-          }
         }
         
         @media (max-width: 576px) {
@@ -939,11 +937,6 @@ const OrdersList = () => {
           .filter-section {
             padding: 12px !important;
           }
-
-          .btn-sm {
-            font-size: 0.8rem;
-            padding: 0.25rem 0.5rem;
-          }
         }
 
         /* Search input styling */
@@ -952,15 +945,180 @@ const OrdersList = () => {
           box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
         }
 
-        /* Pagination button styling */
-        .btn-outline-secondary:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
+        /* ===== Modern Pagination Styles ===== */
+        .pagination-container {
+          margin-top: 2rem;
+          padding: 1.25rem 1rem;
+          background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+          border-radius: 12px;
+          border: 1px solid #e9ecef;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
-        .btn-primary {
-          background-color: #0d6efd;
-          border-color: #0d6efd;
+        .pagination-list {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          flex-wrap: wrap;
+          margin-bottom: 1rem;
+        }
+
+        .pagination-item {
+          display: inline-flex;
+        }
+
+        .pagination-btn {
+          min-width: 40px;
+          height: 40px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #dee2e6;
+          background: #ffffff;
+          color: #495057;
+          font-size: 0.875rem;
+          font-weight: 500;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          padding: 0 12px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+          background: #0068a5;
+          color: #ffffff;
+          border-color: #0068a5;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 104, 165, 0.3);
+        }
+
+        .pagination-btn.active {
+          background: linear-gradient(135deg, #0068a5 0%, #005a8c 100%);
+          color: #ffffff;
+          border-color: #0068a5;
+          box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+          font-weight: 600;
+        }
+
+        .pagination-btn.disabled {
+          background: #f8f9fa;
+          color: #adb5bd;
+          border-color: #e9ecef;
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+
+        .pagination-prev,
+        .pagination-next {
+          font-size: 1.2rem;
+          padding: 0;
+          width: 40px;
+        }
+
+        .pagination-ellipsis {
+          display: inline-flex;
+          align-items: center;
+          padding: 0 8px;
+          color: #6c757d;
+          font-weight: 500;
+          user-select: none;
+        }
+
+        .pagination-info {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          flex-wrap: wrap;
+          padding-top: 0.75rem;
+          border-top: 1px solid #e9ecef;
+        }
+
+        .pagination-text {
+          font-size: 0.813rem;
+          color: #6c757d;
+          line-height: 1.5;
+        }
+
+        .pagination-text strong {
+          color: #212529;
+          font-weight: 600;
+        }
+
+        .pagination-separator {
+          color: #dee2e6;
+          font-weight: 300;
+          user-select: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+          .pagination-container {
+            padding: 1rem 0.75rem;
+          }
+
+          .pagination-btn {
+            min-width: 36px;
+            height: 36px;
+            font-size: 0.813rem;
+            padding: 0 10px;
+          }
+
+          .pagination-prev,
+          .pagination-next {
+            width: 36px;
+            font-size: 1.1rem;
+          }
+
+          .pagination-list {
+            gap: 4px;
+          }
+
+          .pagination-info {
+            font-size: 0.75rem;
+            gap: 6px;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .pagination-btn {
+            min-width: 32px;
+            height: 32px;
+            font-size: 0.75rem;
+            padding: 0 8px;
+          }
+
+          .pagination-prev,
+          .pagination-next {
+            width: 32px;
+            font-size: 1rem;
+          }
+
+          .pagination-list {
+            gap: 3px;
+          }
+        }
+
+        /* Animation for page change */
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .card.mb-3 {
+          animation: fadeIn 0.3s ease;
         }
 
         /* Smooth transitions */

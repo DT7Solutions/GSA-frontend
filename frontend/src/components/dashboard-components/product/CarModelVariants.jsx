@@ -18,7 +18,7 @@ const CarModelVariants = () => {
     
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const TRANSMISSION_CHOICES = [
         { value: "MT", label: "Manual Transmission" },
@@ -211,6 +211,16 @@ const CarModelVariants = () => {
         }
     };
 
+    const handleItemsPerPageChange = (e) => {
+        setItemsPerPage(Number(e.target.value));
+        setCurrentPage(1);
+    };
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
     // Reset to page 1 when search term changes
     useEffect(() => {
         setCurrentPage(1);
@@ -255,30 +265,47 @@ const CarModelVariants = () => {
     return (
         <div className="card basic-data-table">
             <div className="card-body">
-                {/* Mobile Search */}
-                <div className="d-lg-none mb-3">
-                    <div className="position-relative">
-                        <input
-                            type="text"
-                            className="form-control ps-5"
-                            placeholder="Search variants..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <span className="position-absolute top-50 translate-middle-y ms-2">
-                           
-                        </span>
+                {/* Search Bar and Items Per Page - Desktop and Mobile */}
+                <div className="row mb-3 align-items-center">
+                    {/* Show Entries */}
+                    <div className="col-md-6 col-12 mb-3 mb-md-0">
+                        <div className="d-flex align-items-center gap-2">
+                            <span className="text-nowrap">Show</span>
+                            <select 
+                                className="form-select" 
+                                style={{ width: 'auto' }}
+                                value={itemsPerPage}
+                                onChange={handleItemsPerPageChange}
+                            >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={25}>25</option>
+                                <option value={50}>50</option>
+                                <option value={100}>100</option>
+                            </select>
+                            <span className="text-nowrap">entries</span>
+                        </div>
                     </div>
-                    {searchTerm && (
-                        <small className="text-muted d-block mt-2">
-                            Showing {filteredVariants.length} of {carVariants.length} variants
-                        </small>
-                    )}
+
+                    {/* Search Bar */}
+                    <div className="col-md-6 col-12">
+                        <div className="d-flex justify-content-md-end align-items-center gap-2">
+                            <span className="text-nowrap">Search:</span>
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Car Variants..."
+                                style={{ maxWidth: '250px' }}
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Desktop Table View */}
                 <div className="table-responsive d-none d-lg-block">
-                    <table className="table bordered-table mb-0 sm-table">
+                    <table className="table table-striped table-hover align-middle bordered-table mb-0 sm-table">
                         <thead>
                             <tr>
                                 <th>S.L</th>
@@ -294,27 +321,35 @@ const CarModelVariants = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {carVariants.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item.car_model_name}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.region}</td>
-                                    <td>{item.engine}</td>
-                                    <td>{item.chassis_type}</td>
-                                    <td>{item.fuel_type}</td>
-                                    <td>{item.transmission_type}</td>
-                                    <td>{item.production_start_date} - {item.production_end_date}</td>
-                                    <td>
-                                        <button
-                                            className="btn-theme-admin py-3"
-                                            onClick={() => handleEdit(item)}
-                                        >
-                                            <Icon icon="lucide:edit" />
-                                        </button>
+                            {currentItems.length > 0 ? (
+                                currentItems.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td>{indexOfFirstItem + index + 1}</td>
+                                        <td>{item.car_model_name}</td>
+                                        <td>{item.name}</td>
+                                        <td>{item.region}</td>
+                                        <td>{item.engine}</td>
+                                        <td>{item.chassis_type}</td>
+                                        <td>{item.fuel_type}</td>
+                                        <td>{item.transmission_type}</td>
+                                        <td>{item.production_start_date} - {item.production_end_date}</td>
+                                        <td>
+                                            <button
+                                                className="btn-theme-admin py-3"
+                                                onClick={() => handleEdit(item)}
+                                            >
+                                                <Icon icon="lucide:edit" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="10" className="text-center py-4">
+                                        No matching records found
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -421,85 +456,6 @@ const CarModelVariants = () => {
                                     </div>
                                 </div>
                             ))}
-
-                            {/* Mobile Pagination */}
-                            {totalPages > 1 && (
-                                <div className="mobile-pagination mt-4">
-                                    {/* Pagination Info */}
-                                    <div className="text-center mb-3">
-                                        <small className="text-muted">
-                                            Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredVariants.length)} of {filteredVariants.length} variants
-                                        </small>
-                                    </div>
-
-                                    {/* Pagination Controls */}
-                                    <div className="d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                                        {/* Previous Button */}
-                                        <button
-                                            className="btn btn-sm btn-outline-secondary d-flex align-items-center"
-                                            onClick={handlePrevPage}
-                                            disabled={currentPage === 1}
-                                            style={{ minWidth: '44px', minHeight: '44px' }}
-                                        >
-                                            <Icon icon="mdi:chevron-left" width="20" />
-                                        </button>
-
-                                        {/* Page Numbers */}
-                                        <div className="d-flex gap-1">
-                                            {getPageNumbers().map((page, index) => (
-                                                page === '...' ? (
-                                                    <span key={`ellipsis-${index}`} className="px-2 d-flex align-items-center">
-                                                        ...
-                                                    </span>
-                                                ) : (
-                                                    <button
-                                                        key={page}
-                                                        className={`btn btn-sm ${currentPage === page ? 'btn-primary' : 'btn-outline-secondary'}`}
-                                                        onClick={() => handlePageChange(page)}
-                                                        style={{ minWidth: '44px', minHeight: '44px' }}
-                                                    >
-                                                        {page}
-                                                    </button>
-                                                )
-                                            ))}
-                                        </div>
-
-                                        {/* Next Button */}
-                                        <button
-                                            className="btn btn-sm btn-outline-secondary d-flex align-items-center"
-                                            onClick={handleNextPage}
-                                            disabled={currentPage === totalPages}
-                                            style={{ minWidth: '44px', minHeight: '44px' }}
-                                        >
-                                            <Icon icon="mdi:chevron-right" width="20" />
-                                        </button>
-                                    </div>
-
-                                    {/* Quick Jump (Optional) */}
-                                    {totalPages > 5 && (
-                                        <div className="text-center mt-3">
-                                            <div className="d-inline-flex align-items-center gap-2">
-                                                <small className="text-muted">Go to page:</small>
-                                                <input
-                                                    type="number"
-                                                    className="form-control form-control-sm"
-                                                    style={{ width: '70px' }}
-                                                    min="1"
-                                                    max={totalPages}
-                                                    value={currentPage}
-                                                    onChange={(e) => {
-                                                        const page = parseInt(e.target.value);
-                                                        if (page >= 1 && page <= totalPages) {
-                                                            handlePageChange(page);
-                                                        }
-                                                    }}
-                                                />
-                                                <small className="text-muted">of {totalPages}</small>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </>
                     ) : (
                         <div className="text-center py-5">
@@ -514,6 +470,67 @@ const CarModelVariants = () => {
                         </div>
                     )}
                 </div>
+
+                {/* Pagination Info and Controls - All Screens */}
+                {totalPages > 0 && (
+                    <div className="row mt-3 align-items-center">
+                        <div className="col-md-6 col-12 mb-3 mb-md-0">
+                            <p className="mb-0">
+                                Showing {filteredVariants.length > 0 ? indexOfFirstItem + 1 : 0} to{' '}
+                                {Math.min(indexOfLastItem, filteredVariants.length)} of {filteredVariants.length} entries
+                                {searchTerm && ` (filtered from ${carVariants.length} total entries)`}
+                            </p>
+                        </div>
+                        <div className="col-md-6 col-12">
+                            <nav>
+                                <ul className="pagination justify-content-md-end justify-content-center mb-0">
+                                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                        <button
+                                            className="page-link"
+                                            onClick={handlePrevPage}
+                                            disabled={currentPage === 1}
+                                        >
+                                            Previous
+                                        </button>
+                                    </li>
+                                    
+                                    {getPageNumbers().map((page, index) => {
+                                        if (page === '...') {
+                                            return (
+                                                <li key={`ellipsis-${index}`} className="page-item disabled d-none d-sm-block">
+                                                    <span className="page-link">...</span>
+                                                </li>
+                                            );
+                                        }
+                                        return (
+                                            <li
+                                                key={page}
+                                                className={`page-item ${currentPage === page ? 'active' : ''}`}
+                                            >
+                                                <button
+                                                    className="page-link"
+                                                    onClick={() => handlePageChange(page)}
+                                                >
+                                                    {page}
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+
+                                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                                        <button
+                                            className="page-link"
+                                            onClick={handleNextPage}
+                                            disabled={currentPage === totalPages}
+                                        >
+                                            Next
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Edit Modal - Mobile Optimized */}
@@ -733,9 +750,16 @@ const CarModelVariants = () => {
                 </div>
             )}
 
-            {/* Mobile Responsive Styles */}
+            {/* Mobile & Desktop Responsive Styles */}
             <style jsx>{`
+                /* Touch-friendly inputs */
                 @media (max-width: 991px) {
+                    .btn,
+                    .form-control,
+                    .form-select {
+                        min-height: 44px;
+                    }
+
                     .card-body {
                         padding: 16px !important;
                     }
@@ -764,53 +788,44 @@ const CarModelVariants = () => {
                     }
                 }
 
-                /* Touch-friendly inputs */
-                @media (max-width: 991px) {
-                    .btn,
-                    .form-control,
-                    .form-select {
-                        min-height: 44px;
-                    }
-                }
-
-                /* Search input styling */
-                .position-relative input {
-                    padding-left: 2.5rem;
-                }
-
                 /* Pagination Styles */
-                .mobile-pagination .btn-sm {
-                    font-size: 0.875rem;
-                    padding: 0.5rem;
+                .pagination {
+                    flex-wrap: wrap;
                 }
 
-                .mobile-pagination .btn-primary {
+                .pagination .page-link {
+                    min-width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 2px;
+                    border-radius: 4px;
+                }
+
+                .pagination .page-item.active .page-link {
                     background-color: var(--bs-primary);
                     border-color: var(--bs-primary);
                     font-weight: 600;
                 }
 
-                .mobile-pagination .btn-outline-secondary:disabled {
+                .pagination .page-item.disabled .page-link {
                     opacity: 0.5;
                     cursor: not-allowed;
+                }
+
+                @media (max-width: 576px) {
+                    .pagination .page-link {
+                        min-width: 36px;
+                        height: 36px;
+                        font-size: 0.875rem;
+                        padding: 0.375rem 0.5rem;
+                    }
                 }
 
                 /* Smooth transitions */
                 .card.shadow-sm {
                     transition: all 0.3s ease;
-                }
-
-                /* Page number input */
-                .mobile-pagination input[type="number"] {
-                    text-align: center;
-                    min-height: 38px;
-                }
-
-                /* Remove number input arrows on mobile */
-                .mobile-pagination input[type="number"]::-webkit-inner-spin-button,
-                .mobile-pagination input[type="number"]::-webkit-outer-spin-button {
-                    -webkit-appearance: none;
-                    margin: 0;
                 }
             `}</style>
         </div>
