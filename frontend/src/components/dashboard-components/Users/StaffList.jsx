@@ -377,7 +377,7 @@ const StaffList = () => {
                                             </div>
                                             <div className="ms-3 flex-grow-1">
                                                 <h6 className="mb-1 fw-semibold">{staff.username}</h6>
-                                                <span className={`badge ${
+                                                <span className={`badge badge-align ${
                                                     staff.is_active 
                                                         ? 'text-success-600 bg-success-100' 
                                                         : 'text-danger-600 bg-danger-100'
@@ -432,7 +432,7 @@ const StaffList = () => {
                                         <div className="d-flex gap-2 pt-2 border-top">
                                             <button
                                                 type="button"
-                                                className={`btn btn-sm ${
+                                                className={`btn-theme-admin ${
                                                     staff.is_active 
                                                         ? 'btn-outline-warning' 
                                                         : 'btn-outline-success'

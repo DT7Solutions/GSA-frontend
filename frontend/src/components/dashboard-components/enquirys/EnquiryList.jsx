@@ -141,7 +141,7 @@ const EnquiryList = () => {
             {filteredEnquiries.length > 0 ? (
               filteredEnquiries.map((item) => (
                 <div key={item.id} className="card mb-3 shadow-sm">
-                  <div className="card-body">
+                  <div className="card-body border">
                     <div className="row g-2">
                       <div className="col-12">
                         <h6 className="text-theme mb-2">

@@ -297,16 +297,43 @@ const CustomerList = () => {
 
                     {/* Mobile Filters - Stacked Layout */}
                     <div className="d-lg-none">
-                        {/* Search Bar */}
-                        <div className="navbar-search mb-3 w-100">
-                            <Icon icon="ion:search-outline" className="icon" />
-                            <input
-                                type="text"
-                                className="bg-base w-100"
-                                placeholder="Search customers..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                        {/* Search Bar - Full Width and Prominent */}
+                        <div className="mb-3 w-100">
+                            <div className="navbar-search w-100" style={{
+                                backgroundColor: '#f8f9fa',
+                                borderRadius: '8px',
+                                padding: '8px 12px',
+                                border: '1px solid #e9ecef',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}>
+                                <Icon icon="ion:search-outline" style={{color: '#6c757d', fontSize: '18px', flexShrink: 0}} />
+                                <input
+                                    type="text"
+                                    className="border-0 w-100"
+                                    placeholder="Search by name, email, phone..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{
+                                        outline: 'none',
+                                        boxShadow: 'none',
+                                        backgroundColor: 'transparent',
+                                        fontSize: '14px'
+                                    }}
+                                />
+                                {searchTerm && (
+                                    <button
+                                        type="button"
+                                        className="border-0 bg-transparent p-0"
+                                        onClick={() => setSearchTerm('')}
+                                        style={{cursor: 'pointer', color: '#6c757d'}}
+                                        title="Clear search"
+                                    >
+                                        <Icon icon="mdi:close-circle" style={{fontSize: '18px'}} />
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Filters Row */}

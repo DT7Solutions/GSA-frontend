@@ -770,6 +770,11 @@ min-width: 150px;
        
         width: 35%!important;
     }
+    .badge-align{
+  top:0!important;
+  left:0!important;
+
+} 
 }
 
 .badge-table {
@@ -786,3 +791,4 @@ min-width: 150px;
     font-weight: 400;
     transition: 0.3s ease-in-out;
 }
+

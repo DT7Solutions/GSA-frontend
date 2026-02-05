@@ -22,6 +22,12 @@ const OrdersList = () => {
   const [tableInitialized, setTableInitialized] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  
+  // Mobile-specific states
+  const [mobileSearchTerm, setMobileSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  
   const token = localStorage.getItem("accessToken");
   const tableRef = useRef(null);
 
@@ -252,6 +258,7 @@ const OrdersList = () => {
     filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     setFilteredOrders(filtered);
+    setCurrentPage(1); // Reset to first page when filtering
     
     // Refresh DataTable only on desktop
     if (window.innerWidth >= 992) {
@@ -282,6 +289,8 @@ const OrdersList = () => {
   const handleResetFilter = () => {
     setStartDate('');
     setEndDate('');
+    setMobileSearchTerm('');
+    setCurrentPage(1);
     
     // Reset to original orders (already sorted newest first)
     const sortedOrders = [...orders].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -307,6 +316,107 @@ const OrdersList = () => {
     }
   };
 
+  // Mobile search functionality
+  const handleMobileSearch = (e) => {
+    const searchValue = e.target.value;
+    setMobileSearchTerm(searchValue);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // Get filtered orders based on mobile search
+  const getMobileFilteredOrders = () => {
+    if (!mobileSearchTerm) return filteredOrders;
+
+    const searchLower = mobileSearchTerm.toLowerCase();
+    return filteredOrders.filter(order => {
+      const orderId = `GSA${order.id}`.toLowerCase();
+      const invoiceId = order.razorpay_order_id?.toLowerCase() || '';
+      const productName = `${order.items[0]?.part_group_name}-${order.items[0]?.part_no}`.toLowerCase();
+      const status = order.status?.toLowerCase() || '';
+      const amount = order.total_price?.toString() || '';
+
+      return (
+        orderId.includes(searchLower) ||
+        invoiceId.includes(searchLower) ||
+        productName.includes(searchLower) ||
+        status.includes(searchLower) ||
+        amount.includes(searchLower)
+      );
+    });
+  };
+
+  // Get current page orders for mobile
+  const getCurrentPageOrders = () => {
+    const searchFiltered = getMobileFilteredOrders();
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return searchFiltered.slice(indexOfFirstItem, indexOfLastItem);
+  };
+
+  // Get total pages for mobile
+  const getTotalPages = () => {
+    const searchFiltered = getMobileFilteredOrders();
+    return Math.ceil(searchFiltered.length / itemsPerPage);
+  };
+
+  // Pagination handlers
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    // Scroll to top of orders list on mobile
+    if (window.innerWidth < 992) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < getTotalPages()) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const totalPages = getTotalPages();
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      }
+    }
+
+    return pageNumbers;
+  };
+
   const getStatusBadgeClass = (status) => {
     const statusLower = status?.toLowerCase();
     switch(statusLower) {
@@ -319,6 +429,10 @@ const OrdersList = () => {
       default: return '';
     }
   };
+
+  const currentPageOrders = getCurrentPageOrders();
+  const totalPages = getTotalPages();
+  const mobileFilteredCount = getMobileFilteredOrders().length;
 
   return (
     <div className="card basic-data-table">
@@ -470,100 +584,224 @@ const OrdersList = () => {
 
         {/* Mobile Card View */}
         <div className="d-lg-none">
-          {filteredOrders.length > 0 ? (
-            filteredOrders.map((order, idx) => (
-              <div key={order.id} className="card mb-3 shadow-sm border">
-                <div className="card-body p-3">
-                  {/* Header with Order ID and Status */}
-                  <div className="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
-                    <div>
-                      <h6 className="mb-1 fw-bold text-theme">GSA{order.id}</h6>
-                      <small className="text-muted">#{order.razorpay_order_id}</small>
+          {/* Mobile Search Bar */}
+          <div className="mb-3">
+            <div className="position-relative">
+              <input
+                type="text"
+                className="form-control ps-5"
+                placeholder="Search orders by ID, invoice, product, status..."
+                value={mobileSearchTerm}
+                onChange={handleMobileSearch}
+              />
+              <Icon 
+                icon="mdi:magnify" 
+                className="position-absolute text-muted"
+                style={{ 
+                  left: '12px', 
+                  top: '50%', 
+                  transform: 'translateY(-50%)',
+                  fontSize: '20px'
+                }}
+              />
+              {mobileSearchTerm && (
+                <button
+                  type="button"
+                  className="btn btn-link position-absolute text-muted p-0"
+                  style={{ 
+                    right: '12px', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)'
+                  }}
+                  onClick={() => {
+                    setMobileSearchTerm('');
+                    setCurrentPage(1);
+                  }}
+                >
+                  <Icon icon="mdi:close-circle" style={{ fontSize: '20px' }} />
+                </button>
+              )}
+            </div>
+            
+            {/* Search Results Info */}
+            {mobileSearchTerm && (
+              <div className="mt-2">
+                <small className="text-muted">
+                  Found {mobileFilteredCount} order{mobileFilteredCount !== 1 ? 's' : ''}
+                </small>
+              </div>
+            )}
+          </div>
+
+          {/* Order Cards */}
+          {currentPageOrders.length > 0 ? (
+            <>
+              {currentPageOrders.map((order, idx) => {
+                const globalIndex = (currentPage - 1) * itemsPerPage + idx;
+                return (
+                  <div key={order.id} className="card mb-3 shadow-sm border">
+                    <div className="card-body p-3">
+                      {/* Header with Order ID and Status */}
+                      <div className="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                        <div>
+                          <h6 className="mb-1 fw-bold text-theme">GSA{order.id}</h6>
+                          <small className="text-muted">#{order.razorpay_order_id}</small>
+                        </div>
+                        <span className={`${getStatusBadgeClass(order.status)} px-2 py-1 text-xs`}>
+                          {order.status}
+                        </span>
+                      </div>
+
+                      {/* Order Details */}
+                      <div className="row g-2 mb-3">
+                        <div className="col-12">
+                          <div className="d-flex align-items-start">
+                            <Icon icon="mdi:package-variant" className="text-muted mt-1 me-2 flex-shrink-0" />
+                            <div className="flex-grow-1">
+                              <small className="text-muted d-block">Product</small>
+                              <span className="text-sm fw-medium">
+                                {order.items[0]?.part_group_name}-{order.items[0]?.part_no}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-6">
+                          <div className="d-flex align-items-start">
+                            <Icon icon="mdi:calendar-outline" className="text-muted mt-1 me-2 flex-shrink-0" />
+                            <div>
+                              <small className="text-muted d-block">Date</small>
+                              <span className="text-sm fw-medium">
+                                {new Date(order.created_at).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-6">
+                          <div className="d-flex align-items-start">
+                            <Icon icon="mdi:currency-inr" className="text-muted mt-1 me-2 flex-shrink-0" />
+                            <div>
+                              <small className="text-muted d-block">Amount</small>
+                              <span className="text-sm fw-bold text-success">₹{order.total_price}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="d-flex gap-2 py-4 border-top">
+                        <button
+                          type="button"
+                          className=" btn-theme-admin btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center gap-1"
+                          onClick={() => handleEditClick(order)}
+                        >
+                          <Icon icon="lucide:edit" />
+                          <span className="d-none d-sm-inline">Edit</span>
+                        </button>
+                        
+                        <button
+                          type="button"
+                          className=" btn-theme-admin d-flex align-items-center justify-content-center"
+                          onClick={() => handlePrint(order)}
+                          title="Download Invoice"
+                        >
+                          <Icon icon="mdi:file-document-outline" />
+                        </button>
+                        
+                        <button
+                          type="button"
+                          className=" btn-theme-admin btn-outline-info d-flex align-items-center justify-content-center"
+                          onClick={() => handlePackingSlipPrint(order)}
+                          title="Download Packing Slip"
+                        >
+                          <Icon icon="mdi:package-variant-closed" />
+                        </button>
+                      </div>
                     </div>
-                    <span className={`${getStatusBadgeClass(order.status)} px-2 py-1 text-xs`}>
-                      {order.status}
-                    </span>
+                  </div>
+                );
+              })}
+
+              {/* Mobile Pagination */}
+              {totalPages > 1 && (
+                <div className="d-flex flex-column align-items-center mt-4 mb-3">
+                  {/* Page Info */}
+                  <div className="mb-3 text-center">
+                    <small className="text-muted">
+                      Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, mobileFilteredCount)} of {mobileFilteredCount} orders
+                    </small>
                   </div>
 
-                  {/* Order Details */}
-                  <div className="row g-2 mb-3">
-                    <div className="col-12">
-                      <div className="d-flex align-items-start">
-                        <Icon icon="mdi:package-variant" className="text-muted mt-1 me-2 flex-shrink-0" />
-                        <div className="flex-grow-1">
-                          <small className="text-muted d-block">Product</small>
-                          <span className="text-sm fw-medium">
-                            {order.items[0]?.part_group_name}-{order.items[0]?.part_no}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-6">
-                      <div className="d-flex align-items-start">
-                        <Icon icon="mdi:calendar-outline" className="text-muted mt-1 me-2 flex-shrink-0" />
-                        <div>
-                          <small className="text-muted d-block">Date</small>
-                          <span className="text-sm fw-medium">
-                            {new Date(order.created_at).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-6">
-                      <div className="d-flex align-items-start">
-                        <Icon icon="mdi:currency-inr" className="text-muted mt-1 me-2 flex-shrink-0" />
-                        <div>
-                          <small className="text-muted d-block">Amount</small>
-                          <span className="text-sm fw-bold text-success">₹{order.total_price}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="d-flex gap-2 py-4 border-top">
+                  {/* Pagination Controls */}
+                  <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center">
+                    {/* Previous Button */}
                     <button
-                      type="button"
-                      className=" btn-theme-admin btn-outline-primary flex-grow-1 d-flex align-items-center justify-content-center gap-1"
-                      onClick={() => handleEditClick(order)}
+                      className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                      onClick={handlePrevPage}
+                      disabled={currentPage === 1}
+                      style={{ minWidth: '80px' }}
                     >
-                      <Icon icon="lucide:edit" />
-                      <span className="d-none d-sm-inline">Edit</span>
+                      <Icon icon="mdi:chevron-left" className="me-1" />
+                      <span>Prev</span>
                     </button>
-                    
+
+                    {/* Page Numbers */}
+                    <div className="d-flex gap-1">
+                      {getPageNumbers().map((pageNum, idx) => (
+                        pageNum === '...' ? (
+                          <span key={`ellipsis-${idx}`} className="px-2 py-1">
+                            ...
+                          </span>
+                        ) : (
+                          <button
+                            key={pageNum}
+                            className={`btn btn-sm ${currentPage === pageNum ? 'btn-primary' : 'btn-outline-secondary'}`}
+                            onClick={() => handlePageChange(pageNum)}
+                            style={{ minWidth: '40px' }}
+                          >
+                            {pageNum}
+                          </button>
+                        )
+                      ))}
+                    </div>
+
+                    {/* Next Button */}
                     <button
-                      type="button"
-                      className=" btn-theme-admin d-flex align-items-center justify-content-center"
-                      onClick={() => handlePrint(order)}
-                      title="Download Invoice"
+                      className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      style={{ minWidth: '80px' }}
                     >
-                      <Icon icon="mdi:file-document-outline" />
-                    </button>
-                    
-                    <button
-                      type="button"
-                      className=" btn-theme-admin btn-outline-info d-flex align-items-center justify-content-center"
-                      onClick={() => handlePackingSlipPrint(order)}
-                      title="Download Packing Slip"
-                    >
-                      <Icon icon="mdi:package-variant-closed" />
+                      <span>Next</span>
+                      <Icon icon="mdi:chevron-right" className="ms-1" />
                     </button>
                   </div>
                 </div>
-              </div>
-            ))
+              )}
+            </>
           ) : (
             <div className="text-center py-5">
               <Icon icon="mdi:package-variant-closed-remove" className="text-secondary-light" style={{ fontSize: '64px' }} />
               <p className="text-secondary-light mt-3 mb-0">
-                {startDate || endDate ? "No orders found for the selected date range" : "No orders found"}
+                {mobileSearchTerm ? "No orders found matching your search" :
+                 startDate || endDate ? "No orders found for the selected date range" : "No orders found"}
               </p>
+              {mobileSearchTerm && (
+                <button
+                  className="btn btn-sm btn-outline-primary mt-3"
+                  onClick={() => {
+                    setMobileSearchTerm('');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Clear Search
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -673,6 +911,16 @@ const OrdersList = () => {
             padding: 4px 8px;
             border-radius: 4px;
           }
+
+          .btn-sm {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+          }
+
+          .pagination-btn {
+            min-width: 36px;
+            height: 36px;
+          }
         }
         
         @media (max-width: 576px) {
@@ -691,6 +939,33 @@ const OrdersList = () => {
           .filter-section {
             padding: 12px !important;
           }
+
+          .btn-sm {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+          }
+        }
+
+        /* Search input styling */
+        .form-control:focus {
+          border-color: #86b7fe;
+          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Pagination button styling */
+        .btn-outline-secondary:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .btn-primary {
+          background-color: #0d6efd;
+          border-color: #0d6efd;
+        }
+
+        /* Smooth transitions */
+        .card {
+          transition: all 0.2s ease-in-out;
         }
       `}</style>
     </div>
