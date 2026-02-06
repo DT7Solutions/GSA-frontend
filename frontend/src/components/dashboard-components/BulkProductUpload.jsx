@@ -380,13 +380,13 @@ const BulkProductUpload = () => {
                                     <h6>Step 1: Download Template</h6>
                                     <div className="d-flex gap-2">
                                         <button
-                                            className="btn btn-outline-primary btn-sm"
+                                            className="btn-theme-admin btn-outline-primary gap-2 btn-sm"
                                             onClick={() => downloadTemplate('csv')}
                                         >
                                             <Icon icon="lucide:download" /> Download CSV Template
                                         </button>
                                         <button
-                                            className="btn btn-outline-success btn-sm"
+                                            className="btn-theme-admin btn-outline-primary gap-2 btn-outline-success btn-sm"
                                             onClick={() => downloadTemplate('excel')}
                                         >
                                             <Icon icon="lucide:download" /> Download Excel Template
@@ -500,9 +500,9 @@ const BulkProductUpload = () => {
                                 )}
 
                                 {/* Upload Button */}
-                                <div className="d-flex gap-2">
+                                <div className="d-flex gap-2 mt-3">
                                     <button
-                                        className="btn btn-primary"
+                                        className="btn-theme-admin  gap-2 btn-primary"
                                         onClick={handleBulkUpload}
                                         disabled={parsedData.length === 0 || isProcessing || validationErrors.length > 0}
                                     >
@@ -510,7 +510,7 @@ const BulkProductUpload = () => {
                                         {isProcessing ? 'Uploading...' : 'Upload Products'}
                                     </button>
                                     <button
-                                        className="btn btn-secondary"
+                                        className="btn-theme-admin  gap-2 btn-secondary"
                                         onClick={() => setShowBulkModal(false)}
                                         disabled={isProcessing}
                                     >

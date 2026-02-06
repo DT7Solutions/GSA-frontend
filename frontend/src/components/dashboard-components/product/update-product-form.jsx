@@ -546,7 +546,7 @@ const UpdateProductsForm = () => {
                             <div className="invalid-feedback">Please enter part name.</div>
                         </div>
 
-                        <div className="col-md-4">
+                        {/* <div className="col-md-4">
                             <label className="form-label">Part Image</label>
                             <input
                                 type="file"
@@ -597,7 +597,7 @@ const UpdateProductsForm = () => {
                             )}
 
                             <div className="invalid-feedback">Please select a valid image file.</div>
-                        </div>
+                        </div> */}
 
                         {/* Part Number */}
                         <div className="col-md-4">

@@ -105,10 +105,7 @@ const TwoBannerSection = () => {
 const mediaQueryStyles = `
   /* Extra Small Devices (max-width: 576px) */
   @media (max-width: 576px) {
-    .banner-card {
-      height: 230px !important;
-      
-    }
+    
     
     .banner-content {
       padding: 30px 20px !important;
@@ -130,7 +127,7 @@ const mediaQueryStyles = `
       font-size: 12px !important;
     }
   }
-  
+
   /* Small Devices (577px - 768px) */
   @media (min-width: 577px) and (max-width: 768px) {
     .banner-card {

@@ -137,7 +137,7 @@ const NotificationDropdown = ({ notificationCount, setNotificationCount }) => {
             >
                 <Icon icon='mdi:bell-outline' className='text-xl' />
                 {notificationCount > 0 && (
-                    <span className='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>
+                    <span className='position-absolute top-0 start-100 translate-middle badge badge-notification rounded-pill bg-danger'>
                         {notificationCount > 9 ? '9+' : notificationCount}
                     </span>
                 )}
