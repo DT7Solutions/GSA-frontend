@@ -528,10 +528,7 @@ const Cart = () => {
               margin:auto;
             }
 
-            .remove:hover {
-              background: #ff3838;
-              transform: scale(1.1);
-            }
+           
           }
 
           /* Mobile Card View */

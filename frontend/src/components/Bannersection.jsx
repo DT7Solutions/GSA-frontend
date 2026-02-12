@@ -127,6 +127,11 @@ const mediaQueryStyles = `
       font-size: 12px !important;
     }
   }
+   @media (min-width:1220px) and (max-width: 1300px) {
+    .banner-card {
+      height: 260px !important;
+    }
+}
 
   /* Small Devices (577px - 768px) */
   @media (min-width: 577px) and (max-width: 768px) {
