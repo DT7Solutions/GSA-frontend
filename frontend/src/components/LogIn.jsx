@@ -4,6 +4,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
 import axios from "axios";
+import api from "../components/ApiRefresh"; // Your improved axios instance
 import API_BASE_URL from "../config";
 import "../assets/css/Auth.css";
 
@@ -28,173 +29,163 @@ const Login = () => {
   }, [navigate]);
 
   // Initialize Google Sign-In
- 
- // Initialize Google Sign-In
-useEffect(() => {
-  const initializeGoogle = () => {
-    if (window.google && googleButtonRef.current) {
-      try {
-        window.google.accounts.id.initialize({
-          client_id: '213344695442-ook0blqsmavr33kqser6i359lpcbvfau.apps.googleusercontent.com', // ✅ Hardcoded as string
-          callback: handleGoogleResponse,
-        });
-        
-        window.google.accounts.id.renderButton(
-          googleButtonRef.current,
-          {
+  useEffect(() => {
+    const initializeGoogle = () => {
+      if (window.google && googleButtonRef.current) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id:
+              "213344695442-ook0blqsmavr33kqser6i359lpcbvfau.apps.googleusercontent.com",
+            callback: handleGoogleResponse,
+          });
+
+          window.google.accounts.id.renderButton(googleButtonRef.current, {
             theme: "outline",
             size: "large",
             text: "signin_with",
             shape: "rectangular",
             logo_alignment: "left",
-          }
-        );
-      } catch (error) {
-        console.error("Google initialization error:", error);
+          });
+        } catch (error) {
+          console.error("Google initialization error:", error);
+        }
       }
-    }
-  };
+    };
 
-  // Load Google script
-  const script = document.createElement("script");
-  script.src = "https://accounts.google.com/gsi/client";
-  script.async = true;
-  script.defer = true;
-  script.onload = initializeGoogle;
-  document.head.appendChild(script);
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogle;
+    document.head.appendChild(script);
 
-  return () => {
-    // Cleanup
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.cancel();
-    }
-    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
-    if (existingScript && document.head.contains(existingScript)) {
-      document.head.removeChild(existingScript);
-    }
-  };
-}, []);
+    return () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.cancel();
+      }
+      const existingScript = document.querySelector(
+        'script[src="https://accounts.google.com/gsi/client"]'
+      );
+      if (existingScript && document.head.contains(existingScript)) {
+        document.head.removeChild(existingScript);
+      }
+    };
+  }, []);
 
   // Handle Google Response
-// Handle Google Response
-const handleGoogleResponse = async (response) => {
-  if (!response.credential) {
-    console.error("No credential received from Google");
-    Swal.fire({
-      title: "Error",
-      text: "Failed to get Google credentials",
-      icon: "error",
-      confirmButtonText: "OK",
-    });
-    return;
-  }
+  const handleGoogleResponse = async (response) => {
+    if (!response.credential) {
+      console.error("No credential received from Google");
+      Swal.fire({
+        title: "Error",
+        text: "Failed to get Google credentials",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
 
-  setGoogleLoading(true);
+    setGoogleLoading(true);
 
-  try {
-    // Send token to backend
-    const backendResponse = await axios.post(
-      `${API_BASE_URL}api/auth/google_login/`,
-      {
-        token: response.credential,
-      }
-    );
-
-    if (backendResponse.data.access) {
-      // Store tokens
-      localStorage.setItem("accessToken", backendResponse.data.access);
-      localStorage.setItem("refreshToken", backendResponse.data.refresh);
-      localStorage.setItem(
-        "role",
-        backendResponse.data.role?.toLowerCase() || ""
+    try {
+      // Use regular axios for login (not the api instance)
+      const backendResponse = await axios.post(
+        `${API_BASE_URL}api/auth/google_login/`,
+        {
+          token: response.credential,
+        }
       );
 
-      const userId = backendResponse.data.user_id;
-
-      // Fetch user data
-      try {
-        const userResponse = await axios.get(
-          `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${backendResponse.data.access}`,
-            },
-          }
+      if (backendResponse.data.access) {
+        // Store tokens
+        localStorage.setItem("accessToken", backendResponse.data.access);
+        localStorage.setItem("refreshToken", backendResponse.data.refresh);
+        localStorage.setItem(
+          "role",
+          backendResponse.data.role?.toLowerCase() || ""
         );
 
-        // Check for redirect
-        const redirectUrl = localStorage.getItem("redirectAfterLogin");
-        if (redirectUrl) {
-          localStorage.removeItem("redirectAfterLogin");
-          window.location.href = redirectUrl;
-          return;
-        }
+        console.log('[LOGIN] ✅ Tokens stored successfully');
+        console.log('[LOGIN] Token refresh will be initialized by App.js hook');
 
-        // Navigate based on role
-        const { role_id } = userResponse.data;
-        if (role_id === 1) {
-          navigate("/Dashboard");
-        } else {
+        const userId = backendResponse.data.user_id;
+
+        // Fetch user data using the api instance (with token already set)
+        try {
+          const userResponse = await api.get(
+            `api/auth/user/get_user_data/${userId}/`
+          );
+
+          const redirectUrl = localStorage.getItem("redirectAfterLogin");
+          if (redirectUrl) {
+            localStorage.removeItem("redirectAfterLogin");
+            window.location.href = redirectUrl;
+            return;
+          }
+
+          const { role_id } = userResponse.data;
+          if (role_id === 1) {
+            navigate("/Dashboard");
+          } else {
+            navigate("/");
+          }
+
+          const userName =
+            backendResponse.data.user?.first_name ||
+            backendResponse.data.user?.username ||
+            "User";
+
+          Swal.fire({
+            title: "Login Successful",
+            text: `Welcome ${userName}!`,
+            icon: "success",
+            confirmButtonText: "OK",
+            timer: 2000,
+          });
+        } catch (userError) {
+          console.error("Error fetching user data:", userError);
           navigate("/");
+
+          Swal.fire({
+            title: "Login Successful",
+            text: "Welcome!",
+            icon: "success",
+            confirmButtonText: "OK",
+            timer: 2000,
+          });
         }
-
-        // Show success message
-        const userName = backendResponse.data.user?.first_name || 
-                        backendResponse.data.user?.username || 
-                        "User";
-        
-        Swal.fire({
-          title: "Login Successful",
-          text: `Welcome ${userName}!`,
-          icon: "success",
-          confirmButtonText: "OK",
-          timer: 2000,
-        });
-      } catch (userError) {
-        console.error("Error fetching user data:", userError);
-        // Still navigate to home even if user data fetch fails
-        navigate("/");
-        
-        Swal.fire({
-          title: "Login Successful",
-          text: "Welcome!",
-          icon: "success",
-          confirmButtonText: "OK",
-          timer: 2000,
-        });
       }
+    } catch (error) {
+      console.error("Google login error:", error);
+
+      const errorData = error.response?.data;
+      let errorMessage = "Google login failed. Please try again.";
+      let errorTitle = "Login Failed";
+
+      if (errorData?.error === "account_deactivated") {
+        errorTitle = "Account Deactivated";
+        errorMessage =
+          "Your account has been deactivated. Please contact support.";
+      } else if (errorData?.error === "invalid_token") {
+        errorTitle = "Invalid Token";
+        errorMessage = "The Google token is invalid. Please try again.";
+      } else if (errorData?.error === "email_not_verified") {
+        errorTitle = "Email Not Verified";
+        errorMessage = "Please verify your email with Google first.";
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+
+      Swal.fire({
+        title: errorTitle,
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    } finally {
+      setGoogleLoading(false);
     }
-  } catch (error) {
-    console.error("Google login error:", error);
-
-    const errorData = error.response?.data;
-    let errorMessage = "Google login failed. Please try again.";
-    let errorTitle = "Login Failed";
-
-    // Handle specific errors (account_not_found removed - backend auto-creates accounts)
-    if (errorData?.error === "account_deactivated") {
-      errorTitle = "Account Deactivated";
-      errorMessage = "Your account has been deactivated. Please contact support.";
-    } else if (errorData?.error === "invalid_token") {
-      errorTitle = "Invalid Token";
-      errorMessage = "The Google token is invalid. Please try again.";
-    } else if (errorData?.error === "email_not_verified") {
-      errorTitle = "Email Not Verified";
-      errorMessage = "Please verify your email with Google first.";
-    } else if (errorData?.message) {
-      errorMessage = errorData.message;
-    }
-
-    Swal.fire({
-      title: errorTitle,
-      text: errorMessage,
-      icon: "error",
-      confirmButtonText: "OK",
-    });
-  } finally {
-    setGoogleLoading(false);
-  }
-};
+  };
 
   // Request Email OTP
   const requestEmailOtp = async () => {
@@ -279,16 +270,14 @@ const handleGoogleResponse = async (response) => {
         localStorage.setItem("refreshToken", response.data.refresh);
         localStorage.setItem("role", response.data.role?.toLowerCase() || "");
 
+        console.log('[LOGIN] ✅ Tokens stored successfully');
+        console.log('[LOGIN] Token refresh will be initialized by App.js hook');
+
         const userId = response.data.user_id;
 
         try {
-          const userResponse = await axios.get(
-            `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
-            {
-              headers: {
-                Authorization: `Bearer ${response.data.access}`,
-              },
-            }
+          const userResponse = await api.get(
+            `api/auth/user/get_user_data/${userId}/`
           );
 
           const redirectUrl = localStorage.getItem("redirectAfterLogin");
@@ -364,16 +353,14 @@ const handleGoogleResponse = async (response) => {
         localStorage.setItem("refreshToken", response.data.refresh);
         localStorage.setItem("role", response.data.role.toLowerCase());
 
+        console.log('[LOGIN] ✅ Tokens stored successfully');
+        console.log('[LOGIN] Token refresh will be initialized by App.js hook');
+
         const decoded = jwtDecode(response.data.access);
         const userId = decoded.user_id;
 
-        const userResponse = await axios.get(
-          `${API_BASE_URL}api/auth/user/get_user_data/${userId}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${response.data.access}`,
-            },
-          }
+        const userResponse = await api.get(
+          `api/auth/user/get_user_data/${userId}/`
         );
 
         const redirectUrl = localStorage.getItem("redirectAfterLogin");
@@ -467,7 +454,27 @@ const handleGoogleResponse = async (response) => {
             <div className="login-features-grid">
               <div className="feature-card">
                 <div className="feature-icon">
-                  <svg id="fi_4059951" enable-background="new 0 0 512.002 512.002" fill="#fff" height="512" viewBox="0 0 512.002 512.002" width="512" xmlns="http://www.w3.org/2000/svg"><g><path d="m162.14 512.002h187.733c18.851 0 34.133-15.282 34.133-34.133v-111.505l75.162-20.565c11.04-3.087 18.682-13.138 18.705-24.602v-146.816l4.608-1.289c21.492-6.024 34.031-28.33 28.007-49.822-.971-3.464-2.4-6.783-4.25-9.869l-29.577-49.493-.077.051c-1.082-1.875-2.841-3.264-4.915-3.883l-206.438-58.802c-6.041-1.698-12.434-1.698-18.475 0l-206.421 58.803c-2.071.622-3.826 2.01-4.907 3.883l-.077-.051-29.568 49.493c-11.496 19.132-5.306 43.96 13.826 55.456 3.101 1.863 6.438 3.302 9.922 4.277l4.608 1.289v146.773c.028 11.486 7.703 21.547 18.773 24.61l75.093 20.557v111.505c.001 18.851 15.283 34.133 34.135 34.133zm204.8-34.133c0 9.426-7.641 17.067-17.067 17.067h-187.733c-9.426 0-17.067-7.641-17.067-17.067v-213.333c0-9.426 7.641-17.067 17.067-17.067h187.733c9.426 0 17.067 7.641 17.067 17.067zm93.866-156.672c-.023 3.786-2.539 7.104-6.178 8.149l-70.622 19.319v-84.13c0-18.851-15.282-34.133-34.133-34.133h-85.333v-71.569l22.818 38.042c7.318 12.175 20.483 19.624 34.688 19.627 3.667.004 7.317-.498 10.846-1.493l127.915-35.806v141.994zm32.427-178.347c-2.67 6.758-8.357 11.87-15.36 13.807l-149.589 41.907c-10.124 2.822-20.886-1.462-26.3-10.47l-32.913-54.878 196.267-54.955 26.231 43.904c3.77 6.236 4.387 13.883 1.664 20.642zm-241.826-125.141c2.999-.845 6.174-.845 9.173 0l177.357 50.509-181.931 50.935-181.93-50.935zm-232.627 125.099c-2.713-6.771-2.08-14.425 1.707-20.659l26.163-43.888 196.267 54.955-32.913 54.878c-5.408 9.015-16.176 13.302-26.3 10.47l-149.564-41.907c-7.011-1.948-12.699-7.077-15.36-13.849zm38.639 186.581c-3.668-1.037-6.204-4.38-6.212-8.192v-141.995l127.915 35.84c17.525 4.887 36.156-2.526 45.534-18.116l22.818-38.093v71.569h-85.334c-18.851 0-34.133 15.282-34.133 34.133v84.13z"></path><path d="m207.307 275.569-19.567 19.567-2.5-2.5c-3.39-3.274-8.792-3.18-12.066.209-3.194 3.307-3.194 8.55 0 11.857l8.533 8.533c3.332 3.331 8.734 3.331 12.066 0l25.6-25.6c3.274-3.39 3.18-8.792-.209-12.066-3.308-3.194-8.551-3.194-11.857 0z"></path><path d="m332.806 290.136h-85.333c-4.713 0-8.533 3.821-8.533 8.533s3.821 8.533 8.533 8.533h85.333c4.713 0 8.533-3.82 8.533-8.533s-3.82-8.533-8.533-8.533z"></path><path d="m207.307 326.769-19.567 19.567-2.5-2.5c-3.39-3.274-8.792-3.18-12.066.209-3.194 3.307-3.194 8.55 0 11.857l8.533 8.533c3.332 3.331 8.734 3.331 12.066 0l25.6-25.6c3.274-3.39 3.18-8.792-.209-12.066-3.308-3.194-8.551-3.194-11.857 0z"></path><path d="m332.806 341.336h-85.333c-4.713 0-8.533 3.82-8.533 8.533s3.821 8.533 8.533 8.533h85.333c4.713 0 8.533-3.821 8.533-8.533s-3.82-8.533-8.533-8.533z"></path><path d="m207.307 377.969-19.567 19.567-2.5-2.5c-3.39-3.274-8.792-3.18-12.066.209-3.194 3.307-3.194 8.55 0 11.857l8.533 8.533c3.332 3.331 8.734 3.331 12.066 0l25.6-25.6c3.274-3.39 3.18-8.792-.209-12.066-3.308-3.194-8.551-3.194-11.857 0z"></path><path d="m332.806 392.536h-85.333c-4.713 0-8.533 3.82-8.533 8.533s3.821 8.533 8.533 8.533h85.333c4.713 0 8.533-3.82 8.533-8.533s-3.82-8.533-8.533-8.533z"></path><path d="m207.307 429.169-19.567 19.567-2.5-2.5c-3.39-3.274-8.792-3.18-12.066.209-3.194 3.307-3.194 8.55 0 11.857l8.533 8.533c3.332 3.331 8.734 3.331 12.066 0l25.6-25.6c3.274-3.39 3.18-8.792-.209-12.066-3.308-3.194-8.551-3.194-11.857 0z"></path><path d="m332.806 443.736h-85.333c-4.713 0-8.533 3.821-8.533 8.533s3.821 8.533 8.533 8.533h85.333c4.713 0 8.533-3.82 8.533-8.533s-3.82-8.533-8.533-8.533z"></path></g></svg>
+                  <svg
+                    id="fi_4059951"
+                    enableBackground="new 0 0 512.002 512.002"
+                    fill="#fff"
+                    height="512"
+                    viewBox="0 0 512.002 512.002"
+                    width="512"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g>
+                      <path d="m162.14 512.002h187.733c18.851 0 34.133-15.282 34.133-34.133v-111.505l75.162-20.565c11.04-3.087 18.682-13.138 18.705-24.602v-146.816l4.608-1.289c21.492-6.024 34.031-28.33 28.007-49.822-.971-3.464-2.4-6.783-4.25-9.869l-29.577-49.493-.077.051c-1.082-1.875-2.841-3.264-4.915-3.883l-206.438-58.802c-6.041-1.698-12.434-1.698-18.475 0l-206.421 58.803c-2.071.622-3.826 2.01-4.907 3.883l-.077-.051-29.568 49.493c-11.496 19.132-5.306 43.96 13.826 55.456 3.101 1.863 6.438 3.302 9.922 4.277l4.608 1.289v146.773c.028 11.486 7.703 21.547 18.773 24.61l75.093 20.557v111.505c.001 18.851 15.283 34.133 34.135 34.133zm204.8-34.133c0 9.426-7.641 17.067-17.067 17.067h-187.733c-9.426 0-17.067-7.641-17.067-17.067v-213.333c0-9.426 7.641-17.067 17.067-17.067h187.733c9.426 0 17.067 7.641 17.067 17.067zm93.866-156.672c-.023 3.786-2.539 7.104-6.178 8.149l-70.622 19.319v-84.13c0-18.851-15.282-34.133-34.133-34.133h-85.333v-71.569l22.818 38.042c7.318 12.175 20.483 19.624 34.688 19.627 3.667.004 7.317-.498 10.846-1.493l127.915-35.806v141.994zm32.427-178.347c-2.67 6.758-8.357 11.87-15.36 13.807l-149.589 41.907c-10.124 2.822-20.886-1.462-26.3-10.47l-32.913-54.878 196.267-54.955 26.231 43.904c3.77 6.236 4.387 13.883 1.664 20.642zm-241.826-125.141c2.999-.845 6.174-.845 9.173 0l177.357 50.509-181.931 50.935-181.93-50.935zm-232.627 125.099c-2.713-6.771-2.08-14.425 1.707-20.659l26.163-43.888 196.267 54.955-32.913 54.878c-5.408 9.015-16.176 13.302-26.3 10.47l-149.564-41.907c-7.011-1.948-12.699-7.077-15.36-13.849zm38.639 186.581c-3.668-1.037-6.204-4.38-6.212-8.192v-141.995l127.915 35.84c17.525 4.887 36.156-2.526 45.534-18.116l22.818-38.093v71.569h-85.334c-18.851 0-34.133 15.282-34.133 34.133v84.13z"></path>
+                      <path d="m207.307 275.569-19.567 19.567-2.5-2.5c-3.39-3.274-8.792-3.18-12.066.209-3.194 3.307-3.194 8.55 0 11.857l8.533 8.533c3.332 3.331 8.734 3.331 12.066 0l25.6-25.6c3.274-3.39 3.18-8.792-.209-12.066-3.308-3.194-8.551-3.194-11.857 0z"></path>
+                      <path d="m332.806 290.136h-85.333c-4.713 0-8.533 3.821-8.533 8.533s3.821 8.533 8.533 8.533h85.333c4.713 0 8.533-3.82 8.533-8.533s-3.82-8.533-8.533-8.533z"></path>
+                      <path d="m207.307 326.769-19.567 19.567-2.5-2.5c-3.39-3.274-8.792-3.18-12.066.209-3.194 3.307-3.194 8.55 0 11.857l8.533 8.533c3.332 3.331 8.734 3.331 12.066 0l25.6-25.6c3.274-3.39 3.18-8.792-.209-12.066-3.308-3.194-8.551-3.194-11.857 0z"></path>
+                      <path d="m332.806 341.336h-85.333c-4.713 0-8.533 3.82-8.533 8.533s3.821 8.533 8.533 8.533h85.333c4.713 0 8.533-3.821 8.533-8.533s-3.82-8.533-8.533-8.533z"></path>
+                      <path d="m207.307 377.969-19.567 19.567-2.5-2.5c-3.39-3.274-8.792-3.18-12.066.209-3.194 3.307-3.194 8.55 0 11.857l8.533 8.533c3.332 3.331 8.734 3.331 12.066 0l25.6-25.6c3.274-3.39 3.18-8.792-.209-12.066-3.308-3.194-8.551-3.194-11.857 0z"></path>
+                      <path d="m332.806 392.536h-85.333c-4.713 0-8.533 3.82-8.533 8.533s3.821 8.533 8.533 8.533h85.333c4.713 0 8.533-3.82 8.533-8.533s-3.82-8.533-8.533-8.533z"></path>
+                      <path d="m207.307 429.169-19.567 19.567-2.5-2.5c-3.39-3.274-8.792-3.18-12.066.209-3.194 3.307-3.194 8.55 0 11.857l8.533 8.533c3.332 3.331 8.734 3.331 12.066 0l25.6-25.6c3.274-3.39 3.18-8.792-.209-12.066-3.308-3.194-8.551-3.194-11.857 0z"></path>
+                      <path d="m332.806 443.736h-85.333c-4.713 0-8.533 3.821-8.533 8.533s3.821 8.533 8.533 8.533h85.333c4.713 0 8.533-3.82 8.533-8.533s-3.82-8.533-8.533-8.533z"></path>
+                    </g>
+                  </svg>
                 </div>
                 <h4>100+</h4>
                 <span>Products</span>
@@ -492,7 +499,24 @@ const handleGoogleResponse = async (response) => {
 
               <div className="feature-card">
                 <div className="feature-icon">
-                  <svg height="512pt" viewBox="0 -16 512 512" width="512pt" fill="#fff" xmlns="http://www.w3.org/2000/svg" id="fi_1322236"><path d="m266 390c0 5.523438-4.476562 10-10 10s-10-4.476562-10-10 4.476562-10 10-10 10 4.476562 10 10zm0 0"></path><path d="m479 300c0-33.085938-26.914062-60-60-60s-60 26.914062-60 60 26.914062 60 60 60 60-26.914062 60-60zm-60 40c-22.054688 0-40-17.945312-40-40s17.945312-40 40-40 40 17.945312 40 40-17.945312 40-40 40zm0 0"></path><path d="m419 360c-25.199219 0-50.328125 10.460938-67.445312 27.421875-22.53125-29.609375-57.273438-47.421875-95.554688-47.421875-36.660156 0-72.183594 16.726562-95.550781 47.421875-17.121094-16.957031-42.246094-27.421875-67.449219-27.421875-50.410156 0-93 41.214844-93 90v20c0 5.523438 4.476562 10 10 10h492c5.523438 0 10-4.476562 10-10v-20c0-48.785156-42.589844-90-93-90zm-399 90c0-37.945312 33.429688-70 73-70 21.652344 0 43.125 9.59375 56.417969 24.84375-8.789063 16.976562-13.417969 35.898438-13.417969 55.15625h-116zm236-90c55.644531 0 100 45.148438 100 100h-200c0-55.582031 45.261719-100 100-100zm236 100h-116c0-19.257812-4.628906-38.179688-13.417969-55.15625 13.292969-15.25 34.765625-24.84375 56.417969-24.84375 39.570312 0 73 32.054688 73 70zm0 0"></path><path d="m153 300c0-33.085938-26.914062-60-60-60s-60 26.914062-60 60 26.914062 60 60 60 60-26.914062 60-60zm-60 40c-22.054688 0-40-17.945312-40-40s17.945312-40 40-40 40 17.945312 40 40-17.945312 40-40 40zm0 0"></path><path d="m336 260c0-44.113281-35.886719-80-80-80s-80 35.886719-80 80 35.886719 80 80 80 80-35.886719 80-80zm-80 60c-33.085938 0-60-26.914062-60-60s26.914062-60 60-60 60 26.914062 60 60-26.914062 60-60 60zm0 0"></path><path d="m335.140625 58.160156c-1.175781-3.621094-4.304687-6.257812-8.074219-6.804687l-43.132812-6.261719-19.3125-39.484375c-1.675782-3.433594-5.160156-5.609375-8.980469-5.609375s-7.304687 2.175781-8.984375 5.605469l-19.308594 39.488281-43.132812 6.257812c-3.769532.546876-6.898438 3.1875-8.074219 6.808594s-.195313 7.59375 2.53125 10.25l31.234375 30.441406-7.371094 42.988282c-.644531 3.75.898438 7.542968 3.980469 9.777344 3.0625 2.226562 7.140625 2.542968 10.53125.761718l38.59375-20.292968 38.609375 20.292968c3.367188 1.773438 7.449219 1.476563 10.53125-.761718 3.078125-2.238282 4.621094-6.027344 3.976562-9.78125l-7.378906-42.984376 31.230469-30.441406c2.726563-2.65625 3.707031-6.628906 2.53125-10.25zm-51.492187 30.039063c-2.355469 2.296875-3.433594 5.609375-2.875 8.851562l4.839843 28.199219-25.320312-13.3125c-2.914063-1.53125-6.394531-1.53125-9.308594 0l-25.3125 13.3125 4.835937-28.199219c.554688-3.246093-.523437-6.554687-2.878906-8.851562l-20.484375-19.964844 28.300781-4.109375c3.273438-.472656 6.097657-2.535156 7.546876-5.503906l12.648437-25.859375 12.644531 25.859375c1.453125 2.972656 4.277344 5.03125 7.546875 5.503906l28.304688 4.109375zm0 0"></path><path d="m484.609375 133.109375c-1.175781-3.621094-4.304687-6.257813-8.074219-6.804687l-29.222656-4.246094-13.066406-26.484375c-1.683594-3.414063-5.15625-5.574219-8.964844-5.574219 0 0 0 0-.003906 0-3.804688 0-7.28125 2.160156-8.964844 5.574219l-13.074219 26.484375-29.226562 4.246094c-3.765625.546874-6.894531 3.183593-8.070313 6.804687-1.179687 3.621094-.199218 7.59375 2.527344 10.25l21.144531 20.621094-4.992187 29.101562c-.640625 3.75.898437 7.539063 3.980468 9.777344 3.078126 2.238281 7.160157 2.535156 10.527344.765625l26.148438-13.738281 26.140625 13.738281c3.367187 1.769531 7.453125 1.472656 10.53125-.765625 3.078125-2.234375 4.617187-6.027344 3.976562-9.777344l-4.992187-29.101562 21.148437-20.621094c2.726563-2.65625 3.703125-6.628906 2.527344-10.25zm-41.398437 20.222656c-2.359376 2.296875-3.433594 5.605469-2.875 8.847657l2.453124 14.3125-12.855468-6.753907c-2.914063-1.53125-6.394532-1.53125-9.304688 0l-12.867187 6.757813 2.457031-14.316406c.554688-3.242188-.519531-6.550782-2.875-8.847657l-10.40625-10.148437 14.378906-2.085938c3.257813-.472656 6.074219-2.519531 7.53125-5.46875l6.429688-13.027344 6.425781 13.023438c1.457031 2.953125 4.273437 5 7.53125 5.472656l14.378906 2.085938zm0 0"></path><path d="m144.609375 133.109375c-1.175781-3.621094-4.304687-6.257813-8.074219-6.804687l-29.222656-4.246094-13.066406-26.484375c-1.683594-3.414063-5.15625-5.574219-8.964844-5.574219s-7.285156 2.160156-8.96875 5.574219l-13.074219 26.484375-29.226562 4.246094c-3.765625.546874-6.894531 3.183593-8.070313 6.804687-1.179687 3.621094-.199218 7.59375 2.527344 10.25l21.144531 20.621094-4.988281 29.101562c-.644531 3.75.898438 7.539063 3.976562 9.777344 3.078126 2.238281 7.160157 2.535156 10.53125.765625l26.144532-13.738281 26.140625 13.738281c3.390625 1.78125 7.46875 1.460938 10.53125-.765625 3.078125-2.234375 4.621093-6.027344 3.976562-9.777344l-4.992187-29.101562 21.148437-20.621094c2.726563-2.65625 3.703125-6.628906 2.527344-10.25zm-41.402344 20.222656c-2.355469 2.296875-3.429687 5.605469-2.875 8.847657l2.457031 14.3125-12.859374-6.753907c-2.910157-1.53125-6.390626-1.53125-9.300782 0l-12.871094 6.757813 2.457032-14.316406c.558594-3.242188-.519532-6.550782-2.875-8.847657l-10.40625-10.148437 14.382812-2.085938c3.253906-.472656 6.070313-2.519531 7.527344-5.46875l6.429688-13.027344 6.425781 13.023438c1.457031 2.953125 4.273437 5 7.53125 5.472656l14.378906 2.085938zm0 0"></path><path d="m299.820312 393.09375c-4.617187-3.035156-10.816406-1.75-13.847656 2.867188-3.035156 4.613281-1.75 10.8125 2.867188 13.847656 9.246094 6.074218 16.636718 14.542968 21.371094 24.488281 2.367187 4.980469 8.328124 7.109375 13.324218 4.730469 4.988282-2.371094 7.105469-8.339844 4.734375-13.324219-6.304687-13.25-16.144531-24.527344-28.449219-32.609375zm0 0"></path></svg>
+                  <svg
+                    height="512pt"
+                    viewBox="0 -16 512 512"
+                    width="512pt"
+                    fill="#fff"
+                    xmlns="http://www.w3.org/2000/svg"
+                    id="fi_1322236"
+                  >
+                    <path d="m266 390c0 5.523438-4.476562 10-10 10s-10-4.476562-10-10 4.476562-10 10-10 10 4.476562 10 10zm0 0"></path>
+                    <path d="m479 300c0-33.085938-26.914062-60-60-60s-60 26.914062-60 60 26.914062 60 60 60 60-26.914062 60-60zm-60 40c-22.054688 0-40-17.945312-40-40s17.945312-40 40-40 40 17.945312 40 40-17.945312 40-40 40zm0 0"></path>
+                    <path d="m419 360c-25.199219 0-50.328125 10.460938-67.445312 27.421875-22.53125-29.609375-57.273438-47.421875-95.554688-47.421875-36.660156 0-72.183594 16.726562-95.550781 47.421875-17.121094-16.957031-42.246094-27.421875-67.449219-27.421875-50.410156 0-93 41.214844-93 90v20c0 5.523438 4.476562 10 10 10h492c5.523438 0 10-4.476562 10-10v-20c0-48.785156-42.589844-90-93-90zm-399 90c0-37.945312 33.429688-70 73-70 21.652344 0 43.125 9.59375 56.417969 24.84375-8.789063 16.976562-13.417969 35.898438-13.417969 55.15625h-116zm236-90c55.644531 0 100 45.148438 100 100h-200c0-55.582031 45.261719-100 100-100zm236 100h-116c0-19.257812-4.628906-38.179688-13.417969-55.15625 13.292969-15.25 34.765625-24.84375 56.417969-24.84375 39.570312 0 73 32.054688 73 70zm0 0"></path>
+                    <path d="m153 300c0-33.085938-26.914062-60-60-60s-60 26.914062-60 60 26.914062 60 60 60 60-26.914062 60-60zm-60 40c-22.054688 0-40-17.945312-40-40s17.945312-40 40-40 40 17.945312 40 40-17.945312 40-40 40zm0 0"></path>
+                    <path d="m336 260c0-44.113281-35.886719-80-80-80s-80 35.886719-80 80 35.886719 80 80 80 80-35.886719 80-80zm-80 60c-33.085938 0-60-26.914062-60-60s26.914062-60 60-60 60 26.914062 60 60-26.914062 60-60 60zm0 0"></path>
+                    <path d="m335.140625 58.160156c-1.175781-3.621094-4.304687-6.257812-8.074219-6.804687l-43.132812-6.261719-19.3125-39.484375c-1.675782-3.433594-5.160156-5.609375-8.980469-5.609375s-7.304687 2.175781-8.984375 5.605469l-19.308594 39.488281-43.132812 6.257812c-3.769532.546876-6.898438 3.1875-8.074219 6.808594s-.195313 7.59375 2.53125 10.25l31.234375 30.441406-7.371094 42.988282c-.644531 3.75.898438 7.542968 3.980469 9.777344 3.0625 2.226562 7.140625 2.542968 10.53125.761718l38.59375-20.292968 38.609375 20.292968c3.367188 1.773438 7.449219 1.476563 10.53125-.761718 3.078125-2.238282 4.621094-6.027344 3.976562-9.78125l-7.378906-42.984376 31.230469-30.441406c2.726563-2.65625 3.707031-6.628906 2.53125-10.25zm-51.492187 30.039063c-2.355469 2.296875-3.433594 5.609375-2.875 8.851562l4.839843 28.199219-25.320312-13.3125c-2.914063-1.53125-6.394531-1.53125-9.308594 0l-25.3125 13.3125 4.835937-28.199219c.554688-3.246093-.523437-6.554687-2.878906-8.851562l-20.484375-19.964844 28.300781-4.109375c3.273438-.472656 6.097657-2.535156 7.546876-5.503906l12.648437-25.859375 12.644531 25.859375c1.453125 2.972656 4.277344 5.03125 7.546875 5.503906l28.304688 4.109375zm0 0"></path>
+                    <path d="m484.609375 133.109375c-1.175781-3.621094-4.304687-6.257813-8.074219-6.804687l-29.222656-4.246094-13.066406-26.484375c-1.683594-3.414063-5.15625-5.574219-8.964844-5.574219 0 0 0 0-.003906 0-3.804688 0-7.28125 2.160156-8.964844 5.574219l-13.074219 26.484375-29.226562 4.246094c-3.765625.546874-6.894531 3.183593-8.070313 6.804687-1.179687 3.621094-.199218 7.59375 2.527344 10.25l21.144531 20.621094-4.992187 29.101562c-.640625 3.75.898437 7.539063 3.980468 9.777344 3.078126 2.238281 7.160157 2.535156 10.527344.765625l26.148438-13.738281 26.140625 13.738281c3.367187 1.769531 7.453125 1.472656 10.53125-.765625 3.078125-2.234375 4.617187-6.027344 3.976562-9.777344l-4.992187-29.101562 21.148437-20.621094c2.726563-2.65625 3.703125-6.628906 2.527344-10.25zm-41.398437 20.222656c-2.359376 2.296875-3.433594 5.605469-2.875 8.847657l2.453124 14.3125-12.855468-6.753907c-2.914063-1.53125-6.394532-1.53125-9.304688 0l-12.867187 6.757813 2.457031-14.316406c.554688-3.242188-.519531-6.550782-2.875-8.847657l-10.40625-10.148437 14.378906-2.085938c3.257813-.472656 6.074219-2.519531 7.53125-5.46875l6.429688-13.027344 6.425781 13.023438c1.457031 2.953125 4.273437 5 7.53125 5.472656l14.378906 2.085938zm0 0"></path>
+                    <path d="m144.609375 133.109375c-1.175781-3.621094-4.304687-6.257813-8.074219-6.804687l-29.222656-4.246094-13.066406-26.484375c-1.683594-3.414063-5.15625-5.574219-8.964844-5.574219s-7.285156 2.160156-8.96875 5.574219l-13.074219 26.484375-29.226562 4.246094c-3.765625.546874-6.894531 3.183593-8.070313 6.804687-1.179687 3.621094-.199218 7.59375 2.527344 10.25l21.144531 20.621094-4.988281 29.101562c-.644531 3.75.898438 7.539063 3.976562 9.777344 3.078126 2.238281 7.160157 2.535156 10.53125.765625l26.144532-13.738281 26.140625 13.738281c3.390625 1.78125 7.46875 1.460938 10.53125-.765625 3.078125-2.234375 4.621093-6.027344 3.976562-9.777344l-4.992187-29.101562 21.148437-20.621094c2.726563-2.65625 3.703125-6.628906 2.527344-10.25zm-41.402344 20.222656c-2.355469 2.296875-3.429687 5.605469-2.875 8.847657l2.457031 14.3125-12.859374-6.753907c-2.910157-1.53125-6.390626-1.53125-9.300782 0l-12.871094 6.757813 2.457032-14.316406c.558594-3.242188-.519532-6.550782-2.875-8.847657l-10.40625-10.148437 14.382812-2.085938c3.253906-.472656 6.070313-2.519531 7.527344-5.46875l6.429688-13.027344 6.425781 13.023438c1.457031 2.953125 4.273437 5 7.53125 5.472656l14.378906 2.085938zm0 0"></path>
+                    <path d="m299.820312 393.09375c-4.617187-3.035156-10.816406-1.75-13.847656 2.867188-3.035156 4.613281-1.75 10.8125 2.867188 13.847656 9.246094 6.074218 16.636718 14.542968 21.371094 24.488281 2.367187 4.980469 8.328124 7.109375 13.324218 4.730469 4.988282-2.371094 7.105469-8.339844 4.734375-13.324219-6.304687-13.25-16.144531-24.527344-28.449219-32.609375zm0 0"></path>
+                  </svg>
                 </div>
                 <h4>5K+</h4>
                 <span>Customers</span>
@@ -518,8 +542,6 @@ const handleGoogleResponse = async (response) => {
             <h1>Welcome back</h1>
             <p>Please enter your details</p>
           </div>
-
-        
 
           {/* Login Method Tabs */}
           <div className="login-method-tabs text-center">
@@ -631,7 +653,10 @@ const handleGoogleResponse = async (response) => {
                   </Link>
                 </div>
 
-                <button onClick={handleLogin} className="modern-btn-primary flg text-center">
+                <button
+                  onClick={handleLogin}
+                  className="modern-btn-primary flg text-center"
+                >
                   Sign in
                 </button>
               </>
@@ -644,35 +669,43 @@ const handleGoogleResponse = async (response) => {
               </Link>
             </p>
 
-          {/* Divider */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              margin: "10px 0",
-              gap: "10px",
-            }}
-          >
+            {/* Divider */}
             <div
-              style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}
-            ></div>
-            <span style={{ color: "#999", fontSize: "14px" }}>
-              Or continue with
-            </span>
-            <div
-              style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}
-            ></div>
-          </div>
-              {/* Google Sign-In Button */}
-          <div
-            ref={googleButtonRef}
-            style={{
-              marginBottom: "24px",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          ></div>
+              style={{
+                display: "flex",
+                alignItems: "center",
+                margin: "10px 0",
+                gap: "10px",
+              }}
+            >
+              <div
+                style={{
+                  flex: 1,
+                  height: "1px",
+                  backgroundColor: "#e0e0e0",
+                }}
+              ></div>
+              <span style={{ color: "#999", fontSize: "14px" }}>
+                Or continue with
+              </span>
+              <div
+                style={{
+                  flex: 1,
+                  height: "1px",
+                  backgroundColor: "#e0e0e0",
+                }}
+              ></div>
+            </div>
 
+            {/* Google Sign-In Button */}
+            <div
+              ref={googleButtonRef}
+              style={{
+                marginBottom: "24px",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            ></div>
           </div>
         </div>
       </div>
@@ -993,54 +1026,52 @@ const handleGoogleResponse = async (response) => {
             height: 100px;
           }
           
-         
-    
-    .login-left-hero {
-      max-width: 460px;
-      margin-bottom: 38px;
-    }
-    
-    .login-left-hero h1 {
-      font-size: 40px;
-    }
-    
-    .login-left-tagline {
-      font-size: 16px;
-    }
-    
-    .login-features-grid {
-      gap: 13px;
-      margin-bottom: 38px;
-      max-width: 500px;
-    }
-    
-    .feature-card {
-      padding: 18px 12px;
-    }
-    
-    .feature-icon svg {
-      width: 28px;
-      height: 28px;
-    }
-    
-    .feature-card h4 {
-      font-size: 23px;
-    }
-    
-    .feature-card span {
-      font-size: 11px;
-    }
-    
-    .login-bottom-cta {
-      max-width: 500px;
-    }
-    
-    .footer-tagline-login {
-      font-size: 12px;
-      letter-spacing: 2px;
-    }
-  }
-`}</style>
+          .login-left-hero {
+            max-width: 460px;
+            margin-bottom: 38px;
+          }
+          
+          .login-left-hero h1 {
+            font-size: 40px;
+          }
+          
+          .login-left-tagline {
+            font-size: 16px;
+          }
+          
+          .login-features-grid {
+            gap: 13px;
+            margin-bottom: 38px;
+            max-width: 500px;
+          }
+          
+          .feature-card {
+            padding: 18px 12px;
+          }
+          
+          .feature-icon svg {
+            width: 28px;
+            height: 28px;
+          }
+          
+          .feature-card h4 {
+            font-size: 23px;
+          }
+          
+          .feature-card span {
+            font-size: 11px;
+          }
+          
+          .login-bottom-cta {
+            max-width: 500px;
+          }
+          
+          .footer-tagline-login {
+            font-size: 12px;
+            letter-spacing: 2px;
+          }
+        }
+      `}</style>
     </div>
   );
 };

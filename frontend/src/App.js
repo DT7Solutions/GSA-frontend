@@ -11,7 +11,7 @@ import BlogPage from "./pages/BlogPage";
 import BlogDetailsPage from "./pages/BlogDetailsPage";
 import ShopPage from "./pages/ShopPage";
 import ShopDetailsPage from "./pages/ShopDetailsPage";
-
+import useProactiveTokenRefresh from './hook/useProactiveTokenRefresh';
 
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -53,17 +53,20 @@ import CarVariantListPages from "./pages/dashboard-pages/ProductsPages/CarVarian
 import CarPartCategoryPages from "./pages/dashboard-pages/ProductsPages/carPartCategoryPages"
 import CarPartGroupPages from "./pages/dashboard-pages/ProductsPages/carPartGroupPages"
 import Enquiryformpages from "./pages/dashboard-pages/Enquiryformpages"
-
+import TokenTester from './components/TestTokenRefresh';
 import UnauthorizedPage from "./pages/UnauthorizedPage"
 import Commingsoon from "./pages/Commingsoon"
 import CustomerListPage from "pages/dashboard-pages/CustomerListPage";
 import StaffList from "components/dashboard-components/Users/StaffList";
 import NotFoundPage from "pages/NotFoundPage";
-
+import TestTokenRefresh from './components/TestTokenRefresh';
 function App() {
-  return (
+  useProactiveTokenRefresh(); // Initialize token refresh hook
 
+  return (
+  
     <Router>
+      
       <RouteScrollToTop />
  
       <ScrollToTop smooth color="#E8092E" />
@@ -84,10 +87,10 @@ function App() {
         <Route exact path="/checkout" element={<CheckoutPage />} />
         <Route exact path="/wishlist" element={<WishlistPage />} />
         <Route exact path="/contact-us" element={<ContactPage />} />
-        <Route exact path="/Login" element={<LoginPage />} />
-        <Route exact path="/Register" element={<RegisterPage />} />
+        <Route exact path="/login" element={<LoginPage />} />
+        <Route exact path="/register" element={<RegisterPage />} />
         <Route exact path="/forgot-password" element={<ForgotPassword />} />
-        {/* <Route exact path="/Dashboard2" element={<DashboardPage />} /> */}
+        {/* <Route exact path="/dashboard2" element={<DashboardPage />} /> */}
         <Route exact path="/brand-models/:id" element={<BrandModelspage />} />
         <Route exact path="/models-variant/:id" element={<BrandModelVariantPage />} />
         <Route exact path="/part-category/:id" element={<PartCategoryPage />} />
@@ -103,22 +106,22 @@ function App() {
         <Route exact path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
         <Route exact path="/shipping-policy" element={<ShippingPolicyPage />} />
         <Route exact path="/refund-policy" element={<RefundPolicyPage />} />
-        
+         <Route path="/test-token-refresh" element={<TestTokenRefresh />} />
        
 
 
 
-         {/* Private Route for Dashboard2 */}
+         {/* Private Route for Dashboard */}
         <Route element={<PrivateRoute requiredRoles={["admin","staff"]} />}>
-          <Route path="/Dashboard" element={<AdminPage />} />
-          <Route path="/Tables" element={<TableDataPage />} />
-          <Route path="/OrderList" element={<OrdersListPage />} />
+          <Route path="/dashboard" element={<AdminPage />} />
+          <Route path="/tables" element={<TableDataPage />} />
+          <Route path="/order-list" element={<OrdersListPage />} />
           <Route path="/form" element={<FormValidationPage />} />
-          <Route path="/Add-products" element={<AddProductPage />} />
+          <Route path="/add-products" element={<AddProductPage />} />
           <Route path="/update-products/:id" element={<UpdateProductsFormPage />} />
           <Route path="/products-list" element={<ProductListDisplayPage />} />
           
-          <Route path="/car-barnds" element={<CarBrandsListPage />} />
+          <Route path="/car-brands" element={<CarBrandsListPage />} />
           <Route path="/car-models" element={<CarModelPages />} />
           <Route path="/car-variants" element={<CarVariantListPages />} />
           <Route path="/car-category" element={<CarPartCategoryPages />} />
@@ -127,7 +130,7 @@ function App() {
           <Route path="/enquiry-queries" element={<Enquiryformpages />} />
           <Route path="/customers-list" element={<CustomerListPage />} />
           <Route path="/staff-list" element={<StaffList />} />
-       
+         
         </Route>
 
         <Route element={<PrivateRoute requiredRoles={["customer"]} />}>

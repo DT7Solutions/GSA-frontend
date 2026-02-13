@@ -358,7 +358,7 @@ const MasterLayout = ({ children }) => {
                             <ul className='sidebar-submenu'>
                                 <li>
                                     <NavLink
-                                        to='/OrderList'
+                                        to='/order-list'
                                         className={(navData) =>
                                             navData.isActive ? "active-page" : ""
                                         }
@@ -400,7 +400,7 @@ const MasterLayout = ({ children }) => {
                                 </li>
                                 <li>
                                     <NavLink
-                                        to='/car-barnds'
+                                        to='/car-brands'
                                         className={(navData) =>
                                             navData.isActive ? "active-page" : ""
                                         }
