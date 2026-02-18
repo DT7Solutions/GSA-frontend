@@ -45,12 +45,12 @@ const BulkProductUpload = () => {
 
         if (fileExtension === 'csv') {
             parseCSV(file);
-        } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+        } else if (fileExtension === 'xlsx' || fileExtension === 'xls' || fileExtension === 'xlsm') {
             parseExcel(file);
         } else {
             Swal.fire({
                 title: 'Invalid File',
-                text: 'Please upload a CSV or Excel file',
+                text: 'Please upload a CSV or Excel file (.xlsx, .xls, .xlsm)',
                 icon: 'error',
             });
         }
@@ -80,9 +80,9 @@ const BulkProductUpload = () => {
 
         const normalize = (str) =>
             str
-                ?.replace(/\u2013/g, '-')   // Replace en dash with normal dash
-                .replace(/\u00A0/g, ' ')   // Replace non-breaking space
-                .replace(/\s+/g, ' ')      // Collapse multiple spaces
+                ?.replace(/\u2013/g, '-')
+                .replace(/\u00A0/g, ' ')
+                .replace(/\s+/g, ' ')
                 .trim()
                 .toUpperCase();
 
@@ -91,35 +91,31 @@ const BulkProductUpload = () => {
         reader.onload = (e) => {
             try {
                 const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
 
-                // 🔹 Ensure required sheets exist
-                if (!workbook.Sheets["Products"]) {
-                    Swal.fire({
-                        title: 'Invalid File',
-                        text: 'Products sheet not found.',
-                        icon: 'error',
-                    });
-                    return;
+                const workbook = XLSX.read(data, {
+                    type: 'array',
+                    cellDates: false,
+                    cellText: false
+                });
+
+                if (!workbook.SheetNames.includes("Products")) {
+                    throw new Error("Products sheet not found.");
                 }
 
-                if (!workbook.Sheets["Compatibility_List"]) {
-                    Swal.fire({
-                        title: 'Invalid File',
-                        text: 'Compatibility_List sheet not found.',
-                        icon: 'error',
-                    });
-                    return;
+                if (!workbook.SheetNames.includes("Compatibility_List")) {
+                    throw new Error("Compatibility_List sheet not found.");
                 }
 
-                // 🔹 Read sheets
                 const productsSheet = workbook.Sheets["Products"];
-                const productsData = XLSX.utils.sheet_to_json(productsSheet, { raw: false });
-
                 const compatSheet = workbook.Sheets["Compatibility_List"];
+
+                const productsData = XLSX.utils.sheet_to_json(productsSheet, { raw: false });
                 const compatData = XLSX.utils.sheet_to_json(compatSheet, { raw: false });
 
-                // 🔹 Build normalized DisplayName → ID map
+                if (!productsData.length) {
+                    throw new Error("Products sheet is empty.");
+                }
+
                 const compatMap = {};
 
                 compatData.forEach(row => {
@@ -128,21 +124,29 @@ const BulkProductUpload = () => {
                     }
                 });
 
-                // 🔥 IMPORTANT: Validate using local map (avoid async state timing issue)
-                validateAndSetData(productsData, compatMap);
+                if (Object.keys(compatMap).length === 0) {
+                    throw new Error("Compatibility list is empty or corrupted.");
+                }
 
-                // Still store in state if needed elsewhere
-                setCompatibilityMap(compatMap);
+                validateAndSetData(productsData, compatMap);
 
             } catch (error) {
                 console.error("Excel parse error:", error);
 
                 Swal.fire({
-                    title: 'Parse Error',
-                    text: 'Failed to parse Excel file',
+                    title: 'Excel Parse Error',
+                    text: error.message || 'Failed to read Excel file.',
                     icon: 'error',
                 });
             }
+        };
+
+        reader.onerror = () => {
+            Swal.fire({
+                title: 'File Read Error',
+                text: 'Unable to read the selected file.',
+                icon: 'error',
+            });
         };
 
         reader.readAsArrayBuffer(file);
@@ -152,8 +156,8 @@ const BulkProductUpload = () => {
     const validateAndSetData = (data, compatMap) => {
         if (!compatMap || Object.keys(compatMap).length === 0) {
             Swal.fire({
-                title: 'Error',
-                text: 'Compatibility mapping not loaded.',
+                title: 'Invalid Template',
+                text: 'Compatibility mapping could not be loaded. Please download a fresh template.',
                 icon: 'error',
             });
             return;
@@ -308,7 +312,12 @@ const BulkProductUpload = () => {
                     failedItems.push({
                         row: i + 2,
                         partName: item.partName,
-                        error: error.response?.data?.message || error.response?.data?.error || 'Unknown error',
+                        error: error.response?.data?.errors
+                            ? JSON.stringify(error.response.data.errors)
+                            : error.response?.data?.message ||
+                            error.response?.data?.error ||
+                            'Unknown error'
+                        ,
                     });
                 }
 
@@ -390,12 +399,12 @@ const BulkProductUpload = () => {
                                 <div className="mb-4">
                                     <h6>Step 1: Download Template</h6>
                                     <div className="d-flex gap-2">
-                                        <button
+                                        {/* <button
                                             className="btn-theme-admin btn-outline-primary gap-2 btn-sm"
                                             onClick={() => downloadTemplate('csv')}
                                         >
                                             <Icon icon="lucide:download" /> Download CSV Template
-                                        </button>
+                                        </button> */}
                                         <button
                                             className="btn-theme-admin btn-outline-primary gap-2 btn-outline-success btn-sm"
                                             onClick={() => downloadTemplate('excel')}
@@ -411,7 +420,7 @@ const BulkProductUpload = () => {
                                     <input
                                         type="file"
                                         className="form-control"
-                                        accept=".csv,.xlsx,.xls"
+                                        accept=".xlsx, .xls, .xlsm"
                                         onChange={handleFileChange}
                                     />
                                     {uploadedFile && (
