@@ -240,6 +240,7 @@ const BulkProductUpload = () => {
 
     // Handle bulk upload
     const handleBulkUpload = async () => {
+
         if (parsedData.length === 0) {
             Swal.fire({
                 title: 'No Data',
@@ -259,98 +260,68 @@ const BulkProductUpload = () => {
         }
 
         setIsProcessing(true);
-        setUploadProgress(0);
+        setUploadProgress(30);
 
         try {
-            const totalItems = parsedData.length;
-            let successCount = 0;
-            let failCount = 0;
-            const failedItems = [];
 
-            for (let i = 0; i < parsedData.length; i++) {
+            // 🔥 Build clean bulk payload
+            const payload = parsedData.map(item => ({
+                car_make: item.carMake,
+                car_model: item.carModel,
+                car_variant: item.carVariant,
+                part_section: item.partCategory,
+                part_group: item.partGroup,
+                product_name: item.partName,
+                part_no: item.partNumber,
+                fig_no: item.figureNumber || '',
+                price: item.price,
+                sale_price: item.salePrice || '',
+                discount: item.discount || '0',
+                qty: item.qty || '0',
+                stock_count: item.qty || '0',
+                sku: item.sku || '',
+                remarks: item.remarks || '',
+                description: item.description || '',
+                is_available: true,
+                product_image: item.partImageUrl || '',
+                compatibility: item.compatibility || ''
+            }));
+            debugger;
 
-                const item = parsedData[i];
-                const formData = new FormData();
-                console.log("FINAL COMPATIBILITY VALUE:", item.compatibility);
-
-                formData.append('car_make', item.carMake);
-                formData.append('car_model', item.carModel);
-                formData.append('car_variant', item.carVariant);
-                formData.append('part_section', item.partCategory);
-                formData.append('part_group', item.partGroup);
-                formData.append('product_name', item.partName);
-                formData.append('part_no', item.partNumber);
-                formData.append('fig_no', item.figureNumber || '');
-                formData.append('price', item.price);
-                formData.append('sale_price', item.salePrice || '');
-                formData.append('discount', item.discount || '0');
-                formData.append('qty', item.qty || '0');
-                formData.append('stock_count', item.qty || '0');
-                formData.append('sku', item.sku || '');
-                formData.append('remarks', item.remarks || '');
-                formData.append('description', item.description || '');
-                formData.append('is_available', 'true');
-
-                if (item.partImageUrl && item.partImageUrl.trim() !== '') {
-                    formData.append('product_image', item.partImageUrl);
+            const response = await axios.post(
+                `${API_BASE_URL}api/home/upload_products/`,
+                payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
                 }
+            );
 
-                // 🔥 Now this is already ID string
-                if (item.compatibility && item.compatibility.trim() !== '') {
-                    formData.append('compatibility', item.compatibility);
-                }
-
-                try {
-                    await axios.post(`${API_BASE_URL}api/home/upload_products/`, formData, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    successCount++;
-                } catch (error) {
-                    failCount++;
-                    failedItems.push({
-                        row: i + 2,
-                        partName: item.partName,
-                        error: error.response?.data?.errors
-                            ? JSON.stringify(error.response.data.errors)
-                            : error.response?.data?.message ||
-                            error.response?.data?.error ||
-                            'Unknown error'
-                        ,
-                    });
-                }
-
-                setUploadProgress(Math.round(((i + 1) / totalItems) * 100));
-            }
-
+            setUploadProgress(100);
             setIsProcessing(false);
 
-            if (failCount === 0) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: `All ${successCount} products uploaded successfully`,
-                    icon: 'success',
-                });
-                setShowBulkModal(false);
-                setParsedData([]);
-                setUploadedFile(null);
-            } else {
-                Swal.fire({
-                    title: 'Upload Complete',
-                    html: `
-                        <p><strong>Success:</strong> ${successCount}</p>
-                        <p><strong>Failed:</strong> ${failCount}</p>
-                    `,
-                    icon: failCount > successCount ? 'error' : 'warning',
-                });
-            }
+            Swal.fire({
+                title: 'Upload Complete',
+                html: `
+                    <p><strong>Success:</strong> ${response.data.success}</p>
+                    <p><strong>Failed:</strong> ${response.data.failed}</p>
+                `,
+                icon: response.data.failed > 0 ? 'warning' : 'success'
+            });
+
+            setShowBulkModal(false);
+            setParsedData([]);
+            setUploadedFile(null);
 
         } catch (error) {
+
             setIsProcessing(false);
+
             Swal.fire({
                 title: 'Upload Failed',
-                text: error.message,
+                text: error.response?.data?.message || 'Bulk upload failed.',
                 icon: 'error',
             });
         }
