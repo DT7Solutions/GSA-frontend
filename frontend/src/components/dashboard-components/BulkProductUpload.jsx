@@ -214,7 +214,7 @@ const BulkProductUpload = () => {
                 } else {
                     const compatIds = compatList.map(name => compatMap[name]);
 
-                    // 🔥 Replace display names with ID string
+                    // Replace display names with ID string
                     row.compatibility = compatIds.join(',');
                 }
             }
@@ -264,7 +264,7 @@ const BulkProductUpload = () => {
 
         try {
 
-            // 🔥 Build clean bulk payload
+            // Build clean bulk payload
             const payload = parsedData.map(item => ({
                 car_make: item.carMake,
                 car_model: item.carModel,
