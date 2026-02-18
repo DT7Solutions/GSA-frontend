@@ -13,6 +13,7 @@ const BulkProductUpload = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [validationErrors, setValidationErrors] = useState([]);
+    const [compatibilityMap, setCompatibilityMap] = useState({});
     
     const token = localStorage.getItem("accessToken");
 
@@ -24,61 +25,10 @@ const BulkProductUpload = () => {
     ];
 
     // Download template function
-    const downloadTemplate = (format) => {
-        const sampleData = [
-            {
-                carMake: 'Hyundai',
-                carModel: 'Creta',
-                carVariant: 'SX',
-                partCategory: 'Engine Parts',
-                partGroup: 'Oil Filters',
-                partName: 'Engine Oil Filter',
-                partImageUrl: 'https://example.com/images/oil-filter.jpg',
-                partNumber: 'PN-12345',
-                figureNumber: 'FIG-001',
-                price: '1000',
-                salePrice: '900',
-                discount: '10',
-                qty: '50',
-                sku: 'SKU-12345',
-                remarks: 'Premium quality filter',
-                compatibility: 'Creta SX,Creta EX,Venue SX',
-                description: 'High-quality engine oil filter for optimal performance'
-            },
-            {
-                carMake: 'Maruti Suzuki',
-                carModel: 'Swift',
-                carVariant: 'VXI',
-                partCategory: 'Brake System',
-                partGroup: 'Brake Pads',
-                partName: 'Front Brake Pad Set',
-                partImageUrl: 'https://example.com/images/brake-pad.jpg',
-                partNumber: 'BP-67890',
-                figureNumber: 'FIG-002',
-                price: '2500',
-                salePrice: '2200',
-                discount: '12',
-                qty: '30',
-                sku: 'SKU-67890',
-                remarks: 'Ceramic brake pads',
-                compatibility: 'Swift VXI,Swift ZXI',
-                description: 'Premium ceramic brake pads for enhanced stopping power'
-            }
-        ];
+    const downloadTemplate = async (format) => {
 
-        if (format === 'csv') {
-            const csv = Papa.unparse(sampleData);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'bulk_products_template.csv';
-            a.click();
-        } else if (format === 'excel') {
-            const ws = XLSX.utils.json_to_sheet(sampleData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Products');
-            XLSX.writeFile(wb, 'bulk_products_template.xlsx');
+        if (format === "excel") {
+            window.open(`${API_BASE_URL}api/home/download-bulk-template/`, "_blank");
         }
     };
 
@@ -127,16 +77,66 @@ const BulkProductUpload = () => {
 
     // Parse Excel file
     const parseExcel = (file) => {
+
+        const normalize = (str) =>
+            str
+                ?.replace(/\u2013/g, '-')   // Replace en dash with normal dash
+                .replace(/\u00A0/g, ' ')   // Replace non-breaking space
+                .replace(/\s+/g, ' ')      // Collapse multiple spaces
+                .trim()
+                .toUpperCase();
+
         const reader = new FileReader();
+
         reader.onload = (e) => {
             try {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false });
-                validateAndSetData(jsonData);
+
+                // 🔹 Ensure required sheets exist
+                if (!workbook.Sheets["Products"]) {
+                    Swal.fire({
+                        title: 'Invalid File',
+                        text: 'Products sheet not found.',
+                        icon: 'error',
+                    });
+                    return;
+                }
+
+                if (!workbook.Sheets["Compatibility_List"]) {
+                    Swal.fire({
+                        title: 'Invalid File',
+                        text: 'Compatibility_List sheet not found.',
+                        icon: 'error',
+                    });
+                    return;
+                }
+
+                // 🔹 Read sheets
+                const productsSheet = workbook.Sheets["Products"];
+                const productsData = XLSX.utils.sheet_to_json(productsSheet, { raw: false });
+
+                const compatSheet = workbook.Sheets["Compatibility_List"];
+                const compatData = XLSX.utils.sheet_to_json(compatSheet, { raw: false });
+
+                // 🔹 Build normalized DisplayName → ID map
+                const compatMap = {};
+
+                compatData.forEach(row => {
+                    if (row.DisplayName && row.ID) {
+                        compatMap[normalize(row.DisplayName)] = String(row.ID);
+                    }
+                });
+
+                // 🔥 IMPORTANT: Validate using local map (avoid async state timing issue)
+                validateAndSetData(productsData, compatMap);
+
+                // Still store in state if needed elsewhere
+                setCompatibilityMap(compatMap);
+
             } catch (error) {
+                console.error("Excel parse error:", error);
+
                 Swal.fire({
                     title: 'Parse Error',
                     text: 'Failed to parse Excel file',
@@ -144,11 +144,28 @@ const BulkProductUpload = () => {
                 });
             }
         };
+
         reader.readAsArrayBuffer(file);
     };
 
     // Validate parsed data
-    const validateAndSetData = (data) => {
+    const validateAndSetData = (data, compatMap) => {
+        if (!compatMap || Object.keys(compatMap).length === 0) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Compatibility mapping not loaded.',
+                icon: 'error',
+            });
+            return;
+        }
+
+        const normalize = (str) =>
+            str
+                ?.replace(/\u2013/g, '-')     // Replace en dash with normal dash
+                .replace(/\s+/g, ' ')         // Collapse multiple spaces
+                .trim()
+                .toUpperCase();
+
         const errors = [];
         const validData = [];
 
@@ -162,7 +179,7 @@ const BulkProductUpload = () => {
                 }
             });
 
-            // Required field validation (using name-based matching)
+            // Required fields
             if (!row.carMake) rowErrors.push('carMake is required');
             if (!row.carModel) rowErrors.push('carModel is required');
             if (!row.carVariant) rowErrors.push('carVariant is required');
@@ -178,20 +195,23 @@ const BulkProductUpload = () => {
             if (row.discount && row.discount !== '' && isNaN(parseFloat(row.discount))) rowErrors.push('discount must be numeric');
             if (row.qty && row.qty !== '' && isNaN(parseInt(row.qty))) rowErrors.push('qty must be numeric');
 
-            // Image URL validation (if provided)
-            if (row.partImageUrl && row.partImageUrl.trim() !== '') {
-                const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-                if (!urlPattern.test(row.partImageUrl)) {
-                    rowErrors.push('partImageUrl must be a valid URL');
-                }
-            }
-
-            // Compatibility validation (if provided)
+            // Compatibility validation + conversion
             if (row.compatibility && row.compatibility.trim() !== '') {
-                // Compatibility can be comma-separated variant names
-                const compatList = row.compatibility.split(',').map(item => item.trim());
-                if (compatList.length === 0) {
-                    rowErrors.push('compatibility must contain comma-separated variant names');
+
+                const compatList = row.compatibility
+                    .split(',')
+                    .map(item => normalize(item))
+                    .filter(Boolean);
+
+                const invalidCompat = compatList.filter(name => !compatMap[name]);
+
+                if (invalidCompat.length > 0) {
+                    rowErrors.push(`Invalid compatibility: ${invalidCompat.join(', ')}`);
+                } else {
+                    const compatIds = compatList.map(name => compatMap[name]);
+
+                    // 🔥 Replace display names with ID string
+                    row.compatibility = compatIds.join(',');
                 }
             }
 
@@ -244,11 +264,11 @@ const BulkProductUpload = () => {
             const failedItems = [];
 
             for (let i = 0; i < parsedData.length; i++) {
+
                 const item = parsedData[i];
-                
                 const formData = new FormData();
-                
-                // Send name-based matching data
+                console.log("FINAL COMPATIBILITY VALUE:", item.compatibility);
+
                 formData.append('car_make', item.carMake);
                 formData.append('car_model', item.carModel);
                 formData.append('car_variant', item.carVariant);
@@ -266,13 +286,12 @@ const BulkProductUpload = () => {
                 formData.append('remarks', item.remarks || '');
                 formData.append('description', item.description || '');
                 formData.append('is_available', 'true');
-                
-                // Handle image URL - send as URL string for backend to download
+
                 if (item.partImageUrl && item.partImageUrl.trim() !== '') {
                     formData.append('product_image', item.partImageUrl);
                 }
-                
-                // Handle compatibility - send as comma-separated string
+
+                // 🔥 Now this is already ID string
                 if (item.compatibility && item.compatibility.trim() !== '') {
                     formData.append('compatibility', item.compatibility);
                 }
@@ -281,7 +300,6 @@ const BulkProductUpload = () => {
                     await axios.post(`${API_BASE_URL}api/home/upload_products/`, formData, {
                         headers: {
                             Authorization: `Bearer ${token}`,
-                            'Content-Type': 'multipart/form-data',
                         },
                     });
                     successCount++;
@@ -292,7 +310,6 @@ const BulkProductUpload = () => {
                         partName: item.partName,
                         error: error.response?.data?.message || error.response?.data?.error || 'Unknown error',
                     });
-                    console.error(`Failed to upload row ${i + 2}:`, error.response?.data);
                 }
 
                 setUploadProgress(Math.round(((i + 1) / totalItems) * 100));
@@ -300,7 +317,6 @@ const BulkProductUpload = () => {
 
             setIsProcessing(false);
 
-            // Show results
             if (failCount === 0) {
                 Swal.fire({
                     title: 'Success!',
@@ -316,16 +332,11 @@ const BulkProductUpload = () => {
                     html: `
                         <p><strong>Success:</strong> ${successCount}</p>
                         <p><strong>Failed:</strong> ${failCount}</p>
-                        <details>
-                            <summary>View Failed Items</summary>
-                            <ul style="text-align: left; max-height: 200px; overflow-y: auto;">
-                                ${failedItems.map(item => `<li>Row ${item.row} (${item.partName}): ${item.error}</li>`).join('')}
-                            </ul>
-                        </details>
                     `,
                     icon: failCount > successCount ? 'error' : 'warning',
                 });
             }
+
         } catch (error) {
             setIsProcessing(false);
             Swal.fire({

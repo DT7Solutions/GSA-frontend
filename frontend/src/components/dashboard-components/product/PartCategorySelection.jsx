@@ -12,7 +12,6 @@ const PartCategorySelection = ({id, modelvariant}) => {
             const fetchCarModel = async () => {
               try {
                 const response = await axios.get(`${API_BASE_URL}api/home/car_variant_category/${id}/`);
-                debugger;
                 setvariantCategory(response.data);
                 console.log('got car-models payload:', response.data);
               } catch (error) {

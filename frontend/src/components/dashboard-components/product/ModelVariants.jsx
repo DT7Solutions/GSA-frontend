@@ -47,7 +47,6 @@ const ModelVariantsList = () => {
   });
   // Handle input changes
   const handleChange = (e) => {
-    debugger;
   
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };

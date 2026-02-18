@@ -17,6 +17,8 @@
     "apexcharts": "^4.5.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.3",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "datatables.net-bs5": "^2.3.1",
     "datatables.net-dt": "^2.2.2",
     "html2canvas": "^1.4.1",
@@ -49,10 +51,12 @@
     "react-select": "^5.10.1",
     "react-toastify": "^11.0.5",
     "remixicon": "^4.6.0",
+    "stream-browserify": "^3.0.0",
     "sweetalert2": "^11.17.2",
     "swiper": "^9.1.1",
     "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-populate": "^1.21.0"
   },
   "scripts": {
     "start": "react-scripts start",

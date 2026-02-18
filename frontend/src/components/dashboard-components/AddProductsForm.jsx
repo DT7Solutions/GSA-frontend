@@ -396,7 +396,6 @@ const AddProductsForm = () => {
 
 
         try {
-            debugger;
             const response = await axios.post(`${API_BASE_URL}api/home/add_car_model/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -491,7 +490,6 @@ const AddProductsForm = () => {
 
 
         try {
-            debugger;
             const response = await axios.post(`${API_BASE_URL}api/home/create_car_Variant/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -574,7 +572,6 @@ const AddProductsForm = () => {
 
         console.log('Part Selection Data:', partSelectionData);
         try {
-            debugger;
             const response = await axios.post(`${API_BASE_URL}api/home/create_car_part_categories/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -644,7 +641,6 @@ const AddProductsForm = () => {
         formData.append("image", partGrouponData.image);
 
         try {
-            debugger;
             const response = await axios.post(`${API_BASE_URL}api/home/create_car_part_group_item/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -819,14 +815,14 @@ const AddProductsForm = () => {
             />
         </div>
 
-        {/* <button
+        <button
             type="button"
             className="input-group-text bg-theme-button gap-1 Add-car-top-gap"
             onClick={() => setShowModal(true)}
         >
             <Icon icon="lucide:plus" />
             Add Car
-        </button> */}
+        </button>
     </div>
 </div>
 
@@ -842,13 +838,13 @@ const AddProductsForm = () => {
                                         </option>
                                     ))}
                                 </select>
-                                {/* <button
+                                <button
                                     type="button"
                                     className="input-group-text  bg-theme-button gap-1"
                                     onClick={() => setShowCarModelModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Model
-                                </button> */}
+                                </button>
                             </div>
                         </div>
                         {/* Car Variant Selection */}
@@ -861,13 +857,13 @@ const AddProductsForm = () => {
                                         <option key={varient.id} value={varient.id}>{varient.car_model_name}-{varient.name}({new Date(varient.production_start_date).getFullYear()} - {new Date(varient.production_end_date).getFullYear()})</option>
                                     ))}
                                 </select>
-                                {/* <button
+                                <button
                                     type="button"
                                     className="input-group-text bg-theme-button gap-1"
                                     onClick={() => setShowCarVariantModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Variant
-                                </button> */}
+                                </button>
                             </div>
                         </div>
 
@@ -882,13 +878,13 @@ const AddProductsForm = () => {
                                     ))}
 
                                 </select>
-                                {/* <button
+                                <button
                                     type="button"
                                     className="input-group-text  bg-theme-button gap-1"
                                     onClick={() => setShowPartSelectionCatModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Part
-                                </button> */}
+                                </button>
                             </div>
                         </div>
 
@@ -903,13 +899,13 @@ const AddProductsForm = () => {
                                     ))}
 
                                 </select>
-                                {/* <button
+                                <button
                                     type="button"
                                     className="input-group-text bg-theme-button gap-1"
                                     onClick={() => setShowPartGroupModal(true)}
                                 >
                                     <Icon icon="lucide:plus" /> Add Part
-                                </button> */}
+                                </button>
                             </div>
                         </div>
 

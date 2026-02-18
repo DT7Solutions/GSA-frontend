@@ -4,7 +4,6 @@ import { jwtDecode } from "jwt-decode";
 
 const PrivateRoute = ({ requiredRoles }) => {
   const location = useLocation();
-  debugger;
   const token = localStorage.getItem("accessToken");
   const role = (localStorage.getItem("role") || "").toLowerCase();
 
