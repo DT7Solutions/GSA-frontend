@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import $ from 'jquery';
-import 'datatables.net-dt/js/dataTables.dataTables.js';
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
@@ -12,16 +10,24 @@ import autoTable from 'jspdf-autotable';
 import Invoicetemplate from '../Orders/Invoicetemplate';
 import PackingSlipTemplate from '../Orders/PackingSlipTemplate';
 import { createRoot } from 'react-dom/client';
-import "../../../../src/assets/css/Auth.css"
+import "../../../../src/assets/css/Auth.css";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [tableInitialized, setTableInitialized] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [orderIdFilter, setOrderIdFilter] = useState('');
+  const [productFilter, setProductFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [priceOption, setPriceOption] = useState('');
+  const [customMinPrice, setCustomMinPrice] = useState('');
+  const [customMaxPrice, setCustomMaxPrice] = useState('');
   
   // Mobile-specific states
   const [mobileSearchTerm, setMobileSearchTerm] = useState('');
@@ -29,7 +35,7 @@ const OrdersList = () => {
   const [itemsPerPage] = useState(10);
   
   const token = localStorage.getItem("accessToken");
-  const tableRef = useRef(null);
+  // const tableRef = useRef(null);
 
   useEffect(() => {
     if (token) {
@@ -54,29 +60,35 @@ const OrdersList = () => {
     }
   }, [token]);
 
-  // Separate useEffect for DataTable initialization
-  useEffect(() => {
-    if (filteredOrders.length > 0 && !tableInitialized && window.innerWidth >= 992) {
-      setTimeout(() => {
-        if ($.fn.DataTable.isDataTable('#ordersDataTable')) {
-          $('#ordersDataTable').DataTable().destroy();
-        }
-        tableRef.current = $('#ordersDataTable').DataTable({ 
-          pageLength: 10, 
-          destroy: true,
-          order: [], // Disable initial sorting - we're already sorted
-          columnDefs: [
-            { orderable: false, targets: [0, 7] } // Disable sorting on S.L and Action columns
-          ]
-        });
-        setTableInitialized(true);
-      }, 100);
-    }
-  }, [filteredOrders, tableInitialized]);
-
   const handleEditClick = (order) => {
     setSelectedOrder({ ...order });
     setShowModal(true);
+  };
+
+  const handleExportExcel = () => {
+    const dataToExport = getMobileFilteredOrders().map(order => ({
+      OrderID: `GSA${order.id}`,
+      Invoice: order.razorpay_order_id,
+      Product: `${order.items[0]?.part_group_name}-${order.items[0]?.part_no}`,
+      Date: new Date(order.created_at).toLocaleDateString(),
+      Amount: order.total_price,
+      Status: order.status
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array"
+    });
+
+    const data = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8"
+    });
+
+    saveAs(data, `Orders_Report.xlsx`);
   };
 
   const handleClose = () => {
@@ -115,7 +127,7 @@ const OrdersList = () => {
         updatedOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         
         setOrders(updatedOrders);
-        applyDateFilter(updatedOrders);
+        applyAllFilters(updatedOrders);
         
         await Swal.fire({ 
           title: 'Status Updated', 
@@ -136,6 +148,20 @@ const OrdersList = () => {
       });
     }
   };
+
+  useEffect(() => {
+    applyAllFilters();
+  }, [
+    orders,
+    startDate,
+    endDate,
+    orderIdFilter,
+    productFilter,
+    statusFilter,
+    priceOption,
+    customMinPrice,
+    customMaxPrice,
+  ]);
 
   const handlePrint = async (order) => {
     const container = document.createElement('div');
@@ -215,105 +241,117 @@ const OrdersList = () => {
     }, 100);
   };
 
-  const applyDateFilter = (ordersToFilter = orders) => {
-    let filtered = ordersToFilter;
+  const applyAllFilters = (ordersToFilter = orders) => {
 
-    if (startDate && endDate) {
+    let filtered = [...ordersToFilter];
+
+    // Date filter
+    if (startDate) {
       const start = new Date(startDate);
       start.setHours(0, 0, 0, 0);
+
+      filtered = filtered.filter(order =>
+        new Date(order.created_at) >= start
+      );
+    }
+
+    if (endDate) {
       const end = new Date(endDate);
       end.setHours(23, 59, 59, 999);
 
-      filtered = ordersToFilter.filter(order => {
-        const orderDate = new Date(order.created_at);
-        orderDate.setHours(0, 0, 0, 0);
-        return orderDate >= start && orderDate <= end;
-      });
-    } else if (startDate) {
-      const start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-      filtered = ordersToFilter.filter(order => {
-        const orderDate = new Date(order.created_at);
-        orderDate.setHours(0, 0, 0, 0);
-        return orderDate >= start;
-      });
-    } else if (endDate) {
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
-      filtered = ordersToFilter.filter(order => {
-        const orderDate = new Date(order.created_at);
-        return orderDate <= end;
+      filtered = filtered.filter(order =>
+        new Date(order.created_at) <= end
+      );
+    }
+
+    // Order ID filter
+    if (orderIdFilter) {
+      filtered = filtered.filter(order =>
+        `GSA${order.id}`
+          .toLowerCase()
+          .includes(orderIdFilter.toLowerCase())
+      );
+    }
+
+    // Product filter
+    if (productFilter) {
+      filtered = filtered.filter(order =>
+        `${order.items[0]?.part_group_name}-${order.items[0]?.part_no}`
+          .toLowerCase()
+          .includes(productFilter.toLowerCase())
+      );
+    }
+
+    // Status filter
+    if (statusFilter) {
+      filtered = filtered.filter(order =>
+        order.status.toLowerCase() === statusFilter.toLowerCase()
+      );
+    }
+
+    // Price filter
+    if (priceOption) {
+      filtered = filtered.filter(order => {
+        const price = parseFloat(order.total_price);
+
+        if (priceOption === '0-1000') {
+          return price >= 0 && price <= 1000;
+        }
+
+        if (priceOption === '1000-5000') {
+          return price > 1000 && price <= 5000;
+        }
+
+        if (priceOption === '5000-10000') {
+          return price > 5000 && price <= 10000;
+        }
+
+        if (priceOption === '10000+') {
+          return price > 10000;
+        }
+
+        if (priceOption === 'custom') {
+          const min = parseFloat(customMinPrice) || 0;
+          const max = parseFloat(customMaxPrice) || Infinity;
+          return price >= min && price <= max;
+        }
+
+        return true;
       });
     }
 
-    console.log('Filtering orders:', {
-      startDate,
-      endDate,
-      totalOrders: ordersToFilter.length,
-      filteredCount: filtered.length,
-      sampleDates: ordersToFilter.slice(0, 3).map(o => o.created_at)
-    });
-
-    // Sort filtered orders by date (newest first)
-    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Sort newest first
+    filtered.sort((a, b) =>
+      new Date(b.created_at) - new Date(a.created_at)
+    );
 
     setFilteredOrders(filtered);
-    setCurrentPage(1); // Reset to first page when filtering
-    
-    // Refresh DataTable only on desktop
-    if (window.innerWidth >= 992) {
-      if (tableRef.current) {
-        tableRef.current.destroy();
-      }
-      setTimeout(() => {
-        if ($.fn.DataTable.isDataTable('#ordersDataTable')) {
-          $('#ordersDataTable').DataTable().destroy();
-        }
-        tableRef.current = $('#ordersDataTable').DataTable({ 
-          pageLength: 10, 
-          destroy: true,
-          order: [], // No initial sorting - we pre-sorted the data
-          columnDefs: [
-            { orderable: false, targets: [0, 7] } // Disable sorting on S.L and Action columns
-          ]
-        });
-      }, 0);
-    }
+    setCurrentPage(1);
   };
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();
-    applyDateFilter();
+    applyAllFilters();
   };
 
   const handleResetFilter = () => {
+
     setStartDate('');
     setEndDate('');
+    setOrderIdFilter('');
+    setProductFilter('');
+    setStatusFilter('');
+    setPriceOption('');
+    setCustomMinPrice('');
+    setCustomMaxPrice('');
     setMobileSearchTerm('');
     setCurrentPage(1);
-    
-    // Reset to original orders (already sorted newest first)
-    const sortedOrders = [...orders].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    const sortedOrders = [...orders].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+
     setFilteredOrders(sortedOrders);
-    
-    if (window.innerWidth >= 992) {
-      if (tableRef.current) {
-        tableRef.current.destroy();
-      }
-      setTimeout(() => {
-        if ($.fn.DataTable.isDataTable('#ordersDataTable')) {
-          $('#ordersDataTable').DataTable().destroy();
-        }
-        tableRef.current = $('#ordersDataTable').DataTable({ 
-          pageLength: 10, 
-          destroy: true,
-          order: [], // No initial sorting
-          columnDefs: [
-            { orderable: false, targets: [0, 7] }
-          ]
-        });
-      }, 0);
-    }
   };
 
   // Mobile search functionality
@@ -467,14 +505,14 @@ const OrdersList = () => {
               </div>
 
               {/* Buttons - Desktop */}
-              <div className="col-md-4 d-none d-md-flex align-items-end">
-                <button
+              <div className="col-md-4 d-none d-md-flex align-items-end gap-4">
+                {/* <button
                   type="submit"
                   className="btn-theme-admin btn-primary me-2 d-inline-flex align-items-center"
                 >
                   <Icon icon="mdi:filter" className="me-1" />
                   <span>Apply Filter</span>
-                </button>
+                </button> */}
 
                 <button
                   type="button"
@@ -484,18 +522,25 @@ const OrdersList = () => {
                   <Icon icon="mdi:refresh" className="me-1" />
                   <span>Reset</span>
                 </button>
+
+                <button
+                  className="btn-theme-admin btn-primary me-2 d-inline-flex align-items-center"
+                  onClick={handleExportExcel}
+                >
+                  Export to Excel
+                </button>
               </div>
 
               {/* Buttons - Mobile (Full Width) */}
               <div className="col-12 d-md-none">
                 <div className="d-flex gap-2">
-                  <button
+                  {/* <button
                     type="submit"
                     className="btn-theme-admin btn-primary flex-grow-1 d-inline-flex align-items-center justify-content-center"
                   >
                     <Icon icon="mdi:filter" className="me-1" />
                     <span>Apply</span>
-                  </button>
+                  </button> */}
 
                   <button
                     type="button"
@@ -505,6 +550,14 @@ const OrdersList = () => {
                     <Icon icon="mdi:refresh" className="me-1" />
                     <span>Reset</span>
                   </button>
+
+                  <button
+                    className="btn-theme-admin btn-secondary flex-grow-1 d-inline-flex align-items-center justify-content-center"
+                    onClick={handleExportExcel}
+                  >
+                    Export to Excel
+                  </button>
+
                 </div>
               </div>
             </div>
@@ -517,6 +570,67 @@ const OrdersList = () => {
               </small>
             </div>
           )}
+        </div>
+
+        <div className="row mb-3 d-flex gap-3 align-items-center">
+          <div className="col-md-2">
+            <input type="text" className="form-control" placeholder="Order ID" value={orderIdFilter} onChange={(e) => setOrderIdFilter(e.target.value)} />
+          </div>
+
+          <div className="col-md-3">
+            <input type="text" className="form-control" placeholder="Product Name" value={productFilter} onChange={(e) => setProductFilter(e.target.value)} />
+          </div>
+
+          <div className="col-md-2">
+            <select id="statusFilter" className="form-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="progress">Progress</option>
+              <option value="failed">Failed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <div className="col-md-3">
+
+            <select
+              className="form-select"
+              value={priceOption}
+              onChange={(e) => {
+                setPriceOption(e.target.value);
+                setCustomMinPrice('');
+                setCustomMaxPrice('');
+              }}
+            >
+              <option value="">All Prices</option>
+              <option value="0-1000">₹0 - ₹1,000</option>
+              <option value="1000-5000">₹1,001 - ₹5,000</option>
+              <option value="5000-10000">₹5,001 - ₹10,000</option>
+              <option value="10000+">Above ₹10,000</option>
+              <option value="custom">Custom Range</option>
+            </select>
+
+            {priceOption === 'custom' && (
+              <div className="d-flex gap-2 mt-2">
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="Min"
+                  value={customMinPrice}
+                  onChange={(e) => setCustomMinPrice(e.target.value)}
+                />
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="Max"
+                  value={customMaxPrice}
+                  onChange={(e) => setCustomMaxPrice(e.target.value)}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Desktop Table View */}
@@ -535,7 +649,7 @@ const OrdersList = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order, idx) => (
+              {currentPageOrders.map((order, idx) => (
                 <tr key={order.id}>
                   <td>{String(idx + 1).padStart(2, '0')}</td>
                   <td>GSA{order.id}</td>
@@ -580,6 +694,44 @@ const OrdersList = () => {
               ))}
             </tbody>
           </table>
+          {totalPages > 1 && (
+            <div className="pagination-container mt-3">
+              <nav>
+                <ul className="pagination-list">
+                  <li>
+                    <button
+                      className="pagination-btn"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(prev => prev - 1)}
+                    >
+                      Prev
+                    </button>
+                  </li>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <li key={page}>
+                      <button
+                        className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </button>
+                    </li>
+                  ))}
+
+                  <li>
+                    <button
+                      className="pagination-btn"
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(prev => prev + 1)}
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          )}
         </div>
 
         {/* Mobile Card View */}
@@ -587,7 +739,7 @@ const OrdersList = () => {
           {/* Mobile Search Bar */}
           <div className="mb-3">
             <div className="position-relative">
-              <input
+              {/* <input
                 type="text"
                 className="form-control ps-5"
                 placeholder="Search orders by ID, invoice, product, status..."
@@ -603,7 +755,7 @@ const OrdersList = () => {
                   transform: 'translateY(-50%)',
                   fontSize: '20px'
                 }}
-              />
+              /> */}
               {mobileSearchTerm && (
                 <button
                   type="button"
