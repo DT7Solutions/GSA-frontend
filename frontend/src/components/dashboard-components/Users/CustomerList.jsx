@@ -263,7 +263,7 @@ const CustomerList = () => {
 
                             <div className="d-flex align-items-center gap-2 ms-3">
                                 <span className="text-md fw-medium text-secondary-light mb-0">Export:</span>
-                                <button
+                                {/* <button
                                     type="button"
                                     className="btn-theme-admin d-flex align-items-center gap-1"
                                     onClick={handleExportCSV}
@@ -271,7 +271,7 @@ const CustomerList = () => {
                                 >
                                     <Icon icon="mdi:download-outline" className="text-lg" />
                                     CSV
-                                </button>
+                                </button> */}
                                 <button
                                     type="button"
                                     className="btn-theme-admin d-flex align-items-center gap-1"
@@ -391,15 +391,15 @@ const CustomerList = () => {
                         <table className="table bordered-table sm-table mb-0">
                             <thead>
                                 <tr>
-                                    <th scope="col">S.No</th>
-                                    <th scope="col">Username</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Phone</th>
-                                    <th scope="col">City</th>
-                                    <th scope="col">State</th>
-                                    <th scope="col">Address</th>
-                                    <th scope="col">Role</th>
-                                    <th scope="col">Joined Date</th>
+                                    <th scope="col" className="text-center">S.No</th>
+                                    <th scope="col" className="text-center">Username</th>
+                                    <th scope="col" className="text-center">Email</th>
+                                    <th scope="col" className="text-center">Phone</th>
+                                    <th scope="col" className="text-center">City</th>
+                                    <th scope="col" className="text-center">State</th>
+                                    <th scope="col" className="text-center">Address</th>
+                                    <th scope="col" className="text-center">Role</th>
+                                    <th scope="col" className="text-center">Joined Date</th>
                                     <th scope="col" className="text-center">Status</th>
                                     <th scope="col" className="text-center">Actions</th>
                                 </tr>
@@ -440,7 +440,7 @@ const CustomerList = () => {
                                             </td>
                                             <td>
                                                 <span
-                                                    className={`badge badge-align text-sm fw-semibold ${getRoleBadgeColor(customer.role_name)} px-20 py-9 radius-4`}
+                                                    className={`badge badge-align text-center text-sm fw-semibold ${getRoleBadgeColor(customer.role_name)} px-20 py-9 radius-4`}
                                                 >
                                                     {customer.role_name || "N/A"}
                                                 </span>
@@ -462,7 +462,7 @@ const CustomerList = () => {
                                                 </span>
                                             </td>
                                             <td className="text-center">
-                                                <div className="d-flex align-items-center justify-content-center gap-2">
+                                                <div className="d-flex align-items-center justify-content-between gap-2">
                                                     {customer.is_active ? (
                                                         <button
                                                             type="button"

@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import $ from "jquery";
-import "datatables.net-dt/js/dataTables.dataTables.js";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import API_BASE_URL from "../../../config";
@@ -39,7 +37,7 @@ const CarCategoryList = () => {
   const fetchCarMakes = async () => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}api/home/car_model_varian_list/`
+        `${API_BASE_URL}api/home/car_model_variant_list/`
       );
       setCarModelVariant(response.data);
     } catch (error) {
@@ -52,25 +50,6 @@ const CarCategoryList = () => {
     fetchCarCategoryList();
     fetchCarMakes();
   }, []);
-
-  // DataTable initialization and cleanup on data change
-  useEffect(() => {
-    if (carCategory.length > 0 && window.innerWidth >= 992) {
-      // Only initialize DataTable on desktop
-      if ($.fn.DataTable.isDataTable("#dataTable")) {
-        $("#dataTable").DataTable().destroy();
-      }
-      const table = $("#dataTable").DataTable({
-        pageLength: 10,
-        destroy: true,
-      });
-      return () => {
-        if ($.fn.DataTable.isDataTable("#dataTable")) {
-          table.destroy();
-        }
-      };
-    }
-  }, [carCategory]);
 
   const handleEditClick = (item) => {
     // Find matching variant object by name (case insensitive)
@@ -164,6 +143,70 @@ const CarCategoryList = () => {
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
+  };
+
+  const handleDelete = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This category will be marked as deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await axios.patch(
+        `${API_BASE_URL}api/home/car-part-section-status-update/${selectedItem.id}/status/`,
+        { status: "deleted" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      await Swal.fire({
+        title: "Deleted!",
+        text: "Category has been marked as deleted.",
+        icon: "success",
+        timer: 1200,
+        showConfirmButton: false
+      });
+
+      setCarCategoryList(prev => {
+        const updated = prev.filter(p => p.id !== selectedItem.id);
+
+        // After filtering, fix pagination safely
+        const newFiltered = updated.filter(item => {
+          const searchLower = searchTerm.toLowerCase();
+          return (
+            item.name?.toLowerCase().includes(searchLower) ||
+            item.variant_name?.toLowerCase().includes(searchLower) ||
+            item.variant?.name?.toLowerCase().includes(searchLower)
+          );
+        });
+
+        const newTotalPages = Math.max(
+          1,
+          Math.ceil(newFiltered.length / itemsPerPage)
+        );
+
+        setCurrentPage(prevPage =>
+          prevPage > newTotalPages ? newTotalPages : prevPage
+        );
+
+        return updated;
+      });
+
+      setShowPartGroupModal(false);
+      setIsEdit(false);
+      setSelectedItem(null);
+
+    } catch (error) {
+      console.error("Delete failed:", error);
+      Swal.fire("Error!", "Something went wrong.", "error");
+    }
   };
 
   // Generate page numbers for mobile pagination
@@ -306,9 +349,9 @@ const CarCategoryList = () => {
               </tr>
             </thead>
             <tbody>
-              {carCategory.map((item, index) => (
+              {currentItems.map((item, index) => (
                 <tr key={item.id}>
-                  <td>{index + 1}</td>
+                  <td>{indexOfFirstItem + index + 1}</td>
                   <td>
                     {item.image && (
                       <img
@@ -333,6 +376,60 @@ const CarCategoryList = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="d-none d-lg-block mt-3">
+          {totalPages > 1 && (
+            <nav>
+              <ul className="pagination justify-content-center mb-0 flex-wrap" style={{ gap: "4px" }}>
+                
+                {/* Previous */}
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                </li>
+
+                {/* Dynamic Page Numbers */}
+                {getPageNumbers().map((pageNum, idx) =>
+                  pageNum === "..." ? (
+                    <li key={`ellipsis-${idx}`} className="page-item disabled">
+                      <button className="page-link disabled">...</button>
+                    </li>
+                  ) : (
+                    <li
+                      key={pageNum}
+                      className={`page-item ${currentPage === pageNum ? "active" : ""}`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </button>
+                    </li>
+                  )
+                )}
+
+                {/* Next */}
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </li>
+
+              </ul>
+            </nav>
+          )}
         </div>
 
         {/* Mobile Card View with Pagination */}
@@ -408,8 +505,7 @@ const CarCategoryList = () => {
                         <div className="mt-2">
                           <button
                             onClick={() => handleEditClick(item)}
-                            className="btn-theme-admin
- btn-outline-primary d-flex align-items-center gap-1"
+                            className="btn-theme-admin btn-outline-primary d-flex align-items-center gap-1"
                             style={{ minHeight: '36px' }}
                           >
                             <Icon icon="lucide:edit" />
@@ -581,19 +677,17 @@ const CarCategoryList = () => {
                   {/* Modal Footer with Cancel and Submit buttons */}
                   <div className="modal-footer">
                     <div className="d-flex gap-2 w-100">
-                      <button
-                        type="button"
-                        className="btn btn-secondary flex-fill"
-                        onClick={() => {
-                          setShowPartGroupModal(false);
-                          setIsEdit(false);
-                          setSelectedItem(null);
-                        }}
-                        style={{ minHeight: '44px' }}
-                      >
-                        <Icon icon="lucide:x" className="me-1" />
-                        Cancel
-                      </button>
+                      {isEdit && (
+                        <button
+                          type="button"
+                          className="btn btn-danger flex-fill"
+                          onClick={handleDelete}
+                          style={{ minHeight: '44px' }}
+                        >
+                          <Icon icon="lucide:trash" className="me-1" />
+                          Delete
+                        </button>
+                      )}
                       <button 
                         type="submit" 
                         className="btn btn-primary flex-fill"

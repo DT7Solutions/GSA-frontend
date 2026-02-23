@@ -284,7 +284,8 @@ const BulkProductUpload = () => {
                 description: item.description || '',
                 is_available: true,
                 product_image: item.partImageUrl || '',
-                compatibility: item.compatibility || ''
+                compatibility: item.compatibility || '',
+                status: 'active',
             }));
             debugger;
 

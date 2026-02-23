@@ -132,6 +132,7 @@ const ModelVariantsList = () => {
         console.error("Error fetching variants:", err);
       });
   }, [carModelItem]);
+
    if (!carModelItem) {
     return (
       <div className="container my-5">
@@ -144,10 +145,10 @@ const ModelVariantsList = () => {
         <div className="category-area-1 pb-100 brand-logo-display mt-5">
       <div className="container-fluid">
         <h5 className="search-heading text-center mb-0">
-    <span className="heading-muted">Select Your</span>
-    <span className="heading-brand">{carModelItem.name} {carModelItem.generation}</span>
-    <span className="heading-muted">  Variants </span>
-  </h5>
+          <span className="heading-muted">Select Your</span>
+          <span className="heading-brand">{carModelItem.name} {carModelItem.generation}</span>
+          <span className="heading-muted">  Variants </span>
+        </h5>
        
         <div className="row mt-5 brands-sec d-flex justify-content-center align-items-center">
         
@@ -292,12 +293,12 @@ const ModelVariantsList = () => {
                             name="modelYear"
                             placeholder="Model Year"
                             className="form-control style-white"
-    //                         defaultValue={
-    //   carModelItem.production_start_date && carModelItem.production_end_date
-    //     ? `(${carModelItem.production_start_date} - ${carModelItem.production_end_date})`
-    //     : carModelItem.generation || ""
-    // }
-     value={formData.modelYear}
+                            //                         defaultValue={
+                            //   carModelItem.production_start_date && carModelItem.production_end_date
+                            //     ? `(${carModelItem.production_start_date} - ${carModelItem.production_end_date})`
+                            //     : carModelItem.generation || ""
+                            // }
+                            value={formData.modelYear}
                             onChange={handleChange}
                           />
                         </div>

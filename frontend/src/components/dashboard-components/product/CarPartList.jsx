@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import $ from "jquery";
-import "datatables.net-dt/js/dataTables.dataTables.js";
 import { Icon } from "@iconify/react";
 import axios from "axios";
 import API_BASE_URL from "../../../config";
@@ -39,19 +37,6 @@ const CarPartList = () => {
     }
   };
 
-  useEffect(() => {
-    if (carVariants.length > 0 && window.innerWidth >= 992) {
-      // Only initialize DataTable on desktop
-      if ($.fn.DataTable.isDataTable("#dataTable")) {
-        $("#dataTable").DataTable().destroy();
-      }
-      $("#dataTable").DataTable({
-        pageLength: 10,
-        destroy: true,
-      });
-    }
-  }, [carVariants]);
-
   const handleEditClick = (item) => {
     setSelectedItem(item);
     setFormData({ name: item.name, image: null });
@@ -67,6 +52,81 @@ const CarPartList = () => {
     const file = e.target.files[0];
     setFormData({ ...formData, image: file });
     setPreviewImage(URL.createObjectURL(file));
+  };
+
+  const handleDelete = async () => {
+
+    const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "This product will be marked as deleted.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel"
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+        const response = await axios.patch(
+        `${API_BASE_URL}api/home/car_update_part_group_status/${selectedItem.id}/status/`,
+        { status: "deleted" },
+        {
+            headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+        }
+        );
+
+        await Swal.fire({
+        title: "Deleted!",
+        text: "Product has been marked as deleted.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false
+        });
+
+        setShowModal(false);
+
+        // Option 1: Refresh entire list
+        // refreshList();
+
+        // Option 2 (better UX): Remove item locally
+        setCarVariantsList(prev => prev.filter(p => p.id !== selectedItem.id));
+        setSelectedItem(null);
+
+        setCarVariantsList(prev => {
+          const updated = prev.filter(p => p.id !== selectedItem.id);
+
+          const newFiltered = updated.filter(item =>
+            item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+
+          const newTotalPages = Math.max(
+            1,
+            Math.ceil(newFiltered.length / itemsPerPage)
+          );
+
+          setCurrentPage(prevPage =>
+            prevPage > newTotalPages ? newTotalPages : prevPage
+          );
+
+          return updated;
+        });
+
+    } catch (error) {
+        console.error("Delete failed:", error);
+        Swal.fire({
+        title: "Error!",
+        text: "Something went wrong while deleting.",
+        icon: "error",
+        confirmButtonColor: "#d33"
+        });
+    }
   };
 
   const handleUpdate = async (e) => {
@@ -115,7 +175,7 @@ const CarPartList = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredCarVariants.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredCarVariants.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredCarVariants.length / itemsPerPage));
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -247,6 +307,33 @@ const CarPartList = () => {
           )}
         </div>
 
+        <div className="d-none d-lg-flex justify-content-between mb-3">
+          <div>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search part groups..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              style={{ width: "250px" }}
+            />
+          </div>
+
+          <div>
+            <select
+              className="form-select"
+              style={{ width: "100px" }}
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+        </div>
+
         {/* Desktop Table View */}
         <div className="table-responsive d-none d-lg-block">
           <table className="table table-striped table-hover align-middle" id="dataTable" data-page-length={10}>
@@ -259,9 +346,9 @@ const CarPartList = () => {
               </tr>
             </thead>
             <tbody>
-              {carVariants.map((item, index) => (
+              {currentItems.map((item, index) => (
                 <tr key={item.id}>
-                  <td>{index + 1}</td>
+                  <td>{indexOfFirstItem + index + 1}</td>
                   <td>{item.name}</td>
                   <td>
                     {item.image && (
@@ -285,6 +372,60 @@ const CarPartList = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="d-none d-lg-block">
+          {totalPages > 1 && (
+            <nav>
+              <ul className="pagination justify-content-center mb-0 flex-wrap" style={{ gap: "4px" }}>
+                
+                {/* Previous */}
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                </li>
+
+                {/* Dynamic Page Numbers */}
+                {getPageNumbers().map((pageNum, idx) =>
+                  pageNum === "..." ? (
+                    <li key={`ellipsis-${idx}`} className="page-item disabled">
+                      <button className="page-link disabled">...</button>
+                    </li>
+                  ) : (
+                    <li
+                      key={pageNum}
+                      className={`page-item ${currentPage === pageNum ? "active" : ""}`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </button>
+                    </li>
+                  )
+                )}
+
+                {/* Next */}
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage >= totalPages}
+                  >
+                    Next
+                  </button>
+                </li>
+
+              </ul>
+            </nav>
+          )}
         </div>
 
         {/* Mobile Card View with Pagination */}
@@ -380,7 +521,13 @@ const CarPartList = () => {
                       {getPageNumbers().map((pageNum, idx) => (
                         pageNum === '...' ? (
                           <li key={`ellipsis-${idx}`} className="page-item disabled">
-                            <span className="page-link" style={styles.pageLinkMobile}>...</span>
+                            <button
+                              className="page-link"
+                              style={styles.pageLinkMobile}
+                              disabled
+                            >
+                              ...
+                            </button>
                           </li>
                         ) : (
                           <li
@@ -403,7 +550,7 @@ const CarPartList = () => {
                           className="page-link"
                           style={styles.pageLinkMobile}
                           onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={currentPage === totalPages}
+                          disabled={currentPage >= totalPages}
                         >
                           <Icon icon="lucide:chevron-right" />
                         </button>
@@ -503,11 +650,11 @@ const CarPartList = () => {
                     <button 
                       type="button" 
                       className="btn btn-secondary flex-fill" 
-                      onClick={handleCloseModal}
+                      onClick={handleDelete}
                       style={{ minHeight: '44px' }}
                     >
                       <Icon icon="lucide:x" className="me-1" />
-                      Cancel
+                      Delete
                     </button>
                     <button 
                       type="submit" 

@@ -1,23 +1,121 @@
 import React, { useEffect, useState } from "react";
-import $ from 'jquery';
-import 'datatables.net-dt/js/dataTables.dataTables.js';
+import { useNavigate } from "react-router-dom";
 
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import API_BASE_URL from "../../../config";
+import Swal from "sweetalert2";
+
+function ActionMenu({ item, setProductList }) {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+
+    const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "This product will be marked as deleted.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel"
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+        const response = await axios.patch(
+        `${API_BASE_URL}api/home/carparts/${item.id}/status/`,
+        { status: "deleted" },
+        {
+            headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+        }
+        );
+
+        await Swal.fire({
+        title: "Deleted!",
+        text: "Product has been marked as deleted.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false
+        });
+
+        // Option 1: Refresh entire list
+        // refreshList();
+
+        // Option 2 (better UX): Remove item locally
+        setProductList(prev => prev.filter(p => p.id !== item.id));
+
+    } catch (error) {
+        console.error("Delete failed:", error);
+        Swal.fire({
+        title: "Error!",
+        text: "Something went wrong while deleting.",
+        icon: "error",
+        confirmButtonColor: "#d33"
+        });
+    }
+  };
+
+  return (
+    <div className="dropdown">
+      <button
+        className="btn btn-lg btn-light"
+        type="button"
+        data-bs-toggle="dropdown"
+      >
+        <Icon icon="lucide:more-vertical" />
+      </button>
+
+      <div className="dropdown-menu p-2">
+        <div className="d-flex gap-2">
+            <button
+                className="btn btn-light btn-sm bg-white text-primary"
+                onClick={() => navigate(`/update-products/${item.id}`)}
+            >
+                <Icon icon="lucide:edit" className="me-2" width="24" height="24" />
+            </button>
+
+            <button
+                className="btn btn-light btn-sm bg-white text-danger"
+                onClick={handleDelete}
+            >
+                <Icon icon="lucide:trash" className="me-2" width="24" height="24" />
+            </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const ProductListDisplay = () => {
     const [products, setProductList] = useState([]);
     const token = localStorage.getItem("accessToken");
     const [loading, setLoading] = useState(false);
+    const [makeFilter, setMakeFilter] = useState('');
+    const [modelFilter, setModelFilter] = useState('');
+    const [variantFilter, setVariantFilter] = useState('');
+    const [sectionFilter, setSectionFilter] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const fetchProductList = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}api/home/car-parts-list/`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await axios.get(
+                `${API_BASE_URL}api/home/car-parts-list/`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
             setProductList(response.data);
         } catch (error) {
             console.error('Error fetching product list:', error);
@@ -31,50 +129,33 @@ const ProductListDisplay = () => {
     }, [token]);
 
     useEffect(() => {
-        let table;
-        if (!loading && products.length > 0) {
-            table = $('#dataTable').DataTable({
-                destroy: true,
-                deferRender: true,
-                pageLength: 10,
-                searching: true,
-                ordering: true,
-                lengthMenu: [5, 10, 25, 50, 100],
-                language: {
-                    search: "Filter records:",
-                }
-            });
+    setCurrentPage(1);
+    }, [makeFilter, modelFilter, variantFilter, sectionFilter]);
 
-        $.fn.dataTable.ext.search.push(function (settings, data) {
+    const filteredProducts = products.filter((item) => {
+        const makeName = item.car_make?.name || "";
+        const modelName = item.car_model?.name || "";
+        const variantName = item.car_variant?.name || "";
+        const sectionName = item.part_section?.name || "";
 
-            const make = $('#makeFilter').val();
-            const model = $('#modelFilter').val();
-            const variant = $('#variantFilter').val();
-            const section = $('#sectionFilter').val();
+        return (
+            (!makeFilter || makeName === makeFilter) &&
+            (!modelFilter || modelName === modelFilter) &&
+            (!variantFilter || variantName === variantFilter) &&
+            (!sectionFilter || sectionName === sectionFilter)
+        );
+    });
 
-            const carDetails = data[1]; // Column index of Car Details
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
 
-            const matchMake = !make || carDetails.includes(make);
-            const matchModel = !model || carDetails.includes(model);
-            const matchVariant = !variant || carDetails.includes(variant);
-            const matchSection = !section || carDetails.includes(section);
+    const safeCurrentPage =
+    currentPage > totalPages ? totalPages : currentPage;
 
-            return matchMake && matchModel && matchVariant && matchSection;
-        });
-
-        $('#makeFilter, #modelFilter, #variantFilter, #sectionFilter').on('change', function () {
-            table.draw();
-        });
-
-        }
-
-        return () => {
-            if (table) {
-                table.destroy(true);
-            }
-        };
-
-    }, [products, loading]);
+    const startIndex = (safeCurrentPage - 1) * itemsPerPage;
+    const currentItems = filteredProducts.slice(
+    startIndex,
+    startIndex + itemsPerPage
+    );
 
     // Helper function to display compatible models
     const getCompatibilityDisplay = (compatibility) => {
@@ -93,8 +174,9 @@ const ProductListDisplay = () => {
                 <div className="row mb-3">
                     <div className="col-md-3">
                         <select
-                            id="makeFilter"
                             className="form-select"
+                            value={makeFilter}
+                            onChange={(e) => setMakeFilter(e.target.value)}
                         >
                             <option value="">All Makes</option>
                             {[...new Set(products.map(p => p.car_make?.name))]
@@ -107,7 +189,11 @@ const ProductListDisplay = () => {
                         </select>
                     </div>
                     <div className="col-md-3">
-                        <select id="modelFilter" className="form-select">
+                        <select
+                            className="form-select"
+                            value={modelFilter}
+                            onChange={(e) => setModelFilter(e.target.value)}
+                        >
                             <option value="">All Models</option>
                             {[...new Set(products.map(p => p.car_model?.name))]
                                 .filter(Boolean)
@@ -119,7 +205,11 @@ const ProductListDisplay = () => {
                         </select>
                     </div>
                     <div className="col-md-3">
-                        <select id="variantFilter" className="form-select">
+                        <select
+                            className="form-select"
+                            value={variantFilter}
+                            onChange={(e) => setVariantFilter(e.target.value)}
+                        >
                             <option value="">All Variants</option>
                             {[...new Set(products.map(p => p.car_variant?.name))]
                                 .filter(Boolean)
@@ -131,7 +221,11 @@ const ProductListDisplay = () => {
                         </select>
                     </div>
                     <div className="col-md-3">
-                        <select id="sectionFilter" className="form-select">
+                        <select
+                            className="form-select"
+                            value={sectionFilter}
+                            onChange={(e) => setSectionFilter(e.target.value)}
+                        >
                             <option value="">All Sections</option>
                             {[...new Set(products.map(p => p.part_section?.name))]
                                 .filter(Boolean)
@@ -145,7 +239,7 @@ const ProductListDisplay = () => {
                 </div>
 
                 <div className="table-responsive">
-                    <table className="display table table-striped table-bordered sm-table" id="dataTable" style={{ width: "100%" }}>
+                    <table className="table table-striped table-bordered sm-table" style={{ width: "100%" }}>
                         <thead className="bg-theme-table">
                             <tr>
                                 <th className="bg-theme-color">S.L</th>
@@ -176,9 +270,9 @@ const ProductListDisplay = () => {
                                         </td>
                                     </tr>
                                 ) : (
-                                products.map((item, index) => (
+                                currentItems.map((item, index) => (
                                     <tr key={item.id}>
-                                        <td>{index + 1}</td>
+                                        <td>{startIndex + index + 1}</td>
                                         <td>
                                             {item.car_make?.name}-{item.car_model?.name}-
                                             {item.car_variant?.name}-{item.part_section?.name}
@@ -200,19 +294,50 @@ const ProductListDisplay = () => {
                                             </small>
                                         </td>
                                         <td>
-                                            <Link
-                                                to={`/update-products/${item.id}`}
-                                                className="btn-theme-admin py-3"
-                                                title="Edit"
-                                            >
-                                                <Icon icon="lucide:edit" />
-                                            </Link>
+                                            <ActionMenu item={item} setProductList={setProductList} />
                                         </td>
                                     </tr>
                                 ))
                             )}
                         </tbody>
                     </table>
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+
+                    <div>
+                    {filteredProducts.length === 0 ? (
+                        "No entries found"
+                    ) : (
+                        <>
+                        Showing {startIndex + 1} to{" "}
+                        {Math.min(startIndex + itemsPerPage, filteredProducts.length)} of{" "}
+                        {filteredProducts.length} entries
+                        </>
+                    )}
+                    </div>
+
+                    <div>
+                        <button
+                        className="btn btn-sm btn-outline-secondary me-2"
+                        disabled={safeCurrentPage === 1}
+                        onClick={() => setCurrentPage(prev => prev - 1)}
+                        >
+                        Previous
+                        </button>
+
+                        <span className="mx-2">
+                        Page {safeCurrentPage} of {totalPages || 1}
+                        </span>
+
+                        <button
+                        className="btn btn-sm btn-outline-secondary"
+                        disabled={safeCurrentPage === totalPages}
+                        onClick={() => setCurrentPage(prev => prev + 1)}
+                        >
+                        Next
+                        </button>
+                    </div>
+
+                    </div>
                 </div>
             </div>
         </div>

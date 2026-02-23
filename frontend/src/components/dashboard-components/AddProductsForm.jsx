@@ -280,6 +280,8 @@ const AddProductsForm = () => {
             console.log("⚠️ No compatibility data to send");
             submitData.append('compatibility', JSON.stringify([]));
         }
+
+        submitData.append('status', 'active');
         
         // Debug: Print what's being sent
         console.log("\n📤 FormData being sent to backend:");
@@ -639,8 +641,10 @@ const AddProductsForm = () => {
         formData.append("section", partGrouponData.partcat);
         formData.append("name", partGrouponData.name);
         formData.append("image", partGrouponData.image);
+        formData.append("status", "active");
 
         try {
+            debugger;
             const response = await axios.post(`${API_BASE_URL}api/home/create_car_part_group_item/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,

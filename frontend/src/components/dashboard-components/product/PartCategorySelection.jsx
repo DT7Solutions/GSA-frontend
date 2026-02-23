@@ -28,10 +28,10 @@ const PartCategorySelection = ({id, modelvariant}) => {
         <div className="category-area-1 pb-100 brand-logo-display mt-5">
             <div className="container-fluid">
                 <h5 className="text-center search-heading mb-0">
-    <span className="heading-muted">Filter by</span>
-    <span className="heading-brand"> Selected Model</span>
-    <span className="heading-muted"> Part</span>
-  </h5>
+                    <span className="heading-muted">Filter by</span>
+                    <span className="heading-brand"> Selected Model</span>
+                    <span className="heading-muted"> Part</span>
+                </h5>
                 
                 <div className="row mt-5 brands-sec">
                 {variantCategory.map((variant) => (
@@ -40,35 +40,35 @@ const PartCategorySelection = ({id, modelvariant}) => {
                             {/* to={`/part-group/${variant.id}`} */}
                             <Link to={`/part-group/${variant.id}`}
                                 onClick={() => {
-                                    const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
-                                    const updated = {
-                                        ...existing,
-                                        brand_category: variant.id,
-                                        brand_category_name: variant.name,
-                                    };
-                                    localStorage.setItem("selected_brand", JSON.stringify(updated));
-                                }}
-                            ><img
-                                    src={variant.image}
-                                    alt={variant.name}
-                                /></Link>
-                            <div className="text-center">
-                                <Link to={`/part-group/${variant.id}`}
-                                    onClick={() => {
                                         const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
                                         const updated = {
                                             ...existing,
-                                            brand_category: variant.id
+                                            brand_category: variant.id,
+                                            brand_category_name: variant.name,
                                         };
                                         localStorage.setItem("selected_brand", JSON.stringify(updated));
                                     }}
-                                    className="text-center brand-name">
-                                    {variant.name}
-                                </Link>
+                                ><img
+                                        src={variant.image}
+                                        alt={variant.name}
+                                    /></Link>
+                                <div className="text-center">
+                                    <Link to={`/part-group/${variant.id}`}
+                                        onClick={() => {
+                                            const existing = JSON.parse(localStorage.getItem("selected_brand")) || {};
+                                            const updated = {
+                                                ...existing,
+                                                brand_category: variant.id
+                                            };
+                                            localStorage.setItem("selected_brand", JSON.stringify(updated));
+                                        }}
+                                        className="text-center brand-name">
+                                        {variant.name}
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
                   
                 </div>
             </div>

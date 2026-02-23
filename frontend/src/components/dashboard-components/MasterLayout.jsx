@@ -126,9 +126,9 @@ const MasterLayout = ({ children }) => {
                         setUserName(username);
 
                         let userRole = "";
-                        if (role_id == 1) {
+                        if (role_id === 1) {
                             userRole = "Admin";
-                        } else if (role_id == 2) {
+                        } else if (role_id === 2) {
                             userRole = "Staff";
                         } else {
                             userRole = "Customer";
@@ -259,12 +259,12 @@ const MasterLayout = ({ children }) => {
                 processToastQueue();
             };
             
-            notificationService.addListener(handleNotification);
-            notificationService.startPolling(10000); // Poll every 10 seconds
+            // notificationService.addListener(handleNotification);
+            // notificationService.startPolling(10000); // Poll every 10 seconds
             
             return () => {
-                notificationService.removeListener(handleNotification);
-                notificationService.stopPolling();
+                // notificationService.removeListener(handleNotification);
+                // notificationService.stopPolling();
                 // Clear queue on cleanup
                 toastQueueRef.current = [];
                 activeToastsRef.current = 0;
@@ -579,13 +579,13 @@ const MasterLayout = ({ children }) => {
                         <div className='col-auto'>
                             <div className='d-flex flex-wrap align-items-center gap-3'>
                                 {/* Notification Bell with Dropdown */}
-                                {(userRole === "Admin" || userRole === "Staff") && (
+                                {/* {(userRole === "Admin" || userRole === "Staff") && (
                                     <NotificationDropdown 
                                         notificationCount={notificationCount}
                                         setNotificationCount={setNotificationCount}
                                         onNotificationRead={markNotificationAsRead}
                                     />
-                                )}
+                                )} */}
 
                                 {/* User Profile Dropdown */}
                                 <div className='dropdown'>

@@ -9,7 +9,7 @@ const LandinPage = () => {
       {/* MasterLayout */}
       <MasterLayout>
         {/* Breadcrumb */}
-        <Breadcrumb title="AI" />
+        <Breadcrumb title="ADMIN" />
 
 
         {/* DashBoardLayerOne */}

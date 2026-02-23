@@ -60,8 +60,15 @@ import CustomerListPage from "pages/dashboard-pages/CustomerListPage";
 import StaffList from "components/dashboard-components/Users/StaffList";
 import NotFoundPage from "pages/NotFoundPage";
 import TestTokenRefresh from './components/TestTokenRefresh';
+import { useEffect } from "react";
+import NotificationService from "components/dashboard-components/NotificationService";
+
 function App() {
   useProactiveTokenRefresh(); // Initialize token refresh hook
+
+  useEffect(() => {
+    NotificationService.checkForNewOrders();
+  }, []);
 
   return (
   

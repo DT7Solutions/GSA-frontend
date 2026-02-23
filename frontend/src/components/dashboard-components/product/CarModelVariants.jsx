@@ -9,7 +9,7 @@ const CarModelVariants = () => {
     const token = localStorage.getItem("accessToken");
     const [carVariants, setCarVariants] = useState([]);
     const [carMakes, setCarMakes] = useState([]);
-    const [getCarMake, setGetCarBrand] = useState([]);
+    const [getCarMake, setGetCarBrand] = useState({});
     const [carModels, setCarModels] = useState([]);
     const [carVariantModel, setCarVariantModel] = useState([]);
     const [showCarVariantModal, setShowCarVariantModal] = useState(false);
@@ -55,12 +55,11 @@ const CarModelVariants = () => {
         fetchCarVariants();
         fetchCarMakes();
         fetchCarModels();
-        fetchCarModelDetails();
     }, []);
 
     const fetchCarVariants = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}api/home/car_model_varian_list/`, {
+            const response = await axios.get(`${API_BASE_URL}api/home/car_model_variant_list/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCarVariants(response.data);
@@ -173,6 +172,72 @@ const CarModelVariants = () => {
         }
     };
 
+    const handleDelete = async () => {
+
+        if (!editingVariantId) return;
+
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "This variant will be marked as deleted.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            await axios.patch(
+                `${API_BASE_URL}api/home/car-model-variant-update-status/${editingVariantId}/status/`,
+                { status: "deleted" },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            await Swal.fire({
+                title: "Deleted!",
+                text: "Variant marked as deleted.",
+                icon: "success",
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+            // Close modal
+            setShowCarVariantModal(false);
+            setEditingVariantId(null);
+
+            // Remove locally + fix pagination safely
+                const deletedId = editingVariantId;
+
+                setCarVariants(prev => {
+                    const updated = prev.filter(v => v.id !== deletedId);
+
+                const newFiltered = updated.filter(item =>
+                    item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    item.car_model_name?.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+
+                const newTotalPages = Math.max(
+                    1,
+                    Math.ceil(newFiltered.length / itemsPerPage)
+                );
+
+                setCurrentPage(prevPage =>
+                    prevPage > newTotalPages ? newTotalPages : prevPage
+                );
+
+                return updated;
+            });
+
+        } catch (error) {
+            console.error("Delete error:", error);
+            Swal.fire("Error", "Something went wrong.", "error");
+        }
+    };
+
     // Filter variants based on search term
     const filteredVariants = carVariants.filter((item) => {
         const searchLower = searchTerm.toLowerCase();
@@ -186,10 +251,19 @@ const CarModelVariants = () => {
     });
 
     // Pagination calculations
-    const totalPages = Math.ceil(filteredVariants.length / itemsPerPage);
+    const totalPages = Math.max(
+        1,
+        Math.ceil(filteredVariants.length / itemsPerPage)
+    );
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredVariants.slice(indexOfFirstItem, indexOfLastItem);
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [filteredVariants.length, itemsPerPage]);
 
     // Pagination handlers
     const handlePageChange = (pageNumber) => {
@@ -498,7 +572,7 @@ const CarModelVariants = () => {
                                         if (page === '...') {
                                             return (
                                                 <li key={`ellipsis-${index}`} className="page-item disabled d-none d-sm-block">
-                                                    <span className="page-link">...</span>
+                                                    <button className="page-link" disabled>...</button>
                                                 </li>
                                             );
                                         }
@@ -544,7 +618,7 @@ const CarModelVariants = () => {
                                     type="button" 
                                     className="btn-close" 
                                     onClick={() => setShowCarVariantModal(false)}
-                                >
+                                ><span className="text-xl">X</span>
                                 </button>
                             </div>
                             <div className="modal-body">
@@ -725,22 +799,34 @@ const CarModelVariants = () => {
 
                                     {/* Submit Button - Desktop */}
                                     <div className="d-none d-sm-block">
-                                        <button type="submit" className="btn-theme-admin w-100">
-                                            Update Car Variant
-                                        </button>
+                                        <div className="d-flex gap-2">
+                                            <button
+                                                type="button"
+                                                className="btn btn-danger w-50"
+                                                onClick={handleDelete}
+                                            >
+                                                {/* <Icon icon="lucide:trash-2" /> */}
+                                                Delete
+                                            </button>
+
+                                            <button type="submit" className="btn-theme-admin w-50">
+                                                Update
+                                            </button>
+                                        </div>
                                     </div>
 
                                     {/* Submit Button - Mobile */}
                                     <div className="d-sm-none">
-                                        <button type="submit" className="btn-theme-admin w-100 mb-2">
-                                            Update Car Variant
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            className="btn-theme-admin w-100"
-                                            onClick={() => setShowCarVariantModal(false)}
+                                        <button
+                                            type="button"
+                                            className="btn btn-danger w-100 mb-2"
+                                            onClick={handleDelete}
                                         >
-                                            Cancel
+                                            Delete Variant
+                                        </button>
+
+                                        <button type="submit" className="btn-theme-admin w-100 mb-2">
+                                            Update
                                         </button>
                                     </div>
                                 </form>
