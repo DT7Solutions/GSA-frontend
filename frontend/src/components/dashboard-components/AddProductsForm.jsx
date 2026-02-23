@@ -607,7 +607,7 @@ const AddProductsForm = () => {
     useEffect(() => {
         const fetchCarMakes = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}api/home/car_model_varian_list/`);
+                const response = await axios.get(`${API_BASE_URL}api/home/car_model_variant_list/`);
                 setCarModelVariant(response.data);
             } catch (error) {
                 console.error('Error fetching car makes:', error);
