@@ -80,7 +80,8 @@ const BulkProductUpload = () => {
 
         const normalize = (str) =>
             str
-                ?.replace(/\u2013/g, '-')
+                ?.toString()
+                .replace(/\u2013/g, '-')
                 .replace(/\u00A0/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim()
@@ -98,6 +99,9 @@ const BulkProductUpload = () => {
                     cellText: false
                 });
 
+                // ----------------------------
+                // Sheet Validation
+                // ----------------------------
                 if (!workbook.SheetNames.includes("Products")) {
                     throw new Error("Products sheet not found.");
                 }
@@ -109,28 +113,92 @@ const BulkProductUpload = () => {
                 const productsSheet = workbook.Sheets["Products"];
                 const compatSheet = workbook.Sheets["Compatibility_List"];
 
-                const productsData = XLSX.utils.sheet_to_json(productsSheet, { raw: false });
-                const compatData = XLSX.utils.sheet_to_json(compatSheet, { raw: false });
+                const productsData = XLSX.utils.sheet_to_json(productsSheet, {
+                    raw: false,
+                    defval: ''
+                });
+
+                const compatData = XLSX.utils.sheet_to_json(compatSheet, {
+                    raw: false,
+                    defval: ''
+                });
 
                 if (!productsData.length) {
                     throw new Error("Products sheet is empty.");
                 }
 
+                if (!compatData.length) {
+                    throw new Error("Compatibility_List sheet is empty.");
+                }
+
+                // ----------------------------
+                // Build Compatibility Map
+                // ----------------------------
                 const compatMap = {};
 
-                compatData.forEach(row => {
-                    if (row.DisplayName && row.ID) {
-                        compatMap[normalize(row.DisplayName)] = String(row.ID);
+                compatData.forEach((row) => {
+
+                    // Support both header styles
+                    const display =
+                        row.Display_Name ||
+                        row.DisplayName ||
+                        row.display_name ||
+                        row.displayName;
+
+                    const id =
+                        row.ID ||
+                        row.Id ||
+                        row.id;
+
+                    if (display && id !== undefined && id !== null && id !== '') {
+                        compatMap[normalize(display)] = String(id);
                     }
                 });
 
                 if (Object.keys(compatMap).length === 0) {
-                    throw new Error("Compatibility list is empty or corrupted.");
+                    throw new Error("Compatibility mapping is invalid or empty.");
                 }
 
-                validateAndSetData(productsData, compatMap);
+                // ----------------------------
+                // Normalise Product Keys
+                // ----------------------------
+                const normalisedProducts = productsData.map(row => ({
+                    carMake: row.carMake || row.CarMake || '',
+                    carModel: row.carModel || row.CarModel || '',
+                    carVariant: row.carVariant || row.CarVariant || '',
+                    partCategory: row.partCategory || row.PartCategory || '',
+                    partGroup: row.partGroup || row.PartGroup || '',
+                    partName: row.partName || row.PartName || '',
+                    partNumber: row.partNumber || row.PartNumber || '',
+                    figureNumber: row.figureNumber || row.FigureNumber || '',
+                    partImageUrl: row.partImageUrl || row.PartImageUrl || '',
+                    sku: row.sku || row.SKU || '',
+                    price: row.price || row.Price || '',
+                    salePrice: row.salePrice || row.SalePrice || '',
+                    discount: row.discount || row.Discount || '',
+                    qty: row.qty || row.Qty || '',
+                    compatibility: row.compatibility || row.Compatibility || '',
+                    remarks: row.remarks || '',
+                    description: row.description || ''
+                }));
+
+                const filteredProducts = normalisedProducts.filter(row => {
+                    return (
+                        row.carMake ||
+                        row.carModel ||
+                        row.carVariant ||
+                        row.partCategory ||
+                        row.partGroup ||
+                        row.partName ||
+                        row.partNumber ||
+                        row.price
+                    );
+                });
+
+                validateAndSetData(filteredProducts, compatMap);
 
             } catch (error) {
+
                 console.error("Excel parse error:", error);
 
                 Swal.fire({
@@ -165,25 +233,48 @@ const BulkProductUpload = () => {
 
         const normalize = (str) =>
             str
-                ?.replace(/\u2013/g, '-')     // Replace en dash with normal dash
-                .replace(/\s+/g, ' ')         // Collapse multiple spaces
+                ?.toString()
+                .replace(/\u2013/g, '-')     // en dash → dash
+                .replace(/\u00A0/g, ' ')     // non-breaking space
+                .replace(/\s+/g, ' ')
                 .trim()
                 .toUpperCase();
+
+        const toNumber = (val) => {
+            if (val === null || val === undefined || val === '') return null;
+            const num = Number(val);
+            return isNaN(num) ? NaN : num;
+        };
 
         const errors = [];
         const validData = [];
 
-        data.forEach((row, index) => {
+        data.forEach((originalRow, index) => {
+
+            const row = { ...originalRow }; // avoid mutating original
             const rowErrors = [];
 
-            // Trim all string values
-            Object.keys(row).forEach(key => {
-                if (typeof row[key] === 'string') {
-                    row[key] = row[key].trim();
+            // ----------------------------
+            // Trim + Normalize string fields
+            // ----------------------------
+            [
+                'carMake',
+                'carModel',
+                'carVariant',
+                'partCategory',
+                'partGroup',
+                'partName',
+                'partNumber',
+                'compatibility',
+            ].forEach(field => {
+                if (typeof row[field] === 'string') {
+                    row[field] = row[field].trim();
                 }
             });
 
+            // ----------------------------
             // Required fields
+            // ----------------------------
             if (!row.carMake) rowErrors.push('carMake is required');
             if (!row.carModel) rowErrors.push('carModel is required');
             if (!row.carVariant) rowErrors.push('carVariant is required');
@@ -191,15 +282,29 @@ const BulkProductUpload = () => {
             if (!row.partGroup) rowErrors.push('partGroup is required');
             if (!row.partName) rowErrors.push('partName is required');
             if (!row.partNumber) rowErrors.push('partNumber is required');
-            if (!row.price) rowErrors.push('price is required');
+            if (row.price === undefined || row.price === '') rowErrors.push('price is required');
 
+            // ----------------------------
             // Numeric validation
-            if (row.price && isNaN(parseFloat(row.price))) rowErrors.push('price must be numeric');
-            if (row.salePrice && row.salePrice !== '' && isNaN(parseFloat(row.salePrice))) rowErrors.push('salePrice must be numeric');
-            if (row.discount && row.discount !== '' && isNaN(parseFloat(row.discount))) rowErrors.push('discount must be numeric');
-            if (row.qty && row.qty !== '' && isNaN(parseInt(row.qty))) rowErrors.push('qty must be numeric');
+            // ----------------------------
+            const price = toNumber(row.price);
+            const salePrice = toNumber(row.salePrice);
+            const discount = toNumber(row.discount);
+            const qty = toNumber(row.qty);
 
-            // Compatibility validation + conversion
+            if (price !== null && isNaN(price)) rowErrors.push('price must be numeric');
+            if (salePrice !== null && isNaN(salePrice)) rowErrors.push('salePrice must be numeric');
+            if (discount !== null && isNaN(discount)) rowErrors.push('discount must be numeric');
+            if (qty !== null && isNaN(qty)) rowErrors.push('qty must be numeric');
+
+            row.price = price ?? 0;
+            row.salePrice = salePrice ?? '';
+            row.discount = discount ?? 0;
+            row.qty = qty ?? 0;
+
+            // ----------------------------
+            // Compatibility validation
+            // ----------------------------
             if (row.compatibility && row.compatibility.trim() !== '') {
 
                 const compatList = row.compatibility
@@ -207,20 +312,30 @@ const BulkProductUpload = () => {
                     .map(item => normalize(item))
                     .filter(Boolean);
 
-                const invalidCompat = compatList.filter(name => !compatMap[name]);
+                // Remove duplicates
+                const uniqueCompat = [...new Set(compatList)];
+
+                const invalidCompat = uniqueCompat.filter(name => !compatMap[name]);
 
                 if (invalidCompat.length > 0) {
                     rowErrors.push(`Invalid compatibility: ${invalidCompat.join(', ')}`);
                 } else {
-                    const compatIds = compatList.map(name => compatMap[name]);
-
-                    // Replace display names with ID string
+                    const compatIds = uniqueCompat.map(name => compatMap[name]);
                     row.compatibility = compatIds.join(',');
                 }
+
+            } else {
+                row.compatibility = '';
             }
 
+            // ----------------------------
+            // Final decision
+            // ----------------------------
             if (rowErrors.length > 0) {
-                errors.push({ row: index + 2, errors: rowErrors });
+                errors.push({
+                    row: index + 2,
+                    errors: rowErrors,
+                });
             } else {
                 validData.push(row);
             }
@@ -287,7 +402,6 @@ const BulkProductUpload = () => {
                 compatibility: item.compatibility || '',
                 status: 'active',
             }));
-            debugger;
 
             const response = await axios.post(
                 `${API_BASE_URL}api/home/upload_products/`,

@@ -613,7 +613,7 @@ const AddProductsForm = () => {
                 console.error('Error fetching car makes:', error);
             }
         };
-
+        
         fetchCarMakes();
     }, []);
 
@@ -644,7 +644,6 @@ const AddProductsForm = () => {
         formData.append("status", "active");
 
         try {
-            debugger;
             const response = await axios.post(`${API_BASE_URL}api/home/create_car_part_group_item/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
