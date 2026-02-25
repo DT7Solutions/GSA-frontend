@@ -728,7 +728,7 @@ const AddProductsForm = () => {
             const discount = ((price - salePrice) / price) * 100;
             setFormData((prevData) => ({
                 ...prevData,
-                discount: discount.toFixed(2), // keeping the value to 2 decimal places
+                discount: discount.toFixed(0), // keeping the value to 2 decimal places
             }));
         } else {
             setFormData((prevData) => ({
@@ -1007,7 +1007,7 @@ const AddProductsForm = () => {
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label">Discount</label>
+                                <label className="form-label">Discount(%)</label>
                                 <input
                                     type="number"
                                     name="discount"
