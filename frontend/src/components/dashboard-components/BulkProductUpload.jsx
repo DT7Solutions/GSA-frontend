@@ -118,7 +118,8 @@ const BulkProductUpload = () => {
                     defval: ''
                 });
 
-                const compatData = XLSX.utils.sheet_to_json(compatSheet, {
+                const compatRows = XLSX.utils.sheet_to_json(compatSheet, {
+                    header: 1,
                     raw: false,
                     defval: ''
                 });
@@ -127,36 +128,24 @@ const BulkProductUpload = () => {
                     throw new Error("Products sheet is empty.");
                 }
 
-                if (!compatData.length) {
+                if (!compatRows.length) {
                     throw new Error("Compatibility_List sheet is empty.");
                 }
 
                 // ----------------------------
                 // Build Compatibility Map
                 // ----------------------------
+
                 const compatMap = {};
 
-                compatData.forEach((row) => {
+                for (let i = 1; i < compatRows.length; i++) {
 
-                    // Support both header styles
-                    const display =
-                        row.Display_Name ||
-                        row.DisplayName ||
-                        row.display_name ||
-                        row.displayName;
+                    const display = compatRows[i][0]; // Column A
+                    const id = compatRows[i][1];      // Column B
 
-                    const id =
-                        row.ID ||
-                        row.Id ||
-                        row.id;
-
-                    if (display && id !== undefined && id !== null && id !== '') {
+                    if (display && id !== '' && id !== null && id !== undefined) {
                         compatMap[normalize(display)] = String(id);
                     }
-                });
-
-                if (Object.keys(compatMap).length === 0) {
-                    throw new Error("Compatibility mapping is invalid or empty.");
                 }
 
                 // ----------------------------
@@ -175,7 +164,7 @@ const BulkProductUpload = () => {
                     sku: row.sku || row.SKU || '',
                     price: row.price || row.Price || '',
                     salePrice: row.salePrice || row.SalePrice || '',
-                    discount: row.discount || row.Discount || '',
+                    // discount: row.discount || row.Discount || '',
                     qty: row.qty || row.Qty || '',
                     compatibility: row.compatibility || row.Compatibility || '',
                     remarks: row.remarks || '',
@@ -294,12 +283,24 @@ const BulkProductUpload = () => {
 
             if (price !== null && isNaN(price)) rowErrors.push('price must be numeric');
             if (salePrice !== null && isNaN(salePrice)) rowErrors.push('salePrice must be numeric');
-            if (discount !== null && isNaN(discount)) rowErrors.push('discount must be numeric');
+            
             if (qty !== null && isNaN(qty)) rowErrors.push('qty must be numeric');
+
+            let calculatedDiscount = 0;
+
+            if (price !== null && !isNaN(price) && price > 0 &&
+                salePrice !== null && !isNaN(salePrice) &&
+                salePrice > 0 && salePrice < price) {
+
+                calculatedDiscount = Number(
+                    (((price - salePrice) / price) * 100).toFixed(0)
+                );
+            }
+
+            row.discount = calculatedDiscount;
 
             row.price = price ?? 0;
             row.salePrice = salePrice ?? '';
-            row.discount = discount ?? 0;
             row.qty = qty ?? 0;
 
             // ----------------------------
@@ -402,7 +403,7 @@ const BulkProductUpload = () => {
                 compatibility: item.compatibility || '',
                 status: 'active',
             }));
-
+            debugger;
             const response = await axios.post(
                 `${API_BASE_URL}api/home/upload_products/`,
                 payload,

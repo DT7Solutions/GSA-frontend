@@ -723,6 +723,20 @@ const AddProductsForm = () => {
     console.log("\n");
 };
 
+    const calculateDiscount = (price, salePrice) => {
+        if (price > 0 && salePrice > 0 && salePrice < price) {
+            const discount = ((price - salePrice) / price) * 100;
+            setFormData((prevData) => ({
+                ...prevData,
+                discount: discount.toFixed(2), // keeping the value to 2 decimal places
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                discount: 0,
+            }));
+        }
+    };
 
     const carOptions = carMakes.map(make => ({
         value: make.id,
@@ -781,53 +795,53 @@ const AddProductsForm = () => {
                     <form className="row gy-3 needs-validation input-style" noValidate onSubmit={handleSubmit}>
                         {/* Car Brand Selection */}
                        <div className="col-md-4">
-    <label className="form-label fw-semibold">
-        Select Car <span className="text-danger">*</span>
-    </label>
+                            <label className="form-label fw-semibold">
+                                Select Car <span className="text-danger">*</span>
+                            </label>
 
-    <div className="d-flex align-items-center ">
-        <div className="flex-grow-1 addproduct-select search-select">
-            <Select
-                className="basic-single "
-                classNamePrefix="select"
-                options={carMakes.map(make => ({
-                    value: make.id,
-                    label: make.name,
-                }))}
-                onChange={(selectedOption) =>
-                    handleCarMakeChange({ target: { value: selectedOption.value } })
-                }
-                placeholder=" Select Car"
-                isSearchable={true}
-                styles={{
- 
-    valueContainer: (base) => ({
-      ...base,
-      height: "50px",
-      
-    }),
-    input: (base) => ({
-      ...base,
-      height: "40px",
-    }),
-    indicatorsContainer: (base) => ({
-      ...base,
-      height: "40px",
-    }),
-  }}
-            />
-        </div>
+                            <div className="d-flex align-items-center ">
+                                <div className="flex-grow-1 addproduct-select search-select">
+                                    <Select
+                                        className="basic-single "
+                                        classNamePrefix="select"
+                                        options={carMakes.map(make => ({
+                                            value: make.id,
+                                            label: make.name,
+                                        }))}
+                                        onChange={(selectedOption) =>
+                                            handleCarMakeChange({ target: { value: selectedOption.value } })
+                                        }
+                                        placeholder=" Select Car"
+                                        isSearchable={true}
+                                        styles={{
+                        
+                            valueContainer: (base) => ({
+                            ...base,
+                            height: "50px",
+                            
+                            }),
+                            input: (base) => ({
+                            ...base,
+                            height: "40px",
+                            }),
+                            indicatorsContainer: (base) => ({
+                            ...base,
+                            height: "40px",
+                            }),
+                        }}
+                                    />
+                                </div>
 
-        <button
-            type="button"
-            className="input-group-text bg-theme-button gap-1 Add-car-top-gap"
-            onClick={() => setShowModal(true)}
-        >
-            <Icon icon="lucide:plus" />
-            Add Car
-        </button>
-    </div>
-</div>
+                                <button
+                                    type="button"
+                                    className="input-group-text bg-theme-button gap-1 Add-car-top-gap"
+                                    onClick={() => setShowModal(true)}
+                                >
+                                    <Icon icon="lucide:plus" />
+                                    Add Car
+                                </button>
+                            </div>
+                        </div>
 
                         {/* Car Model Selection */}
                         <div className="col-md-4">
@@ -956,46 +970,55 @@ const AddProductsForm = () => {
                             />
                             <div className="invalid-feedback">Please enter figure number</div>
                         </div>
-                        <div className="col-md-4">
-                            <label className="form-label">Price<span className="text-danger">*</span></label>
-                            <input
-                                type="number"
-                                name="#0"
-                                className="form-control"
-                                placeholder="Enter part price,"
-                                onChange={(e) =>
-                                    setFormData({ ...formData, price: e.target.value })
-                                }
-                            />
-                            <div className="invalid-feedback">Please enter part price</div>
-                        </div>
-                        <div className="col-md-4">
-                            <label className="form-label">Sale Price <span className="text-danger">*</span></label>
-                            <input
-                                type="number"
-                                name="#0"
-                                className="form-control"
-                                placeholder="Enter part sale price"
-                                onChange={(e) =>
-                                    setFormData({ ...formData, salePrice: e.target.value })
-                                }
-                                required
-                            />
-                            <div className="invalid-feedback">Please enter part sale price</div>
-                        </div>
-                        <div className="col-md-4">
-                            <label className="form-label">Part discount</label>
-                            <input
-                                type="number"
-                                name="#0"
-                                className="form-control"
-                                placeholder="Enter discount"
-                                onChange={(e) =>
-                                    setFormData({ ...formData, discount: e.target.value })
-                                }
-                            />
-                            <div className="invalid-feedback">Please enter discount.</div>
-                        </div>
+                            <div className="col-md-4">
+                                <label className="form-label">Price<span className="text-danger">*</span></label>
+                                <input
+                                    type="number"
+                                    name="price"
+                                    className="form-control"
+                                    placeholder="Enter part price"
+                                    onChange={(e) => {
+                                        const price = e.target.value;
+                                        setFormData({ ...formData, price });
+                                        // Recalculate discount when price or salePrice changes
+                                        calculateDiscount(price, formData.salePrice);
+                                    }}
+                                    required
+                                />
+                                <div className="invalid-feedback">Please enter part price</div>
+                            </div>
+
+                            <div className="col-md-4">
+                                <label className="form-label">Sale Price <span className="text-danger">*</span></label>
+                                <input
+                                    type="number"
+                                    name="salePrice"
+                                    className="form-control"
+                                    placeholder="Enter part sale price"
+                                    onChange={(e) => {
+                                        const salePrice = e.target.value;
+                                        setFormData({ ...formData, salePrice });
+                                        // Recalculate discount when salePrice or price changes
+                                        calculateDiscount(formData.price, salePrice);
+                                    }}
+                                    required
+                                />
+                                <div className="invalid-feedback">Please enter part sale price</div>
+                            </div>
+
+                            <div className="col-md-4">
+                                <label className="form-label">Discount</label>
+                                <input
+                                    type="number"
+                                    name="discount"
+                                    className="form-control"
+                                    value={formData.discount || 0} // Display calculated discount
+                                    readOnly // Disable editing
+                                    style={{ backgroundColor: '#e9ecef' }} // Greyed out style
+                                    placeholder="Discount"
+                                />
+                                <div className="invalid-feedback">Please enter discount</div>
+                            </div>
                         <div className="col-md-4">
                             <label className="form-label">Part QTY <span className="text-danger">*</span></label>
                             <input
